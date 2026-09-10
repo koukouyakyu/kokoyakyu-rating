@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>高校野球 Rating</title>
+  <meta name="description" content="公開された公式戦結果から独自算出する高校野球レーティングのデモサイト" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <div class="brand-block">
+        <a href="#top" class="brand">高校野球 Rating</a>
+        <span class="badge">DEMO</span>
+      </div>
+      <nav class="nav" aria-label="メインナビゲーション">
+        <a href="#ranking">全国ランキング</a>
+        <a href="#prefectures">都道府県比較</a>
+        <a href="#schools">学校詳細</a>
+        <a href="#simulator">試合シミュレーター</a>
+        <a href="#method">計算方法</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <p class="eyebrow">HIGH SCHOOL BASEBALL RATING</p>
+          <h1>試合結果から、<br>高校野球の「現在地」を見る。</h1>
+          <p class="lead">全校を同じ初期値からスタートし、対戦相手との強さの差と勝敗だけでポイントを受け渡す、独自の高校野球レーティング。</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#ranking">ランキングを見る</a>
+            <a class="btn secondary" href="#method">計算式を見る</a>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="metric-label">現在の計算設定</div>
+          <div class="formula-mini">R' = R + 10 × (W − We)</div>
+          <div class="metric-row"><span>初期Rating</span><strong>1500</strong></div>
+          <div class="metric-row"><span>勝利</span><strong>W = 1.0</strong></div>
+          <div class="metric-row"><span>引き分け</span><strong>W = 0.5</strong></div>
+          <div class="metric-row"><span>敗戦</span><strong>W = 0.0</strong></div>
+          <div class="metric-row"><span>大会補正</span><strong>なし</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="notice wrap">
+      <strong>非公式サイトのデモです。</strong>
+      本Ratingは高野連・学校・新聞社等による公式ランキングではありません。表示中の数値はUI確認用のサンプルデータです。
+    </section>
+
+    <section id="ranking" class="section wrap">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">NATIONAL RANKING</p>
+          <h2>全国ランキング</h2>
+        </div>
+        <div class="controls">
+          <input id="searchInput" type="search" placeholder="学校名・都道府県で検索" aria-label="学校検索" />
+          <select id="prefFilter" aria-label="都道府県フィルター">
+            <option value="">すべて</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr><th>順位</th><th>学校</th><th>都道府県</th><th>Rating</th><th>前回比</th><th>直近</th></tr>
+          </thead>
+          <tbody id="rankingBody"></tbody>
+        </table>
+      </div>
+      <p class="footnote">※ 公開版では全国Top100〜200のみ一覧表示し、下位校は検索時のみ表示する設計を想定しています。</p>
+    </section>
+
+    <section id="prefectures" class="section section-alt">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">PREFECTURE STRENGTH</p>
+            <h2>都道府県の強さ</h2>
+          </div>
+          <p class="section-copy">単純平均だけでなく、中央値・Top5平均・Top25%平均を併記し、「平均的な強さ」と「上位層の厚さ」を分けて見ます。</p>
+        </div>
+        <div id="prefCards" class="pref-grid"></div>
+      </div>
+    </section>
+
+    <section id="schools" class="section wrap">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">SCHOOL PROFILE</p>
+          <h2>学校詳細</h2>
+        </div>
+        <select id="schoolSelect" aria-label="学校を選択"></select>
+      </div>
+      <div class="school-layout">
+        <article class="profile-card">
+          <div class="profile-top">
+            <div>
+              <span id="schoolPref" class="tag"></span>
+              <h3 id="schoolName"></h3>
+              <p id="schoolLeague" class="muted"></p>
+            </div>
+            <div class="rating-big">
+              <span>Rating</span>
+              <strong id="schoolRating"></strong>
+            </div>
+          </div>
+          <div class="stats-row">
+            <div><span>全国順位</span><strong id="schoolRank"></strong></div>
+            <div><span>前回比</span><strong id="schoolDelta"></strong></div>
+            <div><span>直近5試合</span><strong id="schoolForm"></strong></div>
+          </div>
+          <div class="history-wrap">
+            <h4>Rating推移</h4>
+            <svg id="historyChart" viewBox="0 0 720 220" role="img" aria-label="Rating推移グラフ"></svg>
+          </div>
+        </article>
+
+        <article class="matches-card">
+          <h3>直近の試合</h3>
+          <div id="recentMatches"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="simulator" class="section section-alt">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">MATCH SIMULATOR</p>
+            <h2>試合シミュレーター</h2>
+          </div>
+          <p class="section-copy">2校のRatingから期待値と、勝ち・引き分け・負け時のポイント移動を即時計算します。</p>
+        </div>
+
+        <div class="sim-card">
+          <div class="sim-grid">
+            <label>学校A Rating<input id="ratingA" type="number" value="1800" min="800" max="2500" /></label>
+            <label>学校B Rating<input id="ratingB" type="number" value="1700" min="800" max="2500" /></label>
+            <label>K値<input id="kValue" type="number" value="10" min="1" max="50" step="0.5" /></label>
+          </div>
+          <div id="simResult" class="sim-result"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="method" class="section wrap">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">METHODOLOGY</p>
+          <h2>Ratingの計算方法</h2>
+        </div>
+      </div>
+      <div class="method-grid">
+        <article class="method-card">
+          <h3>1. 期待値</h3>
+          <div class="formula">We = 1 / (1 + 10<sup>−D/600</sup>)</div>
+          <p>D は「自校Rating − 相手Rating」。Rating差が大きいほど、格上校の期待値が高くなります。</p>
+        </article>
+        <article class="method-card">
+          <h3>2. 試合後の更新</h3>
+          <div class="formula">R' = R + K × (W − We)</div>
+          <p>勝=1、引き分け=0.5、負=0。互角同士でK=10なら、勝者が約5点を獲得します。</p>
+        </article>
+        <article class="method-card">
+          <h3>3. 都道府県・リーグ評価</h3>
+          <p>学校Ratingとは別のポイントを作らず、所属校の分布から集計します。平均、中央値、Top5平均、Top25%平均などを併記します。</p>
+        </article>
+        <article class="method-card">
+          <h3>4. シーズン切替</h3>
+          <p>現行案では人工的なリセットを行わず、新チームの実力変化は実戦結果によるポイント移動で自然に反映します。</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <div><strong>高校野球 Rating</strong><br><span>Unofficial prototype</span></div>
+      <div>© 2026 Demo</div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
