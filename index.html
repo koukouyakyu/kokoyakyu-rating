@@ -12,7 +12,7 @@
     <div class="wrap header-inner">
       <div class="brand-block">
         <a href="#top" class="brand">高校野球 Rating</a>
-        <span class="badge">DEMO</span>
+        <span class="badge">CSV AUTO</span>
       </div>
       <nav class="nav" aria-label="メインナビゲーション">
         <a href="#ranking">全国ランキング</a>
@@ -39,19 +39,21 @@
         <div class="hero-card">
           <div class="metric-label">現在の計算設定</div>
           <div class="formula-mini">R' = R + 10 × (W − We)</div>
-          <div class="metric-row"><span>初期Rating</span><strong>1500</strong></div>
+          <div class="metric-row"><span>初期Rating</span><strong id="initialRatingLabel">1500</strong></div>
           <div class="metric-row"><span>勝利</span><strong>W = 1.0</strong></div>
           <div class="metric-row"><span>引き分け</span><strong>W = 0.5</strong></div>
           <div class="metric-row"><span>敗戦</span><strong>W = 0.0</strong></div>
-          <div class="metric-row"><span>大会補正</span><strong>なし</strong></div>
+          <div class="metric-row"><span>既定K値</span><strong id="defaultKLabel">10</strong></div>
         </div>
       </div>
     </section>
 
     <section class="notice wrap">
-      <strong>非公式サイトのデモです。</strong>
-      本Ratingは高野連・学校・新聞社等による公式ランキングではありません。表示中の数値はUI確認用のサンプルデータです。
+      <strong>非公式サイトの試作版です。</strong>
+      本Ratingは高野連・学校・新聞社等による公式ランキングではありません。初期CSVには動作確認用の架空試合を収録しています。実運用時は実際の公式戦結果に置き換えてください。
     </section>
+
+    <section id="dataStatus" class="data-status wrap">データを読み込んでいます…</section>
 
     <section id="ranking" class="section wrap">
       <div class="section-head">
@@ -171,11 +173,11 @@
         </article>
         <article class="method-card">
           <h3>3. 都道府県・リーグ評価</h3>
-          <p>学校Ratingとは別のポイントを作らず、所属校の分布から集計します。平均、中央値、Top5平均、Top25%平均などを併記します。</p>
+          <p>学校Ratingとは別のポイントを作らず、登録された所属校の分布から集計します。平均、中央値、Top5平均、Top25%平均などを併記します。</p>
         </article>
         <article class="method-card">
           <h3>4. シーズン切替</h3>
-          <p>現行案では人工的なリセットを行わず、新チームの実力変化は実戦結果によるポイント移動で自然に反映します。</p>
+          <p>現行案では人工的なリセットを行わず、新チームの実力変化は実戦結果によるポイント移動で自然に反映します。試合はCSVの日付順に再計算されます。</p>
         </article>
       </div>
     </section>

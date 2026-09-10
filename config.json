@@ -1,0 +1,6 @@
+{
+  "initial_rating": 1500,
+  "divisor": 600,
+  "default_k": 10,
+  "tournament_k": {}
+}
