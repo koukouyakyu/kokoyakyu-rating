@@ -8,7 +8,7 @@
     name="description"
     content="公開された公式戦結果から独自算出する高校野球レーティング"
   />
-  <link rel="stylesheet" href="styles.css?v=20260911-4" />
+  <link rel="stylesheet" href="styles.css?v=20260911-5" />
 </head>
 <body>
   <header class="site-header">
@@ -49,7 +49,7 @@
           <div class="formula-mini" id="heroFormula">R' = R + 10 × (W − We)</div>
           <div class="metric-row"><span>初期Rating</span><strong id="heroInitial">1500</strong></div>
           <div class="metric-row"><span>期待値の除数</span><strong id="heroDivisor">600</strong></div>
-          <div class="metric-row"><span>K値（県内 / 県外 / 全国）</span><strong id="heroK">10 / 15 / 20</strong></div>
+          <div class="metric-row"><span>K値（地方予選 / 地区・国スポ / 春・神宮 / 夏）</span><strong id="heroK">10 / 15 / 20 / 25</strong></div>
           <div class="metric-row"><span>データ</span><strong id="dataStatus">接続中…</strong></div>
         </div>
       </div>
@@ -159,14 +159,28 @@
           </div>
 
           <div class="history-wrap">
-            <h4>Rating推移</h4>
-            <svg id="historyChart" viewBox="0 0 720 220" role="img" aria-label="Rating推移グラフ"></svg>
+            <div class="history-head">
+              <h4>Rating推移</h4>
+              <div id="historyRange" class="range-buttons" aria-label="Rating表示期間">
+                <button class="range-btn active" type="button" data-years="1">1年</button>
+                <button class="range-btn" type="button" data-years="3">3年</button>
+                <button class="range-btn" type="button" data-years="5">5年</button>
+                <button class="range-btn" type="button" data-years="all">全期間</button>
+              </div>
+            </div>
+            <svg id="historyChart" viewBox="0 0 720 240" role="img" aria-label="Rating推移グラフ"></svg>
           </div>
         </article>
 
         <article class="matches-card">
-          <h3>全戦績</h3>
+          <div class="matches-head">
+            <h3>戦績</h3>
+            <select id="matchYearFilter" aria-label="戦績の年度絞り込み">
+              <option value="">全期間</option>
+            </select>
+          </div>
           <div id="recentMatches"></div>
+          <button id="showMoreMatches" class="btn secondary small matches-more hidden" type="button">さらに表示</button>
         </article>
       </div>
     </section>
@@ -352,6 +366,16 @@
           <p id="matchFormMessage" class="form-message" aria-live="polite"></p>
         </article>
 
+        <article class="panel">
+          <div class="panel-head">
+            <h3>一般からの修正提案</h3>
+            <button id="reloadProposalsButton" class="btn secondary small" type="button">提案を再読み込み</button>
+          </div>
+          <div id="proposalAdminList" class="proposal-admin-list">
+            <div class="empty">提案はありません。</div>
+          </div>
+        </article>
+
         <article class="panel admin-matches">
           <div class="panel-head">
             <h3>登録済み試合</h3>
@@ -422,6 +446,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=20260911-4"></script>
+  <script src="app.js?v=20260911-5"></script>
 </body>
 </html>
