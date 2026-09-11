@@ -8,7 +8,7 @@
     name="description"
     content="公開された公式戦結果から独自算出する高校野球レーティング"
   />
-  <link rel="stylesheet" href="styles.css?v=20260911-7" />
+  <link rel="stylesheet" href="styles.css?v=20260911-8" />
 </head>
 <body>
   <header class="site-header">
@@ -72,7 +72,7 @@
         </div>
         <div class="controls">
           <input id="searchInput" type="search" placeholder="学校名・都道府県で検索" aria-label="学校検索" />
-          <select id="prefFilter" aria-label="都道府県フィルター">
+          <select id="prefFilter" aria-label="都道府県・地区フィルター">
             <option value="">すべて</option>
           </select>
         </div>
@@ -189,8 +189,7 @@
               <option value="">全期間</option>
             </select>
           </div>
-          <div id="recentMatches"></div>
-          <button id="showMoreMatches" class="btn secondary small matches-more hidden" type="button">さらに表示</button>
+          <div id="recentMatches" class="recent-matches-scroll" tabindex="0" aria-label="戦績一覧。最大5試合分の高さでスクロールできます"></div>
         </article>
       </div>
     </section>
@@ -202,16 +201,18 @@
             <p class="eyebrow">RANK HISTORY</p>
             <h2>順位推移を比較</h2>
           </div>
-          <p class="section-copy">最大4校を選び、月ごとの全国順位の変動を比較します。一般向けではRating公開対象校のみ選択できます。</p>
+          <p class="section-copy">学校名を検索して最大4校を追加し、月ごとの全国順位の変動を比較します。一般向けではRating公開対象校のみ検索できます。</p>
         </div>
 
         <div class="rank-compare-card">
-          <div class="rank-compare-controls">
-            <label>学校1<select id="rankSchool1"></select></label>
-            <label>学校2<select id="rankSchool2"></select></label>
-            <label>学校3<select id="rankSchool3"></select></label>
-            <label>学校4<select id="rankSchool4"></select></label>
+          <div class="rank-compare-search-row">
+            <div class="school-search-wrap rank-compare-search-wrap">
+              <input id="rankCompareSearch" type="search" placeholder="学校名・地域名を入力して検索" aria-label="順位比較する学校を検索" autocomplete="off" />
+              <div id="rankCompareSearchResults" class="school-search-results hidden" aria-live="polite"></div>
+            </div>
+            <span class="muted">最大4校まで追加できます</span>
           </div>
+          <div id="rankCompareSelected" class="rank-compare-selected" aria-live="polite"></div>
           <div class="rank-compare-toolbar">
             <div id="rankCompareRange" class="range-buttons" aria-label="順位推移表示期間">
               <button class="range-btn" type="button" data-years="1">1年</button>
@@ -423,7 +424,11 @@
         <article class="panel admin-matches">
           <div class="panel-head">
             <h3>登録済み試合</h3>
-            <button id="reloadButton" class="btn secondary small" type="button">再読み込み</button>
+            <div class="panel-head-actions">
+              <span id="duplicateStatus" class="muted" aria-live="polite"></span>
+              <button id="duplicateScanButton" class="btn secondary small" type="button">重複試合を検知</button>
+              <button id="reloadButton" class="btn secondary small" type="button">再読み込み</button>
+            </div>
           </div>
           <div class="admin-match-search" aria-label="登録済み試合の検索">
             <label>
@@ -512,6 +517,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=20260911-7"></script>
+  <script src="app.js?v=20260911-8"></script>
 </body>
 </html>

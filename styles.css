@@ -1166,3 +1166,78 @@ footer {
   .rank-compare-controls { grid-template-columns: 1fr; }
   .school-picker-stack { width: 100%; min-width: 0; }
 }
+
+/* ===== 2026-09-11 rev4: 5試合スクロール / 順位検索 / 地域 / 重複検知 ===== */
+.recent-matches-scroll {
+  max-height: 650px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding-right: 8px;
+}
+.recent-matches-scroll .match-row {
+  min-height: 130px;
+  box-sizing: border-box;
+}
+.rank-compare-search-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.rank-compare-search-wrap {
+  width: min(100%, 540px);
+  flex: 0 1 540px;
+}
+.rank-compare-selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 42px;
+  align-items: center;
+  margin-top: 12px;
+}
+.rank-school-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 8px 7px 12px;
+  background: var(--surface-soft);
+  font-size: .82rem;
+  font-weight: 800;
+}
+.rank-school-chip button {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0,0,0,.08);
+  cursor: pointer;
+  line-height: 1;
+}
+.panel-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.duplicate-badge {
+  display: inline-block;
+  margin-left: 5px;
+  border-radius: 999px;
+  padding: 2px 6px;
+  background: #fff0e8;
+  color: #a44a16;
+  font-size: .68rem;
+  font-weight: 900;
+}
+@media (max-width: 640px) {
+  .recent-matches-scroll { max-height: 600px; }
+  .recent-matches-scroll .match-row { min-height: 120px; }
+  .rank-compare-search-row { align-items: stretch; flex-direction: column; }
+  .rank-compare-search-wrap { width: 100%; flex-basis: auto; }
+  .panel-head-actions { width: 100%; justify-content: flex-start; }
+}
