@@ -979,3 +979,47 @@ footer {
 .proposal-admin-item { padding: 14px 0; border-bottom: 1px solid var(--line); }
 .proposal-admin-item:last-child { border-bottom: 0; }
 .proposal-admin-item p { margin: 6px 0; color: var(--muted); }
+
+
+/* ===== 2026-09-11: 管理画面の試合検索 ===== */
+.admin-match-search {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-soft);
+}
+.admin-match-search label {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: .78rem;
+  font-weight: 800;
+}
+.admin-match-search input { width: 100%; }
+.admin-match-search-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 34px;
+}
+@media (max-width: 900px) {
+  .admin-match-search { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 580px) {
+  .admin-match-search { grid-template-columns: 1fr; }
+  .admin-match-search-actions { flex-direction: column; align-items: stretch; }
+}
+
+/* 2026-09-11: Rating期間表示 */
+.history-range-status {
+  margin: 7px 0 2px;
+  color: var(--muted);
+  font-size: .76rem;
+  font-weight: 700;
+}

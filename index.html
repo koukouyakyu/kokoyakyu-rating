@@ -8,7 +8,7 @@
     name="description"
     content="公開された公式戦結果から独自算出する高校野球レーティング"
   />
-  <link rel="stylesheet" href="styles.css?v=20260911-5" />
+  <link rel="stylesheet" href="styles.css?v=20260911-6" />
 </head>
 <body>
   <header class="site-header">
@@ -168,6 +168,7 @@
                 <button class="range-btn" type="button" data-years="all">全期間</button>
               </div>
             </div>
+            <div id="historyRangeStatus" class="history-range-status" aria-live="polite"></div>
             <svg id="historyChart" viewBox="0 0 720 240" role="img" aria-label="Rating推移グラフ"></svg>
           </div>
         </article>
@@ -381,6 +382,28 @@
             <h3>登録済み試合</h3>
             <button id="reloadButton" class="btn secondary small" type="button">再読み込み</button>
           </div>
+          <div class="admin-match-search" aria-label="登録済み試合の検索">
+            <label>
+              キーワード
+              <input id="adminMatchKeyword" type="search" placeholder="例：準決勝、10-3、大阪" autocomplete="off" />
+            </label>
+            <label>
+              日付
+              <input id="adminMatchDate" type="date" />
+            </label>
+            <label>
+              大会名
+              <input id="adminMatchTournament" type="search" placeholder="例：全国高等学校野球選手権" autocomplete="off" />
+            </label>
+            <label>
+              学校名
+              <input id="adminMatchSchool" type="search" placeholder="例：大阪桐蔭" autocomplete="off" />
+            </label>
+            <div class="admin-match-search-actions">
+              <span id="adminMatchSearchStatus" class="muted" aria-live="polite"></span>
+              <button id="adminMatchClear" class="btn secondary small" type="button">検索条件をクリア</button>
+            </div>
+          </div>
           <div class="table-card">
             <table>
               <thead>
@@ -446,6 +469,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=20260911-5"></script>
+  <script src="app.js?v=20260911-7"></script>
 </body>
 </html>
