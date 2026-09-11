@@ -49,7 +49,7 @@
           <div class="formula-mini" id="heroFormula">R' = R + 10 × (W − We)</div>
           <div class="metric-row"><span>初期Rating</span><strong id="heroInitial">1500</strong></div>
           <div class="metric-row"><span>期待値の除数</span><strong id="heroDivisor">600</strong></div>
-          <div class="metric-row"><span>既定K値</span><strong id="heroK">10</strong></div>
+          <div class="metric-row"><span>K値（県内 / 県外 / 全国）</span><strong id="heroK">10 / 15 / 20</strong></div>
           <div class="metric-row"><span>データ</span><strong id="dataStatus">接続中…</strong></div>
         </div>
       </div>
@@ -109,9 +109,15 @@
             <p class="eyebrow">PREFECTURE STRENGTH</p>
             <h2>都道府県の強さ</h2>
           </div>
-          <p class="section-copy">
-            平均、中央値、Top5平均、Top25%平均を表示します。
-          </p>
+          <div class="pref-sort-control">
+            <label for="prefSort">並び替え</label>
+            <select id="prefSort" aria-label="都道府県ランキングの並び替え">
+              <option value="average">平均</option>
+              <option value="median">中央値</option>
+              <option value="top5">上位5%</option>
+              <option value="top25" selected>上位25%</option>
+            </select>
+          </div>
         </div>
         <div id="prefCards" class="pref-grid"></div>
       </div>
@@ -123,7 +129,13 @@
           <p class="eyebrow">SCHOOL PROFILE</p>
           <h2>学校詳細</h2>
         </div>
-        <select id="schoolSelect" aria-label="学校を選択"></select>
+        <div class="school-picker">
+          <div class="school-search-wrap">
+            <input id="schoolSearch" type="search" placeholder="学校名をキーワード検索" aria-label="学校名をキーワード検索" autocomplete="off" />
+            <div id="schoolSearchResults" class="school-search-results hidden" aria-live="polite"></div>
+          </div>
+          <select id="schoolSelect" aria-label="学校を一覧から選択"></select>
+        </div>
       </div>
 
       <div class="school-layout">
@@ -153,7 +165,7 @@
         </article>
 
         <article class="matches-card">
-          <h3>直近の試合</h3>
+          <h3>全戦績</h3>
           <div id="recentMatches"></div>
         </article>
       </div>
@@ -323,7 +335,7 @@
             </label>
 
             <label>
-              K値（空欄なら既定値）
+              K値（空欄なら大会レベルから自動判定）
               <input id="matchK" type="number" min="0.1" step="0.5" />
             </label>
 
@@ -381,7 +393,7 @@
           <article class="method-card">
             <h3>2. 試合後の更新</h3>
             <div class="formula">R' = R + K × (W − We)</div>
-            <p>勝=1、引き分け=0.5、負=0。既定K値は10です。</p>
+            <p id="methodKText">勝=1、引き分け=0.5、負=0。K値は大会レベルに応じて自動調整します。</p>
           </article>
 
           <article class="method-card">
