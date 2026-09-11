@@ -6,7 +6,9 @@
     initial: Number(cfg.rating?.initial ?? 1500),
     divisor: Number(cfg.rating?.divisor ?? 600),
     defaultK: Number(cfg.rating?.defaultK ?? 10),
-    tournamentK: cfg.rating?.tournamentK || {}
+    tournamentK: cfg.rating?.tournamentK || {},
+    interPrefMultiplier: Number(cfg.rating?.interPrefMultiplier ?? 1.5),
+    nationalMultiplier: Number(cfg.rating?.nationalMultiplier ?? 2.0)
   };
 
   const rankingLimit = Number(cfg.rankingLimit ?? 200);
@@ -35,6 +37,9 @@
     prefCount: $("prefCount"),
     latestMatchDate: $("latestMatchDate"),
     prefCards: $("prefCards"),
+    prefSort: $("prefSort"),
+    schoolSearch: $("schoolSearch"),
+    schoolSearchResults: $("schoolSearchResults"),
     schoolSelect: $("schoolSelect"),
     schoolPref: $("schoolPref"),
     schoolName: $("schoolName"),
@@ -155,7 +160,7 @@
   }
 
   function schoolKey(name, pref) {
-    return `${String(pref).trim()}\u0000${String(name).trim()}`;
+    return `${String(pref).trim()}::${String(name).trim()}`;
   }
 
   function formatRating(value) {
@@ -179,13 +184,39 @@
     return 1 / (1 + Math.pow(10, -d / ratingCfg.divisor));
   }
 
+  function isNationalTournament(match) {
+    const name = `${match.tournament || ""} ${match.stage || ""}`.replace(/\s+/g, "");
+
+    return (
+      name.includes("明治神宮") ||
+      name.includes("甲子園") ||
+      name.includes("選抜高等学校野球大会") ||
+      name.includes("全国高等学校野球選手権大会")
+    );
+  }
+
   function matchK(match) {
+    // CSVや管理画面でKを明示した試合は、その値を最優先する。
     const direct = Number(match.k);
     if (Number.isFinite(direct) && direct > 0) return direct;
+
+    // config.js で大会ごとのKを指定している場合も優先する。
     const tournamentSpecific = Number(ratingCfg.tournamentK?.[match.tournament]);
     if (Number.isFinite(tournamentSpecific) && tournamentSpecific > 0) {
       return tournamentSpecific;
     }
+
+    // 全国大会: 基準Kの2倍
+    if (isNationalTournament(match)) {
+      return ratingCfg.defaultK * ratingCfg.nationalMultiplier;
+    }
+
+    // 異なる都道府県同士: 基準Kの1.5倍
+    if (match.pref_a && match.pref_b && match.pref_a !== match.pref_b) {
+      return ratingCfg.defaultK * ratingCfg.interPrefMultiplier;
+    }
+
+    // 同一都道府県内: 基準K
     return ratingCfg.defaultK;
   }
 
@@ -311,7 +342,8 @@
         allowed: match.score_b,
         before: beforeA,
         after: a.rating,
-        delta: deltaA
+        delta: deltaA,
+        k
       });
       b.games.push({
         match,
@@ -322,7 +354,8 @@
         allowed: match.score_a,
         before: beforeB,
         after: b.rating,
-        delta: deltaB
+        delta: deltaB,
+        k
       });
     }
 
@@ -359,8 +392,9 @@
     return [...groups.entries()]
       .map(([pref, values]) => {
         const desc = [...values].sort((a, b) => b - a);
-        const top5 = desc.slice(0, 5);
+        const top5Count = Math.max(1, Math.ceil(desc.length * 0.05));
         const top25Count = Math.max(1, Math.ceil(desc.length * 0.25));
+        const top5 = desc.slice(0, top5Count);
         const top25 = desc.slice(0, top25Count);
         return {
           pref,
@@ -370,8 +404,7 @@
           top5: average(top5),
           top25: average(top25)
         };
-      })
-      .sort((a, b) => b.top25 - a.top25 || b.average - a.average);
+      });
   }
 
   // Supabase の1リクエスト1000行上限を回避し、全試合をページ分割で取得する。
@@ -538,7 +571,22 @@
       els.prefCards.innerHTML = `<div class="empty">データがありません。</div>`;
       return;
     }
-    els.prefCards.innerHTML = state.prefs
+
+    const metric = els.prefSort?.value || "top25";
+    const metricLabels = {
+      average: "平均",
+      median: "中央値",
+      top5: "上位5%",
+      top25: "上位25%"
+    };
+
+    const sortedPrefs = [...state.prefs].sort((a, b) => {
+      const primary = (b[metric] ?? -Infinity) - (a[metric] ?? -Infinity);
+      if (primary !== 0) return primary;
+      return (b.average ?? -Infinity) - (a.average ?? -Infinity);
+    });
+
+    els.prefCards.innerHTML = sortedPrefs
       .map(
         (item, index) => `
           <article class="pref-card">
@@ -547,11 +595,20 @@
               <span>${item.count}校</span>
             </h3>
             <div class="pref-metrics">
-              <div><span>平均</span><strong>${formatRating(item.average)}</strong></div>
-              <div><span>中央値</span><strong>${formatRating(item.median)}</strong></div>
-              <div><span>Top5平均</span><strong>${formatRating(item.top5)}</strong></div>
-              <div><span>Top25%平均</span><strong>${formatRating(item.top25)}</strong></div>
+              <div class="${metric === "average" ? "metric-active" : ""}">
+                <span>平均</span><strong>${formatRating(item.average)}</strong>
+              </div>
+              <div class="${metric === "median" ? "metric-active" : ""}">
+                <span>中央値</span><strong>${formatRating(item.median)}</strong>
+              </div>
+              <div class="${metric === "top5" ? "metric-active" : ""}">
+                <span>上位5%</span><strong>${formatRating(item.top5)}</strong>
+              </div>
+              <div class="${metric === "top25" ? "metric-active" : ""}">
+                <span>上位25%</span><strong>${formatRating(item.top25)}</strong>
+              </div>
             </div>
+            <p class="pref-sort-note">${metricLabels[metric]}で順位付け</p>
           </article>
         `
       )
@@ -567,6 +624,62 @@
       )
       .join("");
     if (state.schoolMap.has(previous)) els.schoolSelect.value = previous;
+  }
+
+  function renderSchoolSearchResults() {
+    const query = String(els.schoolSearch?.value || "").trim().toLowerCase();
+
+    if (!query) {
+      els.schoolSearchResults.innerHTML = "";
+      els.schoolSearchResults.classList.add("hidden");
+      return;
+    }
+
+    const matches = state.schools
+      .filter(
+        (school) =>
+          school.name.toLowerCase().includes(query) ||
+          school.pref.toLowerCase().includes(query)
+      )
+      .slice(0, 30);
+
+    if (!matches.length) {
+      els.schoolSearchResults.innerHTML =
+        `<div class="school-search-empty">該当する学校がありません。</div>`;
+      els.schoolSearchResults.classList.remove("hidden");
+      return;
+    }
+
+    els.schoolSearchResults.innerHTML = matches
+      .map(
+        (school) => `
+          <button
+            type="button"
+            class="school-search-item"
+            data-school-key="${escapeHtml(school.key)}"
+          >
+            <strong>${escapeHtml(school.name)}</strong>
+            <span>${escapeHtml(school.pref)} · 全国${school.rank}位 · ${formatRating(school.rating)}</span>
+          </button>
+        `
+      )
+      .join("");
+
+    els.schoolSearchResults.classList.remove("hidden");
+
+    els.schoolSearchResults
+      .querySelectorAll(".school-search-item[data-school-key]")
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          const key = button.dataset.schoolKey;
+          if (!state.schoolMap.has(key)) return;
+
+          els.schoolSelect.value = key;
+          els.schoolSearch.value = state.schoolMap.get(key).name;
+          els.schoolSearchResults.classList.add("hidden");
+          renderSchoolProfile();
+        });
+      });
   }
 
   function renderSchoolProfile() {
@@ -603,7 +716,7 @@
   }
 
   function renderRecentMatches(games) {
-    const recent = [...games].slice(-8).reverse();
+    const recent = [...games].reverse();
     if (!recent.length) {
       els.recentMatches.innerHTML = `<div class="empty">試合がありません。</div>`;
       return;
@@ -626,7 +739,7 @@
             </strong>
             <div class="match-meta">
               ${formatRating(game.before)} → ${formatRating(game.after)}
-              （${formatDelta(game.delta)}）
+              （${formatDelta(game.delta)}） · K=${Number(game.k).toFixed(1)}
             </div>
           </div>
         `;
@@ -1044,7 +1157,14 @@
   function bindEvents() {
     els.searchInput.addEventListener("input", renderRanking);
     els.prefFilter.addEventListener("change", renderRanking);
-    els.schoolSelect.addEventListener("change", renderSchoolProfile);
+    els.prefSort.addEventListener("change", renderPrefCards);
+    els.schoolSearch.addEventListener("input", renderSchoolSearchResults);
+    els.schoolSelect.addEventListener("change", () => {
+      renderSchoolProfile();
+      const school = state.schoolMap.get(els.schoolSelect.value);
+      if (school) els.schoolSearch.value = school.name;
+      els.schoolSearchResults.classList.add("hidden");
+    });
     [els.ratingA, els.ratingB, els.kValue].forEach((input) => {
       input.addEventListener("input", renderSimulator);
     });

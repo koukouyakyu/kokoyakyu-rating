@@ -797,3 +797,118 @@ footer {
     font-size: 2.6rem;
   }
 }
+
+
+/* ===== 2026-09-11: 都道府県ソート / 学校検索 ===== */
+.pref-sort-control {
+  min-width: 180px;
+}
+
+.pref-sort-control label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.pref-sort-control select {
+  min-width: 180px;
+}
+
+.pref-metrics .metric-active {
+  outline: 2px solid var(--accent);
+  background: #f7fbf8;
+}
+
+.pref-sort-note {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-align: right;
+}
+
+.school-picker {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  min-width: min(100%, 520px);
+}
+
+.school-search-wrap {
+  position: relative;
+  flex: 1 1 280px;
+  min-width: 220px;
+}
+
+.school-picker > select {
+  flex: 1 1 240px;
+}
+
+.school-search-results {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 360px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 14px 36px rgba(25, 52, 37, 0.16);
+}
+
+.school-search-item {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 11px 13px;
+  background: #fff;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.school-search-item:last-child {
+  border-bottom: 0;
+}
+
+.school-search-item:hover,
+.school-search-item:focus {
+  background: var(--surface-soft);
+  outline: none;
+}
+
+.school-search-item strong,
+.school-search-item span {
+  display: block;
+}
+
+.school-search-item span {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.school-search-empty {
+  padding: 14px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+@media (max-width: 760px) {
+  .school-picker {
+    width: 100%;
+    min-width: 0;
+    flex-direction: column;
+  }
+
+  .school-search-wrap,
+  .school-picker > select,
+  .pref-sort-control,
+  .pref-sort-control select {
+    width: 100%;
+    min-width: 0;
+  }
+}
