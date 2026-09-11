@@ -8,7 +8,7 @@
     name="description"
     content="公開された公式戦結果から独自算出する高校野球レーティング"
   />
-  <link rel="stylesheet" href="styles.css?v=20260911-6" />
+  <link rel="stylesheet" href="styles.css?v=20260911-7" />
 </head>
 <body>
   <header class="site-header">
@@ -21,6 +21,7 @@
         <a href="#ranking">全国ランキング</a>
         <a href="#prefectures">都道府県比較</a>
         <a href="#schools">学校詳細</a>
+        <a href="#rank-compare">順位推移比較</a>
         <a href="#simulator">シミュレーター</a>
         <a href="#admin">試合登録</a>
         <a href="#method">計算方法</a>
@@ -129,12 +130,20 @@
           <p class="eyebrow">SCHOOL PROFILE</p>
           <h2>学校詳細</h2>
         </div>
-        <div class="school-picker">
-          <div class="school-search-wrap">
-            <input id="schoolSearch" type="search" placeholder="学校名をキーワード検索" aria-label="学校名をキーワード検索" autocomplete="off" />
-            <div id="schoolSearchResults" class="school-search-results hidden" aria-live="polite"></div>
+        <div class="school-picker-stack">
+          <div class="school-picker-label">Rating検索 <span>一般公開は1500以上</span></div>
+          <div class="school-picker">
+            <div class="school-search-wrap">
+              <input id="schoolSearch" type="search" placeholder="学校名をキーワード検索" aria-label="Rating対象校を検索" autocomplete="off" />
+              <div id="schoolSearchResults" class="school-search-results hidden" aria-live="polite"></div>
+            </div>
+            <select id="schoolSelect" aria-label="Rating対象校を一覧から選択"></select>
           </div>
-          <select id="schoolSelect" aria-label="学校を一覧から選択"></select>
+          <div class="school-picker-label record-search-label">戦績検索 <span>Rating非公開校も検索できます</span></div>
+          <div class="school-search-wrap record-school-search-wrap">
+            <input id="recordSchoolSearch" type="search" placeholder="全校から学校名・都道府県で戦績検索" aria-label="全校の戦績を検索" autocomplete="off" />
+            <div id="recordSchoolSearchResults" class="school-search-results hidden" aria-live="polite"></div>
+          </div>
         </div>
       </div>
 
@@ -183,6 +192,40 @@
           <div id="recentMatches"></div>
           <button id="showMoreMatches" class="btn secondary small matches-more hidden" type="button">さらに表示</button>
         </article>
+      </div>
+    </section>
+
+    <section id="rank-compare" class="section section-alt">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">RANK HISTORY</p>
+            <h2>順位推移を比較</h2>
+          </div>
+          <p class="section-copy">最大4校を選び、月ごとの全国順位の変動を比較します。一般向けではRating公開対象校のみ選択できます。</p>
+        </div>
+
+        <div class="rank-compare-card">
+          <div class="rank-compare-controls">
+            <label>学校1<select id="rankSchool1"></select></label>
+            <label>学校2<select id="rankSchool2"></select></label>
+            <label>学校3<select id="rankSchool3"></select></label>
+            <label>学校4<select id="rankSchool4"></select></label>
+          </div>
+          <div class="rank-compare-toolbar">
+            <div id="rankCompareRange" class="range-buttons" aria-label="順位推移表示期間">
+              <button class="range-btn" type="button" data-years="1">1年</button>
+              <button class="range-btn active" type="button" data-years="3">3年</button>
+              <button class="range-btn" type="button" data-years="5">5年</button>
+              <button class="range-btn" type="button" data-years="all">全期間</button>
+            </div>
+            <span id="rankCompareStatus" class="history-range-status"></span>
+          </div>
+          <div class="rank-chart-scroll">
+            <svg id="rankCompareChart" viewBox="0 0 900 360" role="img" aria-label="学校別の順位推移比較チャート"></svg>
+          </div>
+          <div id="rankCompareLegend" class="rank-compare-legend"></div>
+        </div>
       </div>
     </section>
 

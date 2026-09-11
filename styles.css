@@ -1023,3 +1023,146 @@ footer {
   font-size: .76rem;
   font-weight: 700;
 }
+
+/* ===== 2026-09-11 rev3: 公開/管理者表示・戦績検索・順位比較 ===== */
+.school-picker-stack {
+  min-width: min(100%, 620px);
+}
+
+.school-picker-label {
+  margin: 0 0 6px;
+  color: var(--ink);
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.school-picker-label span {
+  margin-left: 5px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.record-search-label { margin-top: 10px; }
+.record-school-search-wrap { max-width: 100%; }
+
+.chart-area {
+  opacity: .10;
+}
+
+.chart-line {
+  stroke-width: 2.5;
+}
+
+.chart-dot {
+  r: 2.5;
+}
+
+.rank-compare-card {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.rank-compare-controls {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.rank-compare-controls label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.rank-compare-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 16px 0 8px;
+  flex-wrap: wrap;
+}
+
+.rank-chart-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+#rankCompareChart {
+  display: block;
+  width: 100%;
+  min-width: 760px;
+  height: auto;
+}
+
+.rank-line {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rank-line-1 { stroke: #176b48; }
+.rank-line-2 { stroke: #a85d10; }
+.rank-line-3 { stroke: #315fa8; }
+.rank-line-4 { stroke: #8b4d93; }
+.rank-dot-1 { fill: #176b48; }
+.rank-dot-2 { fill: #a85d10; }
+.rank-dot-3 { fill: #315fa8; }
+.rank-dot-4 { fill: #8b4d93; }
+
+.rank-compare-legend {
+  display: flex;
+  gap: 12px 18px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.rank-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.rank-legend-swatch {
+  width: 18px;
+  height: 3px;
+  border-radius: 999px;
+}
+
+.rank-legend-1 { background: #176b48; }
+.rank-legend-2 { background: #a85d10; }
+.rank-legend-3 { background: #315fa8; }
+.rank-legend-4 { background: #8b4d93; }
+
+.rank-chart-label {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+.rank-chart-grid {
+  stroke: #dce5df;
+  stroke-width: 1;
+}
+
+.admin-visibility-note {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+@media (max-width: 900px) {
+  .rank-compare-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .rank-compare-controls { grid-template-columns: 1fr; }
+  .school-picker-stack { width: 100%; min-width: 0; }
+}
