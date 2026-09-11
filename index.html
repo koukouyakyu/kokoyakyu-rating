@@ -4,7 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>高校野球 Rating</title>
-  <meta name="description" content="公開された公式戦結果から独自算出する高校野球レーティングのデモサイト" />
+  <meta
+    name="description"
+    content="公開された公式戦結果から独自算出する高校野球レーティング"
+  />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -12,13 +15,14 @@
     <div class="wrap header-inner">
       <div class="brand-block">
         <a href="#top" class="brand">高校野球 Rating</a>
-        <span class="badge">CSV AUTO</span>
+        <span class="badge">BETA</span>
       </div>
       <nav class="nav" aria-label="メインナビゲーション">
         <a href="#ranking">全国ランキング</a>
         <a href="#prefectures">都道府県比較</a>
         <a href="#schools">学校詳細</a>
-        <a href="#simulator">試合シミュレーター</a>
+        <a href="#simulator">シミュレーター</a>
+        <a href="#admin">試合登録</a>
         <a href="#method">計算方法</a>
       </nav>
     </div>
@@ -29,31 +33,35 @@
       <div class="wrap hero-grid">
         <div>
           <p class="eyebrow">HIGH SCHOOL BASEBALL RATING</p>
-          <h1>試合結果から、<br>高校野球の「現在地」を見る。</h1>
-          <p class="lead">全校を同じ初期値からスタートし、対戦相手との強さの差と勝敗だけでポイントを受け渡す、独自の高校野球レーティング。</p>
+          <h1>試合結果から、<br />高校野球の「現在地」を見る。</h1>
+          <p class="lead">
+            Supabaseに保存された試合結果を古い順に読み込み、
+            対戦相手とのRating差と勝敗から全校のRatingを自動計算します。
+          </p>
           <div class="hero-actions">
             <a class="btn primary" href="#ranking">ランキングを見る</a>
-            <a class="btn secondary" href="#method">計算式を見る</a>
+            <a class="btn secondary" href="#admin">試合結果を登録</a>
           </div>
         </div>
+
         <div class="hero-card">
           <div class="metric-label">現在の計算設定</div>
-          <div class="formula-mini">R' = R + 10 × (W − We)</div>
-          <div class="metric-row"><span>初期Rating</span><strong id="initialRatingLabel">1500</strong></div>
-          <div class="metric-row"><span>勝利</span><strong>W = 1.0</strong></div>
-          <div class="metric-row"><span>引き分け</span><strong>W = 0.5</strong></div>
-          <div class="metric-row"><span>敗戦</span><strong>W = 0.0</strong></div>
-          <div class="metric-row"><span>既定K値</span><strong id="defaultKLabel">10</strong></div>
+          <div class="formula-mini" id="heroFormula">R' = R + 10 × (W − We)</div>
+          <div class="metric-row"><span>初期Rating</span><strong id="heroInitial">1500</strong></div>
+          <div class="metric-row"><span>期待値の除数</span><strong id="heroDivisor">600</strong></div>
+          <div class="metric-row"><span>既定K値</span><strong id="heroK">10</strong></div>
+          <div class="metric-row"><span>データ</span><strong id="dataStatus">接続中…</strong></div>
         </div>
       </div>
     </section>
 
     <section class="notice wrap">
-      <strong>非公式サイトの試作版です。</strong>
-      本Ratingは高野連・学校・新聞社等による公式ランキングではありません。初期CSVには動作確認用の架空試合を収録しています。実運用時は実際の公式戦結果に置き換えてください。
+      <strong>非公式サイトです。</strong>
+      本Ratingは高野連・学校・新聞社等による公式ランキングではありません。
+      Ratingは登録された試合結果から独自計算します。
     </section>
 
-    <section id="dataStatus" class="data-status wrap">データを読み込んでいます…</section>
+    <section id="setupNotice" class="setup-notice wrap hidden" aria-live="polite"></section>
 
     <section id="ranking" class="section wrap">
       <div class="section-head">
@@ -69,15 +77,29 @@
         </div>
       </div>
 
+      <div class="summary-strip">
+        <div><span>登録試合</span><strong id="matchCount">0</strong></div>
+        <div><span>学校数</span><strong id="schoolCount">0</strong></div>
+        <div><span>都道府県数</span><strong id="prefCount">0</strong></div>
+        <div><span>最終試合日</span><strong id="latestMatchDate">—</strong></div>
+      </div>
+
       <div class="table-card">
         <table>
           <thead>
-            <tr><th>順位</th><th>学校</th><th>都道府県</th><th>Rating</th><th>前回比</th><th>直近</th></tr>
+            <tr>
+              <th>順位</th>
+              <th>学校</th>
+              <th>都道府県</th>
+              <th>Rating</th>
+              <th>前回比</th>
+              <th>直近5試合</th>
+            </tr>
           </thead>
           <tbody id="rankingBody"></tbody>
         </table>
       </div>
-      <p class="footnote">※ 公開版では全国Top100〜200のみ一覧表示し、下位校は検索時のみ表示する設計を想定しています。</p>
+      <p class="footnote" id="rankingFootnote"></p>
     </section>
 
     <section id="prefectures" class="section section-alt">
@@ -87,7 +109,9 @@
             <p class="eyebrow">PREFECTURE STRENGTH</p>
             <h2>都道府県の強さ</h2>
           </div>
-          <p class="section-copy">単純平均だけでなく、中央値・Top5平均・Top25%平均を併記し、「平均的な強さ」と「上位層の厚さ」を分けて見ます。</p>
+          <p class="section-copy">
+            平均、中央値、Top5平均、Top25%平均を表示します。
+          </p>
         </div>
         <div id="prefCards" class="pref-grid"></div>
       </div>
@@ -101,24 +125,27 @@
         </div>
         <select id="schoolSelect" aria-label="学校を選択"></select>
       </div>
+
       <div class="school-layout">
         <article class="profile-card">
           <div class="profile-top">
             <div>
               <span id="schoolPref" class="tag"></span>
-              <h3 id="schoolName"></h3>
-              <p id="schoolLeague" class="muted"></p>
+              <h3 id="schoolName">—</h3>
+              <p id="schoolRecord" class="muted"></p>
             </div>
             <div class="rating-big">
               <span>Rating</span>
-              <strong id="schoolRating"></strong>
+              <strong id="schoolRating">—</strong>
             </div>
           </div>
+
           <div class="stats-row">
-            <div><span>全国順位</span><strong id="schoolRank"></strong></div>
-            <div><span>前回比</span><strong id="schoolDelta"></strong></div>
-            <div><span>直近5試合</span><strong id="schoolForm"></strong></div>
+            <div><span>全国順位</span><strong id="schoolRank">—</strong></div>
+            <div><span>前回比</span><strong id="schoolDelta">—</strong></div>
+            <div><span>直近5試合</span><strong id="schoolForm">—</strong></div>
           </div>
+
           <div class="history-wrap">
             <h4>Rating推移</h4>
             <svg id="historyChart" viewBox="0 0 720 220" role="img" aria-label="Rating推移グラフ"></svg>
@@ -139,57 +166,250 @@
             <p class="eyebrow">MATCH SIMULATOR</p>
             <h2>試合シミュレーター</h2>
           </div>
-          <p class="section-copy">2校のRatingから期待値と、勝ち・引き分け・負け時のポイント移動を即時計算します。</p>
+          <p class="section-copy">
+            2校のRatingから期待値と、勝ち・引き分け・負け時のポイント移動を計算します。
+          </p>
         </div>
 
         <div class="sim-card">
           <div class="sim-grid">
-            <label>学校A Rating<input id="ratingA" type="number" value="1800" min="800" max="2500" /></label>
-            <label>学校B Rating<input id="ratingB" type="number" value="1700" min="800" max="2500" /></label>
-            <label>K値<input id="kValue" type="number" value="10" min="1" max="50" step="0.5" /></label>
+            <label>
+              学校A Rating
+              <input id="ratingA" type="number" value="1800" min="500" max="3000" />
+            </label>
+            <label>
+              学校B Rating
+              <input id="ratingB" type="number" value="1700" min="500" max="3000" />
+            </label>
+            <label>
+              K値
+              <input id="kValue" type="number" value="10" min="0.1" max="100" step="0.5" />
+            </label>
           </div>
           <div id="simResult" class="sim-result"></div>
         </div>
       </div>
     </section>
 
-    <section id="method" class="section wrap">
+    <section id="admin" class="section wrap">
       <div class="section-head">
         <div>
-          <p class="eyebrow">METHODOLOGY</p>
-          <h2>Ratingの計算方法</h2>
+          <p class="eyebrow">ADMIN</p>
+          <h2>試合結果の登録</h2>
         </div>
+        <p class="section-copy">
+          閲覧は誰でも可能。登録・修正・削除はSupabase Authでログインした管理者だけが行えます。
+        </p>
       </div>
-      <div class="method-grid">
-        <article class="method-card">
-          <h3>1. 期待値</h3>
-          <div class="formula">We = 1 / (1 + 10<sup>−D/600</sup>)</div>
-          <p>D は「自校Rating − 相手Rating」。Rating差が大きいほど、格上校の期待値が高くなります。</p>
+
+      <div id="adminUnavailable" class="panel hidden"></div>
+
+      <div id="loginPanel" class="panel">
+        <h3>管理者ログイン</h3>
+        <form id="loginForm" class="form-grid compact">
+          <label>
+            メールアドレス
+            <input id="loginEmail" type="email" autocomplete="username" required />
+          </label>
+          <label>
+            パスワード
+            <input id="loginPassword" type="password" autocomplete="current-password" required />
+          </label>
+          <div class="form-actions span-2">
+            <button class="btn primary" type="submit">ログイン</button>
+            <button id="showResetButton" class="btn secondary" type="button">パスワードを忘れた場合</button>
+          </div>
+        </form>
+        <p id="loginMessage" class="form-message" aria-live="polite"></p>
+      </div>
+
+      <div id="resetRequestPanel" class="panel hidden">
+        <h3>パスワード再設定メールを送る</h3>
+        <p class="muted">
+          登録済みの管理者メールアドレスを入力してください。
+          メール内のリンクからこのサイトへ戻ると、新しいパスワードを設定できます。
+        </p>
+        <form id="resetRequestForm" class="form-grid compact">
+          <label class="span-2">
+            メールアドレス
+            <input id="resetEmail" type="email" autocomplete="email" required />
+          </label>
+          <div class="form-actions span-2">
+            <button class="btn primary" type="submit">再設定メールを送信</button>
+            <button id="backToLoginButton" class="btn secondary" type="button">ログインへ戻る</button>
+          </div>
+        </form>
+        <p id="resetRequestMessage" class="form-message" aria-live="polite"></p>
+      </div>
+
+      <div id="passwordSetupPanel" class="panel hidden">
+        <h3 id="passwordSetupTitle">新しいパスワードを設定</h3>
+        <p id="passwordSetupDescription" class="muted">
+          新しいパスワードを入力してください。
+        </p>
+        <form id="passwordSetupForm" class="form-grid compact">
+          <label>
+            新しいパスワード
+            <input id="newPassword" type="password" autocomplete="new-password" minlength="8" required />
+          </label>
+          <label>
+            新しいパスワード（確認）
+            <input id="newPasswordConfirm" type="password" autocomplete="new-password" minlength="8" required />
+          </label>
+          <div class="form-actions span-2">
+            <button class="btn primary" type="submit">パスワードを保存</button>
+          </div>
+        </form>
+        <p id="passwordSetupMessage" class="form-message" aria-live="polite"></p>
+      </div>
+
+      <div id="adminPanel" class="hidden">
+        <div class="admin-bar">
+          <div>
+            <strong>ログイン中:</strong>
+            <span id="adminEmail"></span>
+          </div>
+          <button id="logoutButton" class="btn secondary small" type="button">ログアウト</button>
+        </div>
+
+        <article class="panel">
+          <h3 id="matchFormTitle">試合を登録</h3>
+          <form id="matchForm" class="form-grid">
+            <input id="editingMatchId" type="hidden" />
+
+            <label>
+              試合日
+              <input id="matchDate" type="date" required />
+            </label>
+
+            <label>
+              大会名
+              <input id="tournament" type="text" placeholder="例：大阪大会" required />
+            </label>
+
+            <label>
+              ラウンド・節
+              <input id="stage" type="text" placeholder="例：3回戦" />
+            </label>
+
+            <label>
+              A校
+              <input id="teamA" type="text" required />
+            </label>
+
+            <label>
+              A校 都道府県
+              <input id="prefA" type="text" placeholder="例：大阪" required />
+            </label>
+
+            <label>
+              A校 得点
+              <input id="scoreA" type="number" min="0" required />
+            </label>
+
+            <label>
+              B校
+              <input id="teamB" type="text" required />
+            </label>
+
+            <label>
+              B校 都道府県
+              <input id="prefB" type="text" placeholder="例：大阪" required />
+            </label>
+
+            <label>
+              B校 得点
+              <input id="scoreB" type="number" min="0" required />
+            </label>
+
+            <label>
+              K値（空欄なら既定値）
+              <input id="matchK" type="number" min="0.1" step="0.5" />
+            </label>
+
+            <label class="span-2">
+              出典URL（任意）
+              <input id="sourceUrl" type="url" placeholder="https://..." />
+            </label>
+
+            <div class="form-actions span-2">
+              <button id="saveMatchButton" class="btn primary" type="submit">試合を登録</button>
+              <button id="cancelEditButton" class="btn secondary hidden" type="button">編集をキャンセル</button>
+            </div>
+          </form>
+          <p id="matchFormMessage" class="form-message" aria-live="polite"></p>
         </article>
-        <article class="method-card">
-          <h3>2. 試合後の更新</h3>
-          <div class="formula">R' = R + K × (W − We)</div>
-          <p>勝=1、引き分け=0.5、負=0。互角同士でK=10なら、勝者が約5点を獲得します。</p>
+
+        <article class="panel admin-matches">
+          <div class="panel-head">
+            <h3>登録済み試合</h3>
+            <button id="reloadButton" class="btn secondary small" type="button">再読み込み</button>
+          </div>
+          <div class="table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th>日付</th>
+                  <th>大会</th>
+                  <th>対戦</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="adminMatchesBody"></tbody>
+            </table>
+          </div>
         </article>
-        <article class="method-card">
-          <h3>3. 都道府県・リーグ評価</h3>
-          <p>学校Ratingとは別のポイントを作らず、登録された所属校の分布から集計します。平均、中央値、Top5平均、Top25%平均などを併記します。</p>
-        </article>
-        <article class="method-card">
-          <h3>4. シーズン切替</h3>
-          <p>現行案では人工的なリセットを行わず、新チームの実力変化は実戦結果によるポイント移動で自然に反映します。試合はCSVの日付順に再計算されます。</p>
-        </article>
+      </div>
+    </section>
+
+    <section id="method" class="section section-alt">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">METHODOLOGY</p>
+            <h2>Ratingの計算方法</h2>
+          </div>
+        </div>
+
+        <div class="method-grid">
+          <article class="method-card">
+            <h3>1. 期待値</h3>
+            <div class="formula">We = 1 / (1 + 10<sup>−D/600</sup>)</div>
+            <p>D は「自校Rating − 相手Rating」です。</p>
+          </article>
+
+          <article class="method-card">
+            <h3>2. 試合後の更新</h3>
+            <div class="formula">R' = R + K × (W − We)</div>
+            <p>勝=1、引き分け=0.5、負=0。既定K値は10です。</p>
+          </article>
+
+          <article class="method-card">
+            <h3>3. データの保存</h3>
+            <p>試合結果だけをSupabaseに保存し、Ratingはブラウザで全試合を古い順に再計算します。</p>
+          </article>
+
+          <article class="method-card">
+            <h3>4. 訂正への対応</h3>
+            <p>過去の試合を修正・削除した場合も、再読み込み時に全Ratingが自動で再計算されます。</p>
+          </article>
+        </div>
       </div>
     </section>
   </main>
 
   <footer>
     <div class="wrap footer-inner">
-      <div><strong>高校野球 Rating</strong><br><span>Unofficial prototype</span></div>
-      <div>© 2026 Demo</div>
+      <div>
+        <strong>高校野球 Rating</strong><br />
+        <span>Unofficial rating project</span>
+      </div>
+      <div>© 2026</div>
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
