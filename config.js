@@ -1,51 +1,40 @@
 /*
   高校野球 Rating - Supabase設定
 
-  変更するのは基本的に次の2か所だけです。
-
-  1. supabaseUrl
-  2. supabasePublishableKey
+  Supabase接続情報とRating計算設定をまとめています。
 
   注意:
-  sb_secret_... は絶対にGitHubへ載せないでください。
-  使用するのは sb_publishable_... です。
+  - 使用するのは Publishable key です。
+  - sb_secret_... や Service Role key は
+    絶対にGitHubへアップロードしないでください。
 */
 
 window.APP_CONFIG = {
-  // SupabaseのProject URL
-  // 例:
-  // https://abcdefghijk.supabase.co
-  supabaseUrl: "YOUR_PROJECT_URL",
+  // Supabase Project URL
+  supabaseUrl: "https://sbupvnuqbafestxiarkd.supabase.co",
 
-  // SupabaseのPublishable key
-  // 例:
-  // sb_publishable_xxxxxxxxxxxxxxxxxxxxx
-  supabasePublishableKey: "YOUR_PUBLISHABLE_KEY",
+  // Supabase Publishable key
+  supabasePublishableKey:
+    "sb_publishable_SdmaFoqdL0K9ENQLe2VXHw_TheG63ye",
 
   // Rating計算設定
   rating: {
-    // 全学校の初期Rating
+    // 全校の初期Rating
     initial: 1500,
 
-    // 期待値計算の除数
-    // We = 1 / (1 + 10^(-D/divisor))
+    // 期待値計算
+    // We = 1 / (1 + 10^(-D / divisor))
     divisor: 600,
 
-    // 通常のK値
+    // 通常試合のK値
     defaultK: 10,
 
-    // 大会ごとにK値を変更したい場合に使用
-    // 現在はすべて既定値10
-    tournamentK: {
-      /*
-      "夏の甲子園": 12,
-      "春の甲子園": 12,
-      "大阪大会": 10
-      */
-    }
+    // 大会別にK値を変更したい場合に設定
+    // 現在は未設定なので、すべてdefaultK = 10
+    tournamentK: {}
   },
 
-  // ランキング画面で通常表示する最大校数
-  // 検索時は全校が対象
+  // 全国ランキングで通常表示する最大校数
+  // 学校検索時は全校が検索対象になります
   rankingLimit: 200
 };
