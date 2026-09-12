@@ -87,7 +87,7 @@
 
       <div class="summary-strip">
         <div><span>登録試合</span><strong id="matchCount">0</strong></div>
-        <div><span>学校数</span><strong id="schoolCount">0</strong></div>
+        <div><span>学校数（直近1年出場）</span><strong id="schoolCount">0</strong></div>
         <div><span>都道府県数</span><strong id="prefCount">0</strong></div>
         <div><span>最終試合日</span><strong id="latestMatchDate">—</strong></div>
       </div>
@@ -271,7 +271,7 @@
             </label>
             <label>
               K値
-              <input id="kValue" type="number" value="20" min="0.1" max="200" step="0.5" />
+              <input id="kValue" type="text" inputmode="decimal" value="20" autocomplete="off" />
             </label>
           </div>
           <div id="simResult" class="sim-result"></div>
@@ -372,15 +372,15 @@
           </div>
           <form id="siteSettingsForm">
             <div class="site-k-grid site-k-grid-eight">
-              <label>秋季大会予選 K<input id="siteAutumnQualifierK" type="number" min="0.1" max="200" step="0.5" required /></label>
-              <label>秋季大会地区大会 K<input id="siteAutumnRegionalK" type="number" min="0.1" max="200" step="0.5" required /></label>
-              <label>明治神宮大会 K<input id="siteMeijiJinguK" type="number" min="0.1" max="200" step="0.5" required /></label>
-              <label>春の甲子園 K<input id="siteSpringKoshienK" type="number" min="0.1" max="200" step="0.5" required /></label>
-              <label>春季大会予選 K<input id="siteSpringQualifierK" type="number" min="0.1" max="200" step="0.5" required /></label>
-              <label>春季大会地区大会 K<input id="siteSpringRegionalK" type="number" min="0.1" max="200" step="0.5" required /></label>
-              <label>夏の甲子園予選 K<input id="siteSummerQualifierK" type="number" min="0.1" max="200" step="0.5" required /></label>
-              <label>夏の甲子園本戦 K<input id="siteSummerMainK" type="number" min="0.1" max="200" step="0.5" required /></label>
-              <label>国民スポーツ大会 K<input id="siteKokuspoK" type="number" min="0.1" max="200" step="0.5" required /></label>
+              <label>秋季大会予選 K<input id="siteAutumnQualifierK" type="text" inputmode="decimal" autocomplete="off" required /></label>
+              <label>秋季大会地区大会 K<input id="siteAutumnRegionalK" type="text" inputmode="decimal" autocomplete="off" required /></label>
+              <label>明治神宮大会 K<input id="siteMeijiJinguK" type="text" inputmode="decimal" autocomplete="off" required /></label>
+              <label>春の甲子園 K<input id="siteSpringKoshienK" type="text" inputmode="decimal" autocomplete="off" required /></label>
+              <label>春季大会予選 K<input id="siteSpringQualifierK" type="text" inputmode="decimal" autocomplete="off" required /></label>
+              <label>春季大会地区大会 K<input id="siteSpringRegionalK" type="text" inputmode="decimal" autocomplete="off" required /></label>
+              <label>夏の甲子園予選 K<input id="siteSummerQualifierK" type="text" inputmode="decimal" autocomplete="off" required /></label>
+              <label>夏の甲子園本戦 K<input id="siteSummerMainK" type="text" inputmode="decimal" autocomplete="off" required /></label>
+              <label>国民スポーツ大会 K<input id="siteKokuspoK" type="text" inputmode="decimal" autocomplete="off" required /></label>
             </div>
             <p class="muted settings-help">9区分を個別に変更できます。各試合に手動K値が保存されている場合は、その手動値が最優先です。K空欄の試合は大会名から自動判定して再計算されます。</p>
             <div class="form-actions settings-actions">

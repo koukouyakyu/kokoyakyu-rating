@@ -225,7 +225,20 @@
     syncPublicSettingToggles();
   }
   function renderAll(){hideSetupNotice();applyPublicVisibility();renderSummary();renderPrefFilter();renderRanking();renderPrefCards();renderSchoolSelect();renderSchoolProfile();renderRankCompareSelected();renderRankCompareChart();renderAdminMatches();syncSiteSettingsForm();}
-  function renderSummary(){els.matchCount.textContent=state.matches.length.toLocaleString('ja-JP');els.schoolCount.textContent=state.schools.filter(s=>!s.isJoint).length.toLocaleString('ja-JP');els.prefCount.textContent=state.prefs.length.toLocaleString('ja-JP');els.latestMatchDate.textContent=state.matches.map(m=>m.date).filter(Boolean).sort().at(-1)||'—';}
+  function hasOfficialGameInPastYear(school){
+    if(!school||!Array.isArray(school.games)||!school.games.length)return false;
+    const now=new Date();
+    const cutoff=new Date(now);
+    cutoff.setFullYear(cutoff.getFullYear()-1);
+    cutoff.setHours(0,0,0,0);
+    return school.games.some(g=>{
+      const dateText=g?.match?.date;
+      if(!dateText)return false;
+      const d=new Date(`${dateText}T00:00:00`);
+      return Number.isFinite(d.getTime())&&d>=cutoff&&d<=now;
+    });
+  }
+  function renderSummary(){els.matchCount.textContent=state.matches.length.toLocaleString('ja-JP');els.schoolCount.textContent=state.schools.filter(s=>!s.isJoint&&hasOfficialGameInPastYear(s)).length.toLocaleString('ja-JP');els.prefCount.textContent=state.prefs.length.toLocaleString('ja-JP');els.latestMatchDate.textContent=state.matches.map(m=>m.date).filter(Boolean).sort().at(-1)||'—';}
   function renderPrefFilter(){
     const old=els.prefFilter.value,source=ratingVisibleSchools(),special=['東北','関東','中部','関西','中国','四国','九州・沖縄','東京','東東京','西東京','北海道','南北海道','北北海道'];
     const prefs=[...new Set(source.map(s=>s.pref).filter(Boolean))].filter(p=>!special.includes(p)).sort((a,b)=>a.localeCompare(b,'ja'));
@@ -391,7 +404,7 @@
   }
   async function updateProposalStatus(id,status){const {error}=await state.client.from('correction_proposals').update({status}).eq('id',id);if(error)return alert(error.message);await loadProposals();}
 
-  function renderSimulator(){const a=Number(els.ratingA.value),b=Number(els.ratingB.value),k=Number(els.kValue.value);if(![a,b,k].every(Number.isFinite)||k<=0){els.simResult.innerHTML='';return;}const e=expectation(a,b),w=k*(1-e),d=k*(.5-e),l=k*(0-e);els.simResult.innerHTML=`<div><span>A校の勝利期待値</span><strong>${(e*100).toFixed(1)}%</strong></div><div><span>A校が勝った場合</span><strong class="${deltaClass(w)}">${formatDelta(w)}</strong></div><div><span>引分 / 敗戦</span><strong>${formatDelta(d)} / ${formatDelta(l)}</strong></div>`;}
+  function renderSimulator(){const a=Number(els.ratingA.value),b=Number(els.ratingB.value),pk=parseOptionalK(els.kValue.value),k=pk.value;if(![a,b].every(Number.isFinite)||k===null){els.simResult.innerHTML='';return;}const e=expectation(a,b),w=k*(1-e),d=k*(.5-e),l=k*(0-e);els.simResult.innerHTML=`<div><span>A校の勝利期待値</span><strong>${(e*100).toFixed(1)}%</strong></div><div><span>A校が勝った場合</span><strong class="${deltaClass(w)}">${formatDelta(w)}</strong></div><div><span>引分 / 敗戦</span><strong>${formatDelta(d)} / ${formatDelta(l)}</strong></div>`;}
 
   async function loadSiteSettings(){
     if(!state.client)return;
@@ -414,11 +427,19 @@
   }
   async function handleSiteSettingsSave(e){
     e.preventDefault();if(!state.session?.user)return;
-    const values={
-      autumn_qualifier_k:Number(els.siteAutumnQualifierK?.value),autumn_regional_k:Number(els.siteAutumnRegionalK?.value),meiji_jingu_k:Number(els.siteMeijiJinguK?.value),spring_koshien_k:Number(els.siteSpringKoshienK?.value),
-      spring_qualifier_k:Number(els.siteSpringQualifierK?.value),spring_regional_k:Number(els.siteSpringRegionalK?.value),summer_qualifier_k:Number(els.siteSummerQualifierK?.value),summer_main_k:Number(els.siteSummerMainK?.value),kokuspo_k:Number(els.siteKokuspoK?.value)
+    const fields={
+      autumn_qualifier_k:els.siteAutumnQualifierK,autumn_regional_k:els.siteAutumnRegionalK,meiji_jingu_k:els.siteMeijiJinguK,spring_koshien_k:els.siteSpringKoshienK,
+      spring_qualifier_k:els.siteSpringQualifierK,spring_regional_k:els.siteSpringRegionalK,summer_qualifier_k:els.siteSummerQualifierK,summer_main_k:els.siteSummerMainK,kokuspo_k:els.siteKokuspoK
     };
-    if(Object.values(values).some(v=>!Number.isFinite(v)||v<=0))return setMessage(els.siteSettingsMessage,'K値はすべて0より大きい数値を入力してください。','error');
+    const values={};
+    for(const [key,el] of Object.entries(fields)){
+      const parsed=parseOptionalK(el?.value);
+      if(parsed.error||parsed.value===null||parsed.value>200){
+        el?.focus();
+        return setMessage(els.siteSettingsMessage,'K値は0より大きく200以下の数値を入力してください（例：20、25.5、４０）。','error');
+      }
+      values[key]=parsed.value;
+    }
     const payload={id:1,...values,qualifier_k:values.summer_qualifier_k,main_k:values.summer_main_k,k_scheme_version:3,updated_at:new Date().toISOString()};
     setMessage(els.siteSettingsMessage,'保存中…');
     const {data,error}=await state.client.from('site_settings').upsert(payload,{onConflict:'id'}).select().single();
