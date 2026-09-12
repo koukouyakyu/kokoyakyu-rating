@@ -1637,3 +1637,63 @@ footer {
   .rating-range-filter { width: 100%; }
   .rating-range-filter input { flex: 1; width: auto; }
 }
+
+
+/* ===== 2026-09-13 rev20: 順位推移の自由期間指定 / ホバーツールチップ ===== */
+.rank-compare-date-range {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.rank-compare-date-range label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: .78rem;
+  font-weight: 800;
+}
+.rank-compare-date-range input[type="date"] {
+  min-width: 150px;
+}
+.rank-date-separator {
+  padding-bottom: 10px;
+  color: var(--muted);
+  font-weight: 800;
+}
+.rank-point-hit {
+  fill: transparent;
+  stroke: transparent;
+  cursor: crosshair;
+  pointer-events: all;
+}
+.rank-point-hit:focus {
+  outline: none;
+  stroke: var(--text);
+  stroke-width: 1.5;
+}
+.rank-chart-tooltip {
+  position: fixed;
+  z-index: 9999;
+  width: max-content;
+  max-width: 240px;
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 10px 28px rgba(0,0,0,.16);
+  font-size: .82rem;
+  line-height: 1.4;
+  pointer-events: none;
+}
+.rank-chart-tooltip strong { font-size: .9rem; }
+.rank-chart-tooltip span { display: block; }
+@media (max-width: 620px) {
+  .rank-compare-date-range { width: 100%; align-items: stretch; }
+  .rank-compare-date-range label { flex: 1 1 140px; }
+  .rank-compare-date-range input[type="date"] { width: 100%; min-width: 0; }
+  .rank-date-separator { align-self: center; padding: 18px 0 0; }
+}
