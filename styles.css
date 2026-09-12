@@ -1582,3 +1582,58 @@ footer {
   }
 }
 
+
+
+/* ===== 2026-09-12 rev19: Rating範囲検索 / 順位比較10校 ===== */
+.rating-range-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.rating-range-filter input {
+  width: 92px;
+  min-width: 0;
+}
+.rank-chip-swatch {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  border-radius: 50%;
+}
+.rank-line-5 { stroke: #b23a48; }
+.rank-line-6 { stroke: #007c91; }
+.rank-line-7 { stroke: #6b6f16; }
+.rank-line-8 { stroke: #c14f8a; }
+.rank-line-9 { stroke: #5b4bb7; }
+.rank-line-10 { stroke: #6a4a2f; }
+.rank-dot-5 { fill: #b23a48; }
+.rank-dot-6 { fill: #007c91; }
+.rank-dot-7 { fill: #6b6f16; }
+.rank-dot-8 { fill: #c14f8a; }
+.rank-dot-9 { fill: #5b4bb7; }
+.rank-dot-10 { fill: #6a4a2f; }
+.rank-legend-5 { background: #b23a48; }
+.rank-legend-6 { background: #007c91; }
+.rank-legend-7 { background: #6b6f16; }
+.rank-legend-8 { background: #c14f8a; }
+.rank-legend-9 { background: #5b4bb7; }
+.rank-legend-10 { background: #6a4a2f; }
+.rank-school-chip.rank-chip-1 { border-left: 4px solid #176b48; }
+.rank-school-chip.rank-chip-2 { border-left: 4px solid #a85d10; }
+.rank-school-chip.rank-chip-3 { border-left: 4px solid #315fa8; }
+.rank-school-chip.rank-chip-4 { border-left: 4px solid #8b4d93; }
+.rank-school-chip.rank-chip-5 { border-left: 4px solid #b23a48; }
+.rank-school-chip.rank-chip-6 { border-left: 4px solid #007c91; }
+.rank-school-chip.rank-chip-7 { border-left: 4px solid #6b6f16; }
+.rank-school-chip.rank-chip-8 { border-left: 4px solid #c14f8a; }
+.rank-school-chip.rank-chip-9 { border-left: 4px solid #5b4bb7; }
+.rank-school-chip.rank-chip-10 { border-left: 4px solid #6a4a2f; }
+@media (max-width: 720px) {
+  .rating-range-filter { width: 100%; }
+  .rating-range-filter input { flex: 1; width: auto; }
+}
