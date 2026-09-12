@@ -8,7 +8,7 @@
     name="description"
     content="公開された公式戦結果から独自算出する高校野球レーティング"
   />
-  <link rel="stylesheet" href="styles.css?v=20260912-17" />
+  <link rel="stylesheet" href="styles.css?v=20260913-21" />
 </head>
 <body>
   <header class="site-header">
@@ -80,6 +80,10 @@
             <input id="ratingMinFilter" type="number" step="1" inputmode="numeric" placeholder="下限" aria-label="Rating下限" />
             <span>〜</span>
             <input id="ratingMaxFilter" type="number" step="1" inputmode="numeric" placeholder="上限" aria-label="Rating上限" />
+          </div>
+          <div class="ranking-date-filter" role="group" aria-label="ランキング基準日">
+            <label>基準日 <input id="rankingDate" type="date" aria-label="ランキング基準日" /></label>
+            <button id="rankingDateLatest" class="btn secondary small" type="button">最新</button>
           </div>
           <label class="ranking-page-size-label">表示数
             <select id="rankingPageSize" aria-label="ランキング1ページの表示数">
@@ -539,6 +543,33 @@
             </div>
           </div>
 
+          <div class="school-alias-panel" aria-label="学校名の別名辞書">
+            <div class="school-normalize-head">
+              <div>
+                <strong>学校名の別名辞書・自動提案</strong>
+                <p class="muted">別名は都道府県込みで登録します。表記揺れ候補は必ず同じ都道府県内だけで検出し、別都道府県の似た学校は提案しません。</p>
+              </div>
+              <button id="aliasRefreshButton" class="btn secondary small" type="button">再検出</button>
+            </div>
+            <div class="school-alias-grid">
+              <label>都道府県<input id="aliasPref" type="text" placeholder="例：千葉" autocomplete="off" /></label>
+              <label>別表記<input id="aliasName" type="text" placeholder="例：専修大松戸" autocomplete="off" /></label>
+              <label>統一名<input id="aliasCanonical" type="text" placeholder="例：専大松戸" autocomplete="off" /></label>
+              <div class="school-normalize-actions"><button id="aliasAddButton" class="btn primary small" type="button">別名を登録</button></div>
+            </div>
+            <div id="aliasMessage" class="muted school-normalize-status" aria-live="polite"></div>
+            <div class="school-alias-columns">
+              <div>
+                <h4>変更候補</h4>
+                <div id="aliasSuggestionList" class="school-alias-list"><div class="empty">別名辞書を読み込むと自動検出します。</div></div>
+              </div>
+              <div>
+                <h4>登録済み別名</h4>
+                <div id="aliasList" class="school-alias-list"><div class="empty">登録済み別名はありません。</div></div>
+              </div>
+            </div>
+          </div>
+
           <div class="school-normalize-panel" aria-label="学校名の表記揺れ一括修正">
             <div class="school-normalize-head">
               <div>
@@ -645,6 +676,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=20260912-17"></script>
+  <script src="app.js?v=20260913-21"></script>
 </body>
 </html>
