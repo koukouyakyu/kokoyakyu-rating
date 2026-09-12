@@ -527,7 +527,40 @@
               <button id="adminMatchClear" class="btn secondary small" type="button">検索条件をクリア</button>
             </div>
           </div>
-          <div class="table-card">
+
+          <div class="school-normalize-panel" aria-label="学校名の表記揺れ一括修正">
+            <div class="school-normalize-head">
+              <div>
+                <strong>学校名の表記揺れを一括修正</strong>
+                <p class="muted">A校・B校の両方を対象に、登録済み試合の学校名をまとめて置換します。実行前に対象を確認できます。</p>
+              </div>
+            </div>
+            <div class="school-normalize-grid">
+              <label>
+                変更前
+                <input id="schoolReplaceFrom" type="text" placeholder="例：智弁" autocomplete="off" />
+              </label>
+              <label>
+                変更後
+                <input id="schoolReplaceTo" type="text" placeholder="例：智辯" autocomplete="off" />
+              </label>
+              <label>
+                置換方法
+                <select id="schoolReplaceMode">
+                  <option value="contains">文字列を置換（例：智弁→智辯）</option>
+                  <option value="exact">学校名が完全一致した場合だけ</option>
+                </select>
+              </label>
+              <div class="school-normalize-actions">
+                <button id="schoolReplacePreviewButton" class="btn secondary small" type="button">対象を確認</button>
+                <button id="schoolReplaceApplyButton" class="btn primary small" type="button" disabled>一括修正</button>
+              </div>
+            </div>
+            <div id="schoolReplaceStatus" class="muted school-normalize-status" aria-live="polite"></div>
+            <div id="schoolReplacePreview" class="school-normalize-preview hidden"></div>
+          </div>
+
+          <div class="table-card admin-matches-scroll">
             <table>
               <thead>
                 <tr>
