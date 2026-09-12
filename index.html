@@ -50,7 +50,7 @@
           <div class="formula-mini" id="heroFormula">R' = R + 10 × (W − We)</div>
           <div class="metric-row"><span>初期Rating</span><strong id="heroInitial">1500</strong></div>
           <div class="metric-row"><span>期待値の除数</span><strong id="heroDivisor">600</strong></div>
-          <div class="metric-row"><span>K値（地方予選 / 地区・国スポ / 春・神宮 / 夏）</span><strong id="heroK">10 / 15 / 20 / 25</strong></div>
+          <div class="metric-row"><span>K値（地方予選 / 地区・国スポ / 春・神宮 / 夏）</span><strong id="heroK">20 / 30 / 40 / 50</strong></div>
           <div class="metric-row"><span>データ</span><strong id="dataStatus">接続中…</strong></div>
         </div>
       </div>
@@ -395,8 +395,14 @@
             </label>
 
             <label>
-              K値（空欄なら大会レベルから自動判定）
-              <input id="matchK" type="number" min="0.1" step="0.5" />
+              K値（任意・空欄なら大会レベルから自動判定）
+              <input id="matchK" type="text" inputmode="decimal" list="matchKValues" placeholder="自動判定（20 / 30 / 40 / 50）" autocomplete="off" />
+              <datalist id="matchKValues">
+                <option value="20"></option>
+                <option value="30"></option>
+                <option value="40"></option>
+                <option value="50"></option>
+              </datalist>
             </label>
 
             <label class="span-2">

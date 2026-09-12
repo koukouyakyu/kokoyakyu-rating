@@ -5,7 +5,7 @@
   const ratingCfg = {
     initial: Number(cfg.rating?.initial ?? 1500),
     divisor: Number(cfg.rating?.divisor ?? 600),
-    defaultK: Number(cfg.rating?.defaultK ?? 10),
+    defaultK: Number(cfg.rating?.defaultK ?? 20) === 10 ? 20 : Number(cfg.rating?.defaultK ?? 20),
     tournamentK: cfg.rating?.tournamentK || {}
   };
   const PUBLIC_RATING_MIN = Number(cfg.publicRatingMin ?? 1500);
@@ -100,21 +100,21 @@
     const specific=Number(ratingCfg.tournamentK?.[match.tournament]); if(Number.isFinite(specific)&&specific>0) return specific;
     const raw=`${match.tournament||''} ${match.stage||''}`;
     const t=raw.replace(/\s+/g,'');
-    if(/明治神宮/.test(t)) return 20;
-    if(/国民スポーツ|国スポ|国体/.test(t)) return 15;
-    if(/甲子園/.test(t)&&/夏|全国高等学校野球選手権/.test(t)) return 25;
-    if(/選抜|センバツ|春の甲子園/.test(t)) return 20;
+    if(/明治神宮/.test(t)) return 40;
+    if(/国民スポーツ|国スポ|国体/.test(t)) return 30;
+    if(/甲子園/.test(t)&&/夏|全国高等学校野球選手権/.test(t)) return 50;
+    if(/選抜|センバツ|春の甲子園/.test(t)) return 40;
 
     // 春季・秋季は「都道府県内の大会/予選 = 10」「その上の地区大会 = 15」を優先して判定する。
     const springAutumn=/春季|秋季/.test(t);
     if(springAutumn){
       const prefecturalQualifier=/(?:北海道|東京都|京都府|大阪府|.{2,3}県)(?:大会|予選)|都大会|道大会|府大会|県大会|都予選|道予選|府予選|県予選|支部予選|地方予選/.test(t);
-      if(prefecturalQualifier) return 10;
+      if(prefecturalQualifier) return 20;
       const regionalMain=/(?:北海道|東北|関東|北信越|東海|近畿|中国|四国|九州)(?:地区)?(?:高等学校野球)?大会|地区大会/.test(t);
-      if(regionalMain) return 15;
+      if(regionalMain) return 30;
     }
-    if(/地区大会/.test(t)) return 15;
-    return 10;
+    if(/地区大会/.test(t)) return 30;
+    return 20;
   }
   function normalizeMatch(m){
     const a=canonicalTeam(m.team_a), b=canonicalTeam(m.team_b), tournamentOriginal=String(m.tournament??'').trim();
@@ -355,9 +355,19 @@
     }catch(e){alert(`重複統合に失敗しました: ${e.message||e}`);}finally{els.duplicateMergeButton.disabled=false;els.duplicateMergeButton.textContent='チェックした重複を統合';}
   }
 
-  function readMatchForm(){const kt=els.matchK.value.trim(),su=els.sourceUrl.value.trim();return{date:els.matchDate.value,tournament:canonicalTournament(els.tournament.value),stage:els.stage.value.trim()||null,team_a:els.teamA.value.trim(),pref_a:els.prefA.value.trim(),score_a:Number(els.scoreA.value),team_b:els.teamB.value.trim(),pref_b:els.prefB.value.trim(),score_b:Number(els.scoreB.value),k:kt?Number(kt):null,source_url:su||null};}
-  function validateMatchPayload(p){if(!p.date)return'試合日を入力してください。';if(!p.tournament)return'大会名を入力してください。';if(!p.team_a||!p.team_b)return'両校の学校名を入力してください。';if(!p.pref_a||!p.pref_b)return'両校の都道府県を入力してください。';if(!Number.isInteger(p.score_a)||p.score_a<0||!Number.isInteger(p.score_b)||p.score_b<0)return'得点を確認してください。';if(schoolKey(p.team_a,p.pref_a)===schoolKey(p.team_b,p.pref_b))return'同じチーム同士の試合は登録できません。';return null;}
-  async function handleMatchSubmit(e){e.preventDefault();if(!state.session?.user)return setMessage(els.matchFormMessage,'管理者ログインが必要です。','error');const p=readMatchForm(),ve=validateMatchPayload(p);if(ve)return setMessage(els.matchFormMessage,ve,'error');const id=els.editingMatchId.value;const dup=findDuplicateForPayload(p,id);if(dup)return setMessage(els.matchFormMessage,`重複の可能性が高い試合が既に登録されています：${dup.date} ${dup.team_a_display||dup.team_a} ${dup.score_a}-${dup.score_b} ${dup.team_b_display||dup.team_b}（${dup.tournament}）`,'error');setMessage(els.matchFormMessage,id?'更新中…':'登録中…');const r=id?await state.client.from('matches').update(p).eq('id',id):await state.client.from('matches').insert(p);if(r.error)return setMessage(els.matchFormMessage,r.error.message,'error');resetMatchForm();setMessage(els.matchFormMessage,id?'試合を更新しました。':'試合を登録しました。','success');await loadMatches();await loadEditHistory();}
+  function parseOptionalK(value){
+    const raw=String(value??'').normalize('NFKC').replace(/,/g,'').trim();
+    if(!raw)return {value:null,error:null};
+    const n=Number(raw);
+    if(!Number.isFinite(n)||n<=0)return {value:null,error:'K値は正の数で入力してください。空欄なら大会レベルから自動判定します。'};
+    return {value:n,error:null};
+  }
+  function readMatchForm(){
+    const parsedK=parseOptionalK(els.matchK.value),su=els.sourceUrl.value.trim();
+    return{date:els.matchDate.value,tournament:canonicalTournament(els.tournament.value),stage:els.stage.value.trim()||null,team_a:els.teamA.value.trim(),pref_a:els.prefA.value.trim(),score_a:Number(els.scoreA.value),team_b:els.teamB.value.trim(),pref_b:els.prefB.value.trim(),score_b:Number(els.scoreB.value),k:parsedK.value,_kError:parsedK.error,source_url:su||null};
+  }
+  function validateMatchPayload(p){if(!p.date)return'試合日を入力してください。';if(!p.tournament)return'大会名を入力してください。';if(!p.team_a||!p.team_b)return'両校の学校名を入力してください。';if(!p.pref_a||!p.pref_b)return'両校の都道府県を入力してください。';if(!Number.isInteger(p.score_a)||p.score_a<0||!Number.isInteger(p.score_b)||p.score_b<0)return'得点を確認してください。';if(p._kError)return p._kError;if(schoolKey(p.team_a,p.pref_a)===schoolKey(p.team_b,p.pref_b))return'同じチーム同士の試合は登録できません。';return null;}
+  async function handleMatchSubmit(e){e.preventDefault();if(!state.session?.user)return setMessage(els.matchFormMessage,'管理者ログインが必要です。','error');const p=readMatchForm(),ve=validateMatchPayload(p);if(ve)return setMessage(els.matchFormMessage,ve,'error');delete p._kError;const id=els.editingMatchId.value;const dup=findDuplicateForPayload(p,id);if(dup)return setMessage(els.matchFormMessage,`重複の可能性が高い試合が既に登録されています：${dup.date} ${dup.team_a_display||dup.team_a} ${dup.score_a}-${dup.score_b} ${dup.team_b_display||dup.team_b}（${dup.tournament}）`,'error');setMessage(els.matchFormMessage,id?'更新中…':'登録中…');const r=id?await state.client.from('matches').update(p).eq('id',id):await state.client.from('matches').insert(p);if(r.error)return setMessage(els.matchFormMessage,r.error.message,'error');resetMatchForm();setMessage(els.matchFormMessage,id?'試合を更新しました。':'試合を登録しました。','success');await loadMatches();await loadEditHistory();}
   function resetMatchForm(){els.matchForm.reset();els.editingMatchId.value='';els.matchFormTitle.textContent='試合を登録';els.saveMatchButton.textContent='試合を登録';els.cancelEditButton.classList.add('hidden');els.matchDate.value=new Date().toISOString().slice(0,10);}
   function startEdit(id){const m=state.matches.find(x=>x.id===id);if(!m)return;els.editingMatchId.value=m.id;els.matchDate.value=m.date||'';els.tournament.value=m.tournament_original||m.tournament||'';els.stage.value=m.stage||'';els.teamA.value=m.team_a_display||m.team_a||'';els.prefA.value=m.pref_a||'';els.scoreA.value=m.score_a??'';els.teamB.value=m.team_b_display||m.team_b||'';els.prefB.value=m.pref_b||'';els.scoreB.value=m.score_b??'';els.matchK.value=m.k??'';els.sourceUrl.value=m.source_url||'';els.matchFormTitle.textContent='試合を編集';els.saveMatchButton.textContent='変更を保存';els.cancelEditButton.classList.remove('hidden');document.querySelector('#admin').scrollIntoView({behavior:'smooth'});}
   async function deleteMatch(id){const m=state.matches.find(x=>x.id===id);if(!m||!confirm(`${m.date} ${m.team_a} ${m.score_a}-${m.score_b} ${m.team_b}\nこの試合を削除しますか？`))return;const {error}=await state.client.from('matches').delete().eq('id',id);if(error)return alert(error.message);await loadMatches();await loadEditHistory();}
@@ -411,7 +421,7 @@
 
   function bindEvents(){els.searchInput.addEventListener('input',renderRanking);els.prefFilter.addEventListener('change',renderRanking);els.prefSort?.addEventListener('change',renderPrefCards);els.schoolSearch?.addEventListener('input',renderSchoolSearch);els.schoolSearch?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.schoolSearchHits.length){e.preventDefault();selectSchoolSearchHit(0);}});els.recordSchoolSearch?.addEventListener('input',renderRecordSchoolSearch);els.recordSchoolSearch?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.recordSearchHits.length){e.preventDefault();selectRecordSearchHit(0);}});els.schoolSelect.addEventListener('change',()=>{state.selectedSchoolKey=els.schoolSelect.value;renderSchoolProfile();});els.historyRange?.addEventListener('click',e=>{const b=e.target.closest('[data-years]');if(!b)return;state.historyYears=b.dataset.years;els.historyRange.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));renderSchoolProfile();});els.matchYearFilter?.addEventListener('change',()=>renderSchoolProfile());els.rankCompareSearch?.addEventListener('input',renderRankCompareSearch);els.rankCompareSearch?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.rankCompareSearchHits.length){e.preventDefault();addRankCompareSchool(0);}});els.rankCompareRange?.addEventListener('click',e=>{const b=e.target.closest('[data-years]');if(!b)return;state.compareYears=b.dataset.years;els.rankCompareRange.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));renderRankCompareChart();});[els.ratingA,els.ratingB,els.kValue].forEach(i=>i.addEventListener('input',renderSimulator));els.loginForm.addEventListener('submit',handleLogin);els.showResetButton.addEventListener('click',showResetRequest);els.resetRequestForm.addEventListener('submit',handleResetRequest);els.backToLoginButton.addEventListener('click',backToLogin);els.passwordSetupForm.addEventListener('submit',handlePasswordSetup);els.logoutButton.addEventListener('click',handleLogout);els.matchForm.addEventListener('submit',handleMatchSubmit);els.cancelEditButton.addEventListener('click',resetMatchForm);els.reloadButton.addEventListener('click',loadMatches);[els.adminMatchKeyword,els.adminMatchTournament,els.adminMatchSchool].forEach(x=>x?.addEventListener('input',renderAdminMatches));els.adminMatchDate?.addEventListener('change',renderAdminMatches);els.adminMatchClear?.addEventListener('click',clearAdminMatchSearch);els.duplicateScanButton?.addEventListener('click',toggleDuplicateView);els.duplicateMergeButton?.addEventListener('click',mergeCheckedDuplicates);els.normalizeTournamentButton?.addEventListener('click',normalizeTournamentNames);els.reloadProposalsButton?.addEventListener('click',loadProposals);els.reloadHistoryButton?.addEventListener('click',loadEditHistory);document.addEventListener('click',e=>{if(els.schoolSearchResults&&!e.target.closest('.school-search-wrap'))els.schoolSearchResults.classList.add('hidden');if(els.recordSchoolSearchResults&&!e.target.closest('.record-school-search-wrap'))els.recordSchoolSearchResults.classList.add('hidden');if(els.rankCompareSearchResults&&!e.target.closest('.rank-compare-search-wrap'))els.rankCompareSearchResults.classList.add('hidden');});}
 
-  function renderStaticConfig(){els.heroInitial.textContent=ratingCfg.initial;els.heroDivisor.textContent=ratingCfg.divisor;els.heroK.textContent='10 / 15 / 20 / 25';els.heroFormula.textContent="R' = R + K × (W − We)";els.kValue.value=ratingCfg.defaultK;if(els.methodKText)els.methodKText.textContent='K値：夏の甲子園25、春の甲子園・明治神宮大会20、春季・秋季の地区大会と国民スポーツ大会15、春季・秋季の都道府県大会・県予選など地方予選10。';}
+  function renderStaticConfig(){els.heroInitial.textContent=ratingCfg.initial;els.heroDivisor.textContent=ratingCfg.divisor;els.heroK.textContent='20 / 30 / 40 / 50';els.heroFormula.textContent="R' = R + K × (W − We)";els.kValue.value=ratingCfg.defaultK;if(els.methodKText)els.methodKText.textContent='K値：夏の甲子園50、春の甲子園・明治神宮大会40、春季・秋季の地区大会と国民スポーツ大会30、春季・秋季の都道府県大会・県予選など地方予選20。';}
   async function init(){bindEvents();renderStaticConfig();renderSimulator();resetMatchForm();if(!isConfigReady()){setDataStatus('要設定');showSetupNotice('<strong>Supabaseの接続情報が未設定です。</strong> config.js を設定してください。');els.loginPanel.classList.add('hidden');els.adminUnavailable.textContent='config.jsを設定すると利用できます。';els.adminUnavailable.classList.remove('hidden');return;}state.client=window.supabase.createClient(cfg.supabaseUrl,cfg.supabasePublishableKey);els.adminUnavailable.classList.add('hidden');await Promise.all([restoreSession(),loadMatches()]);}
   init().catch(e=>{console.error(e);setDataStatus('エラー');showSetupNotice(`<code>${escapeHtml(e.message||e)}</code>`);});
 })();
