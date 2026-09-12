@@ -8,7 +8,7 @@
     name="description"
     content="公開された公式戦結果から独自算出する高校野球レーティング"
   />
-  <link rel="stylesheet" href="styles.css?v=20260911-8" />
+  <link rel="stylesheet" href="styles.css?v=20260912-9" />
 </head>
 <body>
   <header class="site-header">
@@ -71,7 +71,7 @@
           <h2>全国ランキング</h2>
         </div>
         <div class="controls">
-          <input id="searchInput" type="search" placeholder="学校名・都道府県で検索" aria-label="学校検索" />
+          <input id="searchInput" type="search" placeholder="学校名・都道府県・地域名で検索" aria-label="学校検索" />
           <select id="prefFilter" aria-label="都道府県・地区フィルター">
             <option value="">すべて</option>
           </select>
@@ -113,10 +113,10 @@
           <div class="pref-sort-control">
             <label for="prefSort">並び替え</label>
             <select id="prefSort" aria-label="都道府県ランキングの並び替え">
-              <option value="average">平均</option>
+              <option value="topRating">県内1位校Rating</option>
               <option value="median">中央値</option>
-              <option value="top5">上位5%</option>
-              <option value="top25" selected>上位25%</option>
+              <option value="top5">上位5校平均</option>
+              <option value="top25" selected>上位25%平均</option>
             </select>
           </div>
         </div>
@@ -163,6 +163,7 @@
 
           <div class="stats-row">
             <div><span>全国順位</span><strong id="schoolRank">—</strong></div>
+            <div><span>県内順位</span><strong id="schoolPrefRank">—</strong></div>
             <div><span>前回比</span><strong id="schoolDelta">—</strong></div>
             <div><span>直近5試合</span><strong id="schoolForm">—</strong></div>
           </div>
@@ -427,8 +428,14 @@
             <div class="panel-head-actions">
               <span id="duplicateStatus" class="muted" aria-live="polite"></span>
               <button id="duplicateScanButton" class="btn secondary small" type="button">重複試合を検知</button>
+              <button id="normalizeTournamentButton" class="btn secondary small" type="button">大会名の表記揺れを修正</button>
               <button id="reloadButton" class="btn secondary small" type="button">再読み込み</button>
             </div>
+          </div>
+          <div class="admin-tools-status"><span id="normalizeTournamentStatus" class="muted" aria-live="polite"></span></div>
+          <div class="duplicate-merge-panel">
+            <div class="duplicate-merge-head"><strong>重複候補の統合</strong><button id="duplicateMergeButton" class="btn danger small" type="button" disabled>チェックした重複を統合</button></div>
+            <div id="duplicateMergeList" class="duplicate-merge-list"><div class="empty">「重複試合を検知」を押すと候補を確認できます。</div></div>
           </div>
           <div class="admin-match-search" aria-label="登録済み試合の検索">
             <label>
@@ -465,6 +472,15 @@
               <tbody id="adminMatchesBody"></tbody>
             </table>
           </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h3>編集履歴</h3>
+            <button id="reloadHistoryButton" class="btn secondary small" type="button">履歴を再読み込み</button>
+          </div>
+          <p class="muted">試合の編集・削除・重複統合・大会名正規化を記録します。</p>
+          <div id="editHistoryList" class="edit-history-list"><div class="empty">履歴を読み込み中…</div></div>
         </article>
       </div>
     </section>
@@ -517,6 +533,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=20260911-8"></script>
+  <script src="app.js?v=20260912-9"></script>
 </body>
 </html>
