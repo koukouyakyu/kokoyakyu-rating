@@ -80,7 +80,8 @@
     if(/国民スポーツ大会|国スポ|国民体育大会|国体/.test(t))return '国民スポーツ大会';
     if(/選抜高等学校野球大会|選抜高校野球大会|センバツ|春の甲子園/.test(t))return '春の甲子園';
     if(/夏の甲子園/.test(t))return '夏の甲子園';
-    if(/全国(?:高等学校|高校)野球選手権大会/.test(t)&&!/(?:都|道|府|県|地区|地方|支部)(?:大会|予選)/.test(t))return '夏の甲子園';
+    const summerNational=t.replace(/^第\d+回/,'');
+    if(/^全国(?:高等学校|高校)野球選手権大会$/.test(summerNational))return '夏の甲子園';
     return raw;
   }
   function regionNamesForSchool(school){return Object.entries(REGION_PREFS).filter(([,prefs])=>prefs.includes(school?.pref)).map(([name])=>name);}
@@ -98,22 +99,34 @@
   function inferK(match){
     const direct=Number(match.k); if(Number.isFinite(direct)&&direct>0) return direct;
     const specific=Number(ratingCfg.tournamentK?.[match.tournament]); if(Number.isFinite(specific)&&specific>0) return specific;
-    const raw=`${match.tournament||''} ${match.stage||''}`;
-    const t=raw.replace(/\s+/g,'');
-    if(/明治神宮/.test(t)) return 30;
-    if(/国民スポーツ|国スポ|国体/.test(t)) return 25;
-    if(/甲子園/.test(t)&&/夏|全国高等学校野球選手権/.test(t)) return 35;
-    if(/選抜|センバツ|春の甲子園/.test(t)) return 30;
+    const raw=`${match.tournament_original||match.tournament||''} ${match.stage||''}`;
+    const t=raw.normalize('NFKC').replace(/\s+/g,'');
 
-    // 春季・秋季は「都道府県内の大会/予選 = 20」「その上の地区大会 = 25」を優先して判定する。
+    // Kは2段階だけにする：大会予選=20、本戦=40。
+    // 手動Kが入っている試合は上の direct が優先される。
+    if(/予選|地方大会|支部大会/.test(t)) return 20;
+    if(/東東京大会|西東京大会|北北海道大会|南北海道大会/.test(t)) return 20;
+
+    // 全国大会・主要本戦
+    if(/明治神宮/.test(t)) return 40;
+    if(/国民スポーツ|国スポ|国体/.test(t)) return 40;
+    if(/春の甲子園|選抜|センバツ/.test(t)) return 40;
+    if(/夏の甲子園/.test(t)) return 40;
+    const summerNational=t.replace(/^第\d+回/,'');
+    if(/^全国(?:高等学校|高校)野球選手権大会$/.test(summerNational)) return 40;
+
+    // 春季・秋季の地区本戦。北海道の全道大会も本戦として扱う。
     const springAutumn=/春季|秋季/.test(t);
     if(springAutumn){
-      const prefecturalQualifier=/(?:北海道|東京都|京都府|大阪府|.{2,3}県)(?:大会|予選)|都大会|道大会|府大会|県大会|都予選|道予選|府予選|県予選|支部予選|地方予選/.test(t);
-      if(prefecturalQualifier) return 20;
-      const regionalMain=/(?:北海道|東北|関東|北信越|東海|近畿|中国|四国|九州)(?:地区)?(?:高等学校野球)?大会|地区大会/.test(t);
-      if(regionalMain) return 25;
+      if(/(?:東北|関東|北信越|東海|近畿|中国|四国|九州)(?:地区)?(?:高等学校野球)?大会|地区大会/.test(t)) return 40;
+      if(/北海道(?:高等学校野球)?大会/.test(t) && !/(?:北北海道|南北海道)/.test(t)) return 40;
+      return 20;
     }
-    if(/地区大会/.test(t)) return 25;
+
+    // その他でも明示的に「本戦」「地区大会」とあるものは本戦扱い。
+    if(/本戦|地区大会/.test(t)) return 40;
+
+    // 夏の都道府県大会など、上記に該当しない大会は予選扱い。
     return 20;
   }
   function normalizeMatch(m){
@@ -421,7 +434,7 @@
 
   function bindEvents(){els.searchInput.addEventListener('input',renderRanking);els.prefFilter.addEventListener('change',renderRanking);els.prefSort?.addEventListener('change',renderPrefCards);els.schoolSearch?.addEventListener('input',renderSchoolSearch);els.schoolSearch?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.schoolSearchHits.length){e.preventDefault();selectSchoolSearchHit(0);}});els.recordSchoolSearch?.addEventListener('input',renderRecordSchoolSearch);els.recordSchoolSearch?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.recordSearchHits.length){e.preventDefault();selectRecordSearchHit(0);}});els.schoolSelect.addEventListener('change',()=>{state.selectedSchoolKey=els.schoolSelect.value;renderSchoolProfile();});els.historyRange?.addEventListener('click',e=>{const b=e.target.closest('[data-years]');if(!b)return;state.historyYears=b.dataset.years;els.historyRange.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));renderSchoolProfile();});els.matchYearFilter?.addEventListener('change',()=>renderSchoolProfile());els.rankCompareSearch?.addEventListener('input',renderRankCompareSearch);els.rankCompareSearch?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.rankCompareSearchHits.length){e.preventDefault();addRankCompareSchool(0);}});els.rankCompareRange?.addEventListener('click',e=>{const b=e.target.closest('[data-years]');if(!b)return;state.compareYears=b.dataset.years;els.rankCompareRange.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));renderRankCompareChart();});[els.ratingA,els.ratingB,els.kValue].forEach(i=>i.addEventListener('input',renderSimulator));els.loginForm.addEventListener('submit',handleLogin);els.showResetButton.addEventListener('click',showResetRequest);els.resetRequestForm.addEventListener('submit',handleResetRequest);els.backToLoginButton.addEventListener('click',backToLogin);els.passwordSetupForm.addEventListener('submit',handlePasswordSetup);els.logoutButton.addEventListener('click',handleLogout);els.matchForm.addEventListener('submit',handleMatchSubmit);els.cancelEditButton.addEventListener('click',resetMatchForm);els.reloadButton.addEventListener('click',loadMatches);[els.adminMatchKeyword,els.adminMatchTournament,els.adminMatchSchool].forEach(x=>x?.addEventListener('input',renderAdminMatches));els.adminMatchDate?.addEventListener('change',renderAdminMatches);els.adminMatchClear?.addEventListener('click',clearAdminMatchSearch);els.duplicateScanButton?.addEventListener('click',toggleDuplicateView);els.duplicateMergeButton?.addEventListener('click',mergeCheckedDuplicates);els.normalizeTournamentButton?.addEventListener('click',normalizeTournamentNames);els.reloadProposalsButton?.addEventListener('click',loadProposals);els.reloadHistoryButton?.addEventListener('click',loadEditHistory);document.addEventListener('click',e=>{if(els.schoolSearchResults&&!e.target.closest('.school-search-wrap'))els.schoolSearchResults.classList.add('hidden');if(els.recordSchoolSearchResults&&!e.target.closest('.record-school-search-wrap'))els.recordSchoolSearchResults.classList.add('hidden');if(els.rankCompareSearchResults&&!e.target.closest('.rank-compare-search-wrap'))els.rankCompareSearchResults.classList.add('hidden');});}
 
-  function renderStaticConfig(){els.heroInitial.textContent=ratingCfg.initial;els.heroDivisor.textContent=ratingCfg.divisor;els.heroK.textContent='20 / 25 / 30 / 35';els.heroFormula.textContent="R' = R + K × (W − We)";els.kValue.value=ratingCfg.defaultK;if(els.methodKText)els.methodKText.textContent='K値：夏の甲子園35、春の甲子園・明治神宮大会30、春季・秋季の地区大会と国民スポーツ大会25、春季・秋季の都道府県大会・県予選など地方予選20。';}
+  function renderStaticConfig(){els.heroInitial.textContent=ratingCfg.initial;els.heroDivisor.textContent=ratingCfg.divisor;els.heroK.textContent='20 / 40';els.heroFormula.textContent="R' = R + K × (W − We)";els.kValue.value=ratingCfg.defaultK;if(els.methodKText)els.methodKText.textContent='K値：大会予選20、本戦40。春夏秋で大会の格による差はつけず、地区・全国の本戦を40、それ以前の予選を20として扱います。';}
   async function init(){bindEvents();renderStaticConfig();renderSimulator();resetMatchForm();if(!isConfigReady()){setDataStatus('要設定');showSetupNotice('<strong>Supabaseの接続情報が未設定です。</strong> config.js を設定してください。');els.loginPanel.classList.add('hidden');els.adminUnavailable.textContent='config.jsを設定すると利用できます。';els.adminUnavailable.classList.remove('hidden');return;}state.client=window.supabase.createClient(cfg.supabaseUrl,cfg.supabasePublishableKey);els.adminUnavailable.classList.add('hidden');await Promise.all([restoreSession(),loadMatches()]);}
   init().catch(e=>{console.error(e);setDataStatus('エラー');showSetupNotice(`<code>${escapeHtml(e.message||e)}</code>`);});
 })();
