@@ -1285,3 +1285,56 @@ footer {
   .stats-row > div:nth-child(-n+2) { border-bottom:1px solid var(--line); }
   .duplicate-merge-head { align-items:stretch; flex-direction:column; }
 }
+
+/* ===== 2026-09-12 rev10: 管理画面サイト設定 ===== */
+.site-settings-panel {
+  border-color: color-mix(in srgb, var(--accent) 34%, var(--line));
+}
+.site-k-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 220px));
+  gap: 12px;
+  margin-top: 8px;
+}
+.site-k-grid label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: .8rem;
+  font-weight: 800;
+}
+.site-k-grid input {
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+.settings-help { margin: 10px 0 18px; }
+.settings-subtitle { margin: 6px 0 10px; }
+.feature-toggle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.feature-toggle {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-soft);
+  cursor: pointer;
+}
+.feature-toggle input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex: 0 0 auto;
+}
+.feature-toggle span { display: grid; gap: 3px; }
+.feature-toggle strong { font-size: .88rem; }
+.feature-toggle small { color: var(--muted); line-height: 1.45; }
+.settings-actions { margin-top: 16px; }
+#recordSearchBlock { display: grid; gap: 6px; }
+@media (max-width: 720px) {
+  .site-k-grid, .feature-toggle-grid { grid-template-columns: 1fr; }
+}
