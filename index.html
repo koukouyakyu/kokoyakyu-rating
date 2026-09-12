@@ -8,7 +8,7 @@
     name="description"
     content="公開された公式戦結果から独自算出する高校野球レーティング"
   />
-  <link rel="stylesheet" href="styles.css?v=20260912-14" />
+  <link rel="stylesheet" href="styles.css?v=20260912-17" />
 </head>
 <body>
   <header class="site-header">
@@ -382,7 +382,7 @@
               <label>夏の甲子園本戦 K<input id="siteSummerMainK" type="text" inputmode="decimal" autocomplete="off" required /></label>
               <label>国民スポーツ大会 K<input id="siteKokuspoK" type="text" inputmode="decimal" autocomplete="off" required /></label>
             </div>
-            <p class="muted settings-help">9区分を個別に変更できます。各試合に手動K値が保存されている場合は、その手動値が最優先です。K空欄の試合は大会名から自動判定して再計算されます。</p>
+            <p class="muted settings-help">9区分を個別に変更できます。各試合は大会名ではなく大会タグで分類します。手動K値が保存されている場合だけ手動値が最優先です。</p>
             <div class="form-actions settings-actions">
               <button class="btn primary" type="submit">K係数を保存</button>
             </div>
@@ -402,7 +402,23 @@
 
             <label>
               大会名
-              <input id="tournament" type="text" placeholder="例：大阪大会" required />
+              <input id="tournament" type="text" placeholder="例：2026年夏 甲子園" required />
+            </label>
+
+            <label>
+              大会区分（9種類のタグ）
+              <select id="tournamentType" required>
+                <option value="">選択してください</option>
+                <option value="autumn_qualifier">秋季大会予選</option>
+                <option value="autumn_regional">秋季大会地区大会</option>
+                <option value="meiji_jingu">明治神宮大会</option>
+                <option value="spring_koshien">春の甲子園</option>
+                <option value="spring_qualifier">春季大会予選</option>
+                <option value="spring_regional">春季大会地区大会</option>
+                <option value="summer_qualifier">夏の甲子園予選</option>
+                <option value="summer_main">夏の甲子園本戦</option>
+                <option value="kokuspo">国民スポーツ大会</option>
+              </select>
             </label>
 
             <label>
@@ -441,11 +457,13 @@
             </label>
 
             <label>
-              K値（任意・空欄なら大会レベルから自動判定）
-              <input id="matchK" type="text" inputmode="decimal" list="matchKValues" placeholder="サイト設定から自動判定" autocomplete="off" />
+              K値（任意・空欄なら大会タグから自動決定）
+              <input id="matchK" type="text" inputmode="decimal" list="matchKValues" placeholder="大会タグから自動決定" autocomplete="off" />
               <datalist id="matchKValues">
                 <option value="20"></option>
+                <option value="30"></option>
                 <option value="40"></option>
+                <option value="50"></option>
               </datalist>
             </label>
 
@@ -583,6 +601,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=20260912-14"></script>
+  <script src="app.js?v=20260912-17"></script>
 </body>
 </html>

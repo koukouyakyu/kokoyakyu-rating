@@ -1453,3 +1453,16 @@ footer {
   .ranking-page-status { min-width: 130px; font-size: .78rem; }
   .ranking-page-size-label { width: 100%; justify-content: flex-end; }
 }
+
+
+.tournament-type-badge {
+  display: inline-block;
+  margin-top: 0.25rem;
+  padding: 0.12rem 0.42rem;
+  border: 1px solid var(--border, #d8e0da);
+  border-radius: 999px;
+  background: var(--surface-soft, #f4f7f5);
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--muted, #637069);
+}
