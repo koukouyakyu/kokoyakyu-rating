@@ -8,7 +8,7 @@
     name="description"
     content="公開された公式戦結果から独自算出する高校野球レーティング"
   />
-  <link rel="stylesheet" href="styles.css?v=20260912-11" />
+  <link rel="stylesheet" href="styles.css?v=20260912-13" />
 </head>
 <body>
   <header class="site-header">
@@ -50,7 +50,7 @@
           <div class="formula-mini" id="heroFormula">R' = R + 10 × (W − We)</div>
           <div class="metric-row"><span>初期Rating</span><strong id="heroInitial">1500</strong></div>
           <div class="metric-row"><span>期待値の除数</span><strong id="heroDivisor">600</strong></div>
-          <div class="metric-row"><span>K値（大会予選 / 本戦）</span><strong id="heroK">読込中</strong></div>
+          <div class="metric-row"><span>K値（大会別）</span><strong id="heroK">読込中</strong></div>
           <div class="metric-row"><span>データ</span><strong id="dataStatus">接続中…</strong></div>
         </div>
       </div>
@@ -68,7 +68,7 @@
       <div class="section-head">
         <div>
           <p class="eyebrow">NATIONAL RANKING</p>
-          <h2>全国ランキング</h2>
+          <div class="title-with-public-toggle"><h2>全国ランキング</h2><label class="admin-public-toggle hidden"><input type="checkbox" data-setting="public_ranking" /><span>一般公開</span></label></div>
         </div>
         <div class="controls">
           <input id="searchInput" type="search" placeholder="学校名・都道府県・地域名で検索" aria-label="学校検索" />
@@ -108,7 +108,7 @@
         <div class="section-head">
           <div>
             <p class="eyebrow">PREFECTURE STRENGTH</p>
-            <h2>都道府県の強さ</h2>
+            <div class="title-with-public-toggle"><h2>都道府県の強さ</h2><label class="admin-public-toggle hidden"><input type="checkbox" data-setting="public_prefectures" /><span>一般公開</span></label></div>
           </div>
           <div class="pref-sort-control">
             <label for="prefSort">並び替え</label>
@@ -121,6 +121,7 @@
           </div>
         </div>
         <div id="prefCards" class="pref-grid"></div>
+        <div class="pref-more-wrap"><button id="prefShowMoreButton" class="btn secondary small hidden" type="button">もっと見る</button></div>
       </div>
     </section>
 
@@ -128,7 +129,7 @@
       <div class="section-head">
         <div>
           <p class="eyebrow">SCHOOL PROFILE</p>
-          <h2>学校詳細</h2>
+          <div class="title-with-public-toggle"><h2>学校詳細</h2><label class="admin-public-toggle hidden"><input type="checkbox" data-setting="public_school_details" /><span>一般公開</span></label></div>
         </div>
         <div class="school-picker-stack">
           <div class="school-picker-label">Rating検索 <span>一般公開は1500以上</span></div>
@@ -139,7 +140,10 @@
             </div>
             <select id="schoolSelect" aria-label="Rating対象校を一覧から選択"></select>
           </div>
-          <div id="recordSearchBlock" data-public-subfeature="record_search"><div class="school-picker-label record-search-label">戦績検索 <span>Rating非公開校も検索できます</span></div>
+          <div id="recordSearchBlock" data-public-subfeature="record_search"><div class="school-picker-label record-search-label title-with-public-toggle">
+            <span>戦績検索 <span>Rating非公開校も検索できます</span></span>
+            <label class="admin-public-toggle hidden"><input type="checkbox" data-setting="public_record_search" /><span>一般公開</span></label>
+          </div>
           <div class="school-search-wrap record-school-search-wrap">
             <input id="recordSchoolSearch" type="search" placeholder="全校から学校名・都道府県で戦績検索" aria-label="全校の戦績を検索" autocomplete="off" />
             <div id="recordSchoolSearchResults" class="school-search-results hidden" aria-live="polite"></div>
@@ -170,7 +174,7 @@
 
           <div id="ratingHistoryBlock" class="history-wrap" data-public-subfeature="rating_history">
             <div class="history-head">
-              <h4>Rating推移</h4>
+              <div class="title-with-public-toggle"><h4>Rating推移</h4><label class="admin-public-toggle hidden"><input type="checkbox" data-setting="public_rating_history" /><span>一般公開</span></label></div>
               <div id="historyRange" class="range-buttons" aria-label="Rating表示期間">
                 <button class="range-btn active" type="button" data-years="1">1年</button>
                 <button class="range-btn" type="button" data-years="3">3年</button>
@@ -185,7 +189,7 @@
 
         <article class="matches-card">
           <div class="matches-head">
-            <h3>戦績</h3>
+            <div class="title-with-public-toggle"><h3>戦績</h3><label class="admin-public-toggle hidden"><input type="checkbox" data-setting="public_correction_proposals" /><span>修正提案を一般公開</span></label></div>
             <select id="matchYearFilter" aria-label="戦績の年度絞り込み">
               <option value="">全期間</option>
             </select>
@@ -200,7 +204,7 @@
         <div class="section-head">
           <div>
             <p class="eyebrow">RANK HISTORY</p>
-            <h2>順位推移を比較</h2>
+            <div class="title-with-public-toggle"><h2>順位推移を比較</h2><label class="admin-public-toggle hidden"><input type="checkbox" data-setting="public_rank_compare" /><span>一般公開</span></label></div>
           </div>
           <p class="section-copy">学校名を検索して最大4校を追加し、月ごとの全国順位の変動を比較します。一般向けではRating公開対象校のみ検索できます。</p>
         </div>
@@ -236,7 +240,7 @@
         <div class="section-head">
           <div>
             <p class="eyebrow">MATCH SIMULATOR</p>
-            <h2>試合シミュレーター</h2>
+            <div class="title-with-public-toggle"><h2>試合シミュレーター</h2><label class="admin-public-toggle hidden"><input type="checkbox" data-setting="public_simulator" /><span>一般公開</span></label></div>
           </div>
           <p class="section-copy">
             2校のRatingから期待値と、勝ち・引き分け・負け時のポイント移動を計算します。
@@ -347,37 +351,27 @@
         <article class="panel site-settings-panel">
           <div class="panel-head">
             <div>
-              <h3>サイト設定</h3>
-              <p class="muted">K係数と、一般利用者に公開する機能を設定します。管理者ログイン中は非公開機能も確認できます。</p>
+              <div class="title-with-public-toggle">
+                <h3>大会別K係数</h3>
+                <label class="admin-public-toggle hidden"><input type="checkbox" data-setting="public_k_values" /><span>K値を一般公開</span></label>
+              </div>
+              <p class="muted">大会区分ごとのK係数を変更します。公開/非公開は各機能タイトル横のチェック欄で設定します。</p>
             </div>
           </div>
           <form id="siteSettingsForm">
-            <div class="site-k-grid">
-              <label>
-                大会予選 K
-                <input id="siteQualifierK" type="number" min="0.1" max="200" step="0.5" required />
-              </label>
-              <label>
-                本戦 K
-                <input id="siteMainK" type="number" min="0.1" max="200" step="0.5" required />
-              </label>
+            <div class="site-k-grid site-k-grid-eight">
+              <label>秋季大会予選 K<input id="siteAutumnQualifierK" type="number" min="0.1" max="200" step="0.5" required /></label>
+              <label>秋季大会地区大会 K<input id="siteAutumnRegionalK" type="number" min="0.1" max="200" step="0.5" required /></label>
+              <label>明治神宮大会 K<input id="siteMeijiJinguK" type="number" min="0.1" max="200" step="0.5" required /></label>
+              <label>春の甲子園 K<input id="siteSpringKoshienK" type="number" min="0.1" max="200" step="0.5" required /></label>
+              <label>春季大会予選 K<input id="siteSpringQualifierK" type="number" min="0.1" max="200" step="0.5" required /></label>
+              <label>春季大会地区大会 K<input id="siteSpringRegionalK" type="number" min="0.1" max="200" step="0.5" required /></label>
+              <label>夏の甲子園予選 K<input id="siteSummerQualifierK" type="number" min="0.1" max="200" step="0.5" required /></label>
+              <label>夏の甲子園本戦 K<input id="siteSummerMainK" type="number" min="0.1" max="200" step="0.5" required /></label>
             </div>
-            <p class="muted settings-help">各試合に手動K値が保存されている場合は、その試合の手動値が優先されます。空欄の試合はここで設定したK値で再計算されます。</p>
-            <h4 class="settings-subtitle">一般公開する機能</h4>
-            <div class="feature-toggle-grid">
-              <label class="feature-toggle"><input type="checkbox" data-setting="public_k_values" /><span><strong>K係数の表示</strong><small>トップ画面・戦績欄・計算方法にK値を表示</small></span></label>
-              <label class="feature-toggle"><input type="checkbox" data-setting="public_ranking" /><span><strong>全国ランキング</strong><small>ランキングと地域・都道府県検索</small></span></label>
-              <label class="feature-toggle"><input type="checkbox" data-setting="public_prefectures" /><span><strong>都道府県比較</strong><small>県内1位校などの都道府県指標</small></span></label>
-              <label class="feature-toggle"><input type="checkbox" data-setting="public_school_details" /><span><strong>学校詳細</strong><small>学校プロフィールと戦績一覧</small></span></label>
-              <label class="feature-toggle"><input type="checkbox" data-setting="public_record_search" /><span><strong>全校の戦績検索</strong><small>Rating 1500未満を含む学校検索</small></span></label>
-              <label class="feature-toggle"><input type="checkbox" data-setting="public_rating_history" /><span><strong>Rating推移</strong><small>学校詳細内のRatingチャート</small></span></label>
-              <label class="feature-toggle"><input type="checkbox" data-setting="public_rank_compare" /><span><strong>順位推移比較</strong><small>最大4校の順位比較チャート</small></span></label>
-              <label class="feature-toggle"><input type="checkbox" data-setting="public_simulator" /><span><strong>シミュレーター</strong><small>Ratingから期待値と増減を計算</small></span></label>
-              <label class="feature-toggle"><input type="checkbox" data-setting="public_correction_proposals" /><span><strong>一般からの修正提案</strong><small>戦績欄の「修正を提案」ボタン</small></span></label>
-              <label class="feature-toggle"><input type="checkbox" data-setting="public_methodology" /><span><strong>計算方法</strong><small>Rating計算方法の説明欄</small></span></label>
-            </div>
+            <p class="muted settings-help">8区分を個別に変更できます。各試合に手動K値が保存されている場合は、その手動値が最優先です。K空欄の試合は大会名から自動判定して再計算されます。</p>
             <div class="form-actions settings-actions">
-              <button class="btn primary" type="submit">サイト設定を保存</button>
+              <button class="btn primary" type="submit">K係数を保存</button>
             </div>
             <p id="siteSettingsMessage" class="form-message" aria-live="polite"></p>
           </form>
@@ -477,7 +471,7 @@
           </div>
           <div class="admin-tools-status"><span id="normalizeTournamentStatus" class="muted" aria-live="polite"></span></div>
           <div class="duplicate-merge-panel">
-            <div class="duplicate-merge-head"><strong>重複候補の統合</strong><button id="duplicateMergeButton" class="btn danger small" type="button" disabled>チェックした重複を統合</button></div>
+            <div class="duplicate-merge-head"><strong>重複候補の統合</strong><div class="duplicate-bulk-actions"><label class="duplicate-select-all"><input id="duplicateSelectAll" type="checkbox" disabled /> 候補をすべて選択</label><button id="duplicateMergeButton" class="btn danger small" type="button" disabled>選択した重複を一括統合</button></div></div>
             <div id="duplicateMergeList" class="duplicate-merge-list"><div class="empty">「重複試合を検知」を押すと候補を確認できます。</div></div>
           </div>
           <div class="admin-match-search" aria-label="登録済み試合の検索">
@@ -533,7 +527,7 @@
         <div class="section-head">
           <div>
             <p class="eyebrow">METHODOLOGY</p>
-            <h2>Ratingの計算方法</h2>
+            <div class="title-with-public-toggle"><h2>Ratingの計算方法</h2><label class="admin-public-toggle hidden"><input type="checkbox" data-setting="public_methodology" /><span>一般公開</span></label></div>
           </div>
         </div>
 
@@ -576,6 +570,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=20260912-11"></script>
+  <script src="app.js?v=20260912-13"></script>
 </body>
 </html>

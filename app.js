@@ -13,6 +13,8 @@
   const PAGE_SIZE = 1000;
   const DEFAULT_SITE_SETTINGS = Object.freeze({
     id: 1, qualifier_k: 20, main_k: 40,
+    autumn_qualifier_k: 20, autumn_regional_k: 40, meiji_jingu_k: 40, spring_koshien_k: 40,
+    spring_qualifier_k: 20, spring_regional_k: 40, summer_qualifier_k: 20, summer_main_k: 40, k_scheme_version: 2,
     public_k_values: true, public_ranking: true, public_prefectures: true, public_school_details: true,
     public_record_search: true, public_rating_history: true, public_rank_compare: true, public_simulator: true,
     public_correction_proposals: true, public_methodology: true
@@ -20,14 +22,14 @@
 
   const state = {
     client: null, session: null, authMode: null, matches: [], schools: [], schoolMap: new Map(),
-    ranking: [], prefs: [], proposals: [], editHistory: [], ready: false, historyYears: '1', compareYears: '3', selectedSchoolKey: null, schoolSearchHits: [], recordSearchHits: [], compareSchoolKeys: [], rankCompareSearchHits: [], showDuplicatesOnly: false, duplicateGroups: [],
+    ranking: [], prefs: [], proposals: [], editHistory: [], ready: false, historyYears: '1', compareYears: '3', selectedSchoolKey: null, schoolSearchHits: [], recordSearchHits: [], compareSchoolKeys: [], rankCompareSearchHits: [], showDuplicatesOnly: false, duplicateGroups: [], prefExpanded: false,
     settings: {...DEFAULT_SITE_SETTINGS}, settingsAvailable: true
   };
   const $ = (id) => document.getElementById(id);
   const els = {
     dataStatus:$('dataStatus'), setupNotice:$('setupNotice'), searchInput:$('searchInput'), prefFilter:$('prefFilter'),
     rankingBody:$('rankingBody'), rankingFootnote:$('rankingFootnote'), matchCount:$('matchCount'), schoolCount:$('schoolCount'),
-    prefCount:$('prefCount'), latestMatchDate:$('latestMatchDate'), prefCards:$('prefCards'), prefSort:$('prefSort'),
+    prefCount:$('prefCount'), latestMatchDate:$('latestMatchDate'), prefCards:$('prefCards'), prefSort:$('prefSort'), prefShowMoreButton:$('prefShowMoreButton'),
     schoolSearch:$('schoolSearch'), schoolSearchResults:$('schoolSearchResults'), recordSchoolSearch:$('recordSchoolSearch'), recordSchoolSearchResults:$('recordSchoolSearchResults'), schoolSelect:$('schoolSelect'), schoolPref:$('schoolPref'),
     schoolName:$('schoolName'), schoolRecord:$('schoolRecord'), schoolRating:$('schoolRating'), schoolRank:$('schoolRank'), schoolPrefRank:$('schoolPrefRank'),
     schoolDelta:$('schoolDelta'), schoolForm:$('schoolForm'), historyChart:$('historyChart'), recentMatches:$('recentMatches'),
@@ -45,8 +47,8 @@
     saveMatchButton:$('saveMatchButton'), cancelEditButton:$('cancelEditButton'), matchFormMessage:$('matchFormMessage'), adminMatchesBody:$('adminMatchesBody'),
     adminMatchKeyword:$('adminMatchKeyword'), adminMatchDate:$('adminMatchDate'), adminMatchTournament:$('adminMatchTournament'), adminMatchSchool:$('adminMatchSchool'),
     adminMatchSearchStatus:$('adminMatchSearchStatus'), adminMatchClear:$('adminMatchClear'), duplicateStatus:$('duplicateStatus'), duplicateScanButton:$('duplicateScanButton'),
-    reloadButton:$('reloadButton'), reloadProposalsButton:$('reloadProposalsButton'), proposalAdminList:$('proposalAdminList'), duplicateMergeList:$('duplicateMergeList'), duplicateMergeButton:$('duplicateMergeButton'), normalizeTournamentButton:$('normalizeTournamentButton'), normalizeTournamentStatus:$('normalizeTournamentStatus'), reloadHistoryButton:$('reloadHistoryButton'), editHistoryList:$('editHistoryList'), heroInitial:$('heroInitial'), heroDivisor:$('heroDivisor'), heroK:$('heroK'), heroFormula:$('heroFormula'), methodKText:$('methodKText'),
-    siteSettingsForm:$('siteSettingsForm'), siteQualifierK:$('siteQualifierK'), siteMainK:$('siteMainK'), siteSettingsMessage:$('siteSettingsMessage'), matchKValues:$('matchKValues'), recordSearchBlock:$('recordSearchBlock'), ratingHistoryBlock:$('ratingHistoryBlock')
+    reloadButton:$('reloadButton'), reloadProposalsButton:$('reloadProposalsButton'), proposalAdminList:$('proposalAdminList'), duplicateMergeList:$('duplicateMergeList'), duplicateSelectAll:$('duplicateSelectAll'), duplicateMergeButton:$('duplicateMergeButton'), normalizeTournamentButton:$('normalizeTournamentButton'), normalizeTournamentStatus:$('normalizeTournamentStatus'), reloadHistoryButton:$('reloadHistoryButton'), editHistoryList:$('editHistoryList'), heroInitial:$('heroInitial'), heroDivisor:$('heroDivisor'), heroK:$('heroK'), heroFormula:$('heroFormula'), methodKText:$('methodKText'),
+    siteSettingsForm:$('siteSettingsForm'), siteAutumnQualifierK:$('siteAutumnQualifierK'), siteAutumnRegionalK:$('siteAutumnRegionalK'), siteMeijiJinguK:$('siteMeijiJinguK'), siteSpringKoshienK:$('siteSpringKoshienK'), siteSpringQualifierK:$('siteSpringQualifierK'), siteSpringRegionalK:$('siteSpringRegionalK'), siteSummerQualifierK:$('siteSummerQualifierK'), siteSummerMainK:$('siteSummerMainK'), siteSettingsMessage:$('siteSettingsMessage'), matchKValues:$('matchKValues'), recordSearchBlock:$('recordSearchBlock'), ratingHistoryBlock:$('ratingHistoryBlock')
   };
 
   function escapeHtml(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');}
@@ -106,35 +108,44 @@
 
   function inferK(match){
     const direct=Number(match.k); if(Number.isFinite(direct)&&direct>0) return direct;
-    const specific=Number(ratingCfg.tournamentK?.[match.tournament]); if(Number.isFinite(specific)&&specific>0) return specific;
     const raw=`${match.tournament_original||match.tournament||''} ${match.stage||''}`;
     const t=raw.normalize('NFKC').replace(/\s+/g,'');
 
-    // Kは管理画面の2段階設定：大会予選 / 本戦。
-    // 手動Kが入っている試合は上の direct が優先される。
-    if(/予選|地方大会|支部大会/.test(t)) return qualifierK();
-    if(/東東京大会|西東京大会|北北海道大会|南北海道大会/.test(t)) return qualifierK();
-
-    // 全国大会・主要本戦
-    if(/明治神宮/.test(t)) return mainK();
-    if(/国民スポーツ|国スポ|国体/.test(t)) return mainK();
-    if(/春の甲子園|選抜|センバツ/.test(t)) return mainK();
-    if(/夏の甲子園/.test(t)) return mainK();
+    // 手動Kがない試合は、管理画面の大会別8区分設定から判定する。
+    // 1) 秋季大会予選 / 秋季地区大会 / 明治神宮大会
+    // 2) 春の甲子園 / 春季大会予選 / 春季地区大会
+    // 3) 夏の甲子園予選 / 夏の甲子園本戦
+    if(/明治神宮/.test(t)) return meijiJinguK();
+    if(/春の甲子園|選抜|センバツ/.test(t)) return springKoshienK();
+    if(/夏の甲子園/.test(t)) return summerMainK();
     const summerNational=t.replace(/^第\d+回/,'');
-    if(/^全国(?:高等学校|高校)野球選手権大会$/.test(summerNational)) return mainK();
+    if(/^全国(?:高等学校|高校)野球選手権大会$/.test(summerNational)) return summerMainK();
 
-    // 春季・秋季の地区本戦。北海道の全道大会も本戦として扱う。
-    const springAutumn=/春季|秋季/.test(t);
-    if(springAutumn){
-      if(/(?:東北|関東|北信越|東海|近畿|中国|四国|九州)(?:地区)?(?:高等学校野球)?大会|地区大会/.test(t)) return mainK();
-      if(/北海道(?:高等学校野球)?大会/.test(t) && !/(?:北北海道|南北海道)/.test(t)) return mainK();
-      return qualifierK();
+    const regionalPattern=/(?:東北|関東|北信越|東海|近畿|中国|四国|九州)(?:地区)?(?:高等学校野球)?大会|地区大会/;
+    const explicitQualifier=/予選|地方大会|支部大会|県大会|府大会|都大会/;
+
+    if(/秋季/.test(t)){
+      // 「秋季近畿地区大会 大阪府予選」のように地区名を含んでも、予選表記があれば予選扱い。
+      if(explicitQualifier.test(t)) return autumnQualifierK();
+      if(regionalPattern.test(t)) return autumnRegionalK();
+      if(/北海道(?:高等学校野球)?大会/.test(t)&&!/(?:北北海道|南北海道|支部|予選)/.test(t)) return autumnRegionalK();
+      return autumnQualifierK();
     }
 
-    // その他でも明示的に「本戦」「地区大会」とあるものは本戦扱い。
-    if(/本戦|地区大会/.test(t)) return mainK();
+    if(/春季/.test(t)){
+      if(explicitQualifier.test(t)) return springQualifierK();
+      if(regionalPattern.test(t)) return springRegionalK();
+      if(/北海道(?:高等学校野球)?大会/.test(t)&&!/(?:北北海道|南北海道|支部|予選)/.test(t)) return springRegionalK();
+      return springQualifierK();
+    }
 
-    // 夏の都道府県大会など、上記に該当しない大会は予選扱い。
+    // 「全国高校野球選手権○○大会」など全国本戦以外の選手権大会は夏の予選。
+    if(/全国(?:高等学校|高校)野球選手権|選手権大会|東東京大会|西東京大会|北北海道大会|南北海道大会/.test(t)) return summerQualifierK();
+
+    // 今回8区分に含まれない大会は、config.js の個別Kがあればそれを使い、なければ従来Kへフォールバックする。
+    const specific=Number(ratingCfg.tournamentK?.[match.tournament]); if(Number.isFinite(specific)&&specific>0) return specific;
+    if(/国民スポーツ|国スポ|国体|本戦|地区大会/.test(t)) return mainK();
+    if(/予選|地方大会|支部大会/.test(t)) return qualifierK();
     return qualifierK();
   }
   function normalizeMatch(m){
@@ -185,14 +196,32 @@
   function isAdmin(){return Boolean(state.session?.user);}
   function setting(key){return state.settings?.[key] ?? DEFAULT_SITE_SETTINGS[key];}
   function featureVisible(name){return isAdmin() || setting(`public_${name}`)!==false;}
-  function qualifierK(){const n=Number(setting('qualifier_k'));return Number.isFinite(n)&&n>0?n:20;}
-  function mainK(){const n=Number(setting('main_k'));return Number.isFinite(n)&&n>0?n:40;}
+  function positiveSetting(key,fallback){const n=Number(setting(key));return Number.isFinite(n)&&n>0?n:fallback;}
+  function qualifierK(){return positiveSetting('qualifier_k',20);}
+  function mainK(){return positiveSetting('main_k',40);}
+  function autumnQualifierK(){return positiveSetting('autumn_qualifier_k',qualifierK());}
+  function autumnRegionalK(){return positiveSetting('autumn_regional_k',mainK());}
+  function meijiJinguK(){return positiveSetting('meiji_jingu_k',mainK());}
+  function springKoshienK(){return positiveSetting('spring_koshien_k',mainK());}
+  function springQualifierK(){return positiveSetting('spring_qualifier_k',qualifierK());}
+  function springRegionalK(){return positiveSetting('spring_regional_k',mainK());}
+  function summerQualifierK(){return positiveSetting('summer_qualifier_k',qualifierK());}
+  function summerMainK(){return positiveSetting('summer_main_k',mainK());}
+  function configuredKValues(){return [autumnQualifierK(),autumnRegionalK(),meijiJinguK(),springKoshienK(),springQualifierK(),springRegionalK(),summerQualifierK(),summerMainK()];}
   function ratingVisibleSchools(){return isAdmin()?state.schools:state.ranking;}
   function canViewSchoolRating(school){return Boolean(school)&&(isAdmin()||school.rating>=PUBLIC_RATING_MIN);}
+  function syncPublicSettingToggles(){
+    document.querySelectorAll('.admin-public-toggle').forEach(label=>{
+      const input=label.querySelector('[data-setting]');
+      label.classList.toggle('hidden',!isAdmin());
+      if(input){input.checked=setting(input.dataset.setting)!==false;input.disabled=!isAdmin();}
+    });
+  }
   function applyPublicVisibility(){
     document.querySelectorAll('[data-public-feature]').forEach(el=>el.classList.toggle('hidden',!featureVisible(el.dataset.publicFeature)));
     document.querySelectorAll('[data-public-subfeature]').forEach(el=>el.classList.toggle('hidden',!featureVisible(el.dataset.publicSubfeature)));
     document.querySelectorAll('[data-public-feature-nav]').forEach(el=>el.classList.toggle('hidden',!featureVisible(el.dataset.publicFeatureNav)));
+    syncPublicSettingToggles();
   }
   function renderAll(){hideSetupNotice();applyPublicVisibility();renderSummary();renderPrefFilter();renderRanking();renderPrefCards();renderSchoolSelect();renderSchoolProfile();renderRankCompareSelected();renderRankCompareChart();renderAdminMatches();syncSiteSettingsForm();}
   function renderSummary(){els.matchCount.textContent=state.matches.length.toLocaleString('ja-JP');els.schoolCount.textContent=state.schools.filter(s=>!s.isJoint).length.toLocaleString('ja-JP');els.prefCount.textContent=state.prefs.length.toLocaleString('ja-JP');els.latestMatchDate.textContent=state.matches.map(m=>m.date).filter(Boolean).sort().at(-1)||'—';}
@@ -204,7 +233,17 @@
     if(options.includes(old))els.prefFilter.value=old;
   }
   function renderRanking(){const q=normalizeSearchText(els.searchInput.value),p=els.prefFilter.value,source=ratingVisibleSchools();let rows=source.filter(s=>schoolMatchesSearch(s,q)&&schoolMatchesArea(s,p));const filtered=Boolean(q||p),total=rows.length;if(!filtered)rows=rows.slice(0,rankingLimit);els.rankingBody.innerHTML=rows.length?rows.map(s=>`<tr class="js-ranking-school"><td>${isAdmin()?s.allRank:s.publicRank}</td><td><strong>${escapeHtml(s.name)}</strong>${s.isJoint?' <span class="joint-badge">合同</span>':''}</td><td>${escapeHtml(s.pref)}</td><td class="rating-cell">${formatRating(s.rating)}</td><td class="${deltaClass(s.lastDelta)}">${formatDelta(s.lastDelta)}</td><td>${s.form.split('').map(r=>`<span class="match-result-${r}">${r}</span>`).join(' ')||'—'}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">該当する学校がありません。</td></tr>';els.rankingFootnote.textContent=isAdmin()?(filtered?`管理者表示：該当 ${total}チーム。1500未満も表示しています。`:`管理者表示：全校を対象に上位${Math.min(total,rankingLimit)}チームを表示しています。`):(filtered?`${total}チームを表示しています。Rating ${PUBLIC_RATING_MIN}以上のみRating検索対象です。`:`Rating ${PUBLIC_RATING_MIN}以上の上位${Math.min(total,rankingLimit)}チームを表示しています。`);els.rankingBody.querySelectorAll('.js-ranking-school').forEach((r,i)=>r.onclick=()=>openSchool(rows[i].key,true));}
-  function renderPrefCards(){const mode=els.prefSort?.value||'top25';const data=[...state.prefs].sort((a,b)=>(b[mode]??-Infinity)-(a[mode]??-Infinity)||(b.topRating??0)-(a.topRating??0));els.prefCards.innerHTML=data.length?data.map((x,i)=>`<article class="pref-card"><h3>${i+1}. ${escapeHtml(x.pref)} <span>${x.count}校</span></h3><div class="pref-metrics"><div class="${mode==='topRating'?'metric-active':''}"><span>県内1位 ${escapeHtml(x.topSchool)}</span><strong>${formatRating(x.topRating)}</strong></div><div class="${mode==='median'?'metric-active':''}"><span>中央値</span><strong>${formatRating(x.median)}</strong></div><div class="${mode==='top5'?'metric-active':''}"><span>上位5校平均</span><strong>${formatRating(x.top5)}</strong></div><div class="${mode==='top25'?'metric-active':''}"><span>上位25%平均</span><strong>${formatRating(x.top25)}</strong></div></div></article>`).join(''):'<div class="empty">データがありません。</div>';}
+  function renderPrefCards(){
+    const mode=els.prefSort?.value||'top25';
+    const data=[...state.prefs].sort((a,b)=>(b[mode]??-Infinity)-(a[mode]??-Infinity)||(b.topRating??0)-(a.topRating??0));
+    const visible=state.prefExpanded?data:data.slice(0,6);
+    els.prefCards.innerHTML=visible.length?visible.map((x,i)=>`<article class="pref-card"><h3>${i+1}. ${escapeHtml(x.pref)} <span>${x.count}校</span></h3><div class="pref-metrics"><div class="${mode==='topRating'?'metric-active':''}"><span>県内1位 ${escapeHtml(x.topSchool)}</span><strong>${formatRating(x.topRating)}</strong></div><div class="${mode==='median'?'metric-active':''}"><span>中央値</span><strong>${formatRating(x.median)}</strong></div><div class="${mode==='top5'?'metric-active':''}"><span>上位5校平均</span><strong>${formatRating(x.top5)}</strong></div><div class="${mode==='top25'?'metric-active':''}"><span>上位25%平均</span><strong>${formatRating(x.top25)}</strong></div></div></article>`).join(''):'<div class="empty">データがありません。</div>';
+    if(els.prefShowMoreButton){
+      const hasMore=data.length>6;
+      els.prefShowMoreButton.classList.toggle('hidden',!hasMore);
+      els.prefShowMoreButton.textContent=state.prefExpanded?'6都道府県だけ表示':`もっと見る（残り${Math.max(0,data.length-6)}）`;
+    }
+  }
 
   function renderSchoolSelect(){const previous=state.selectedSchoolKey||els.schoolSelect.value,source=ratingVisibleSchools();els.schoolSelect.innerHTML=`<option value="">${isAdmin()?'全校から選択（管理者）':'Rating 1500以上から選択'}</option>`+source.map(s=>`<option value="${escapeHtml(s.key)}">${escapeHtml(s.name)}（${escapeHtml(s.pref)}）${isAdmin()&&s.rating<PUBLIC_RATING_MIN?' · '+formatRating(s.rating):''}</option>`).join('');if(source.some(s=>s.key===previous))els.schoolSelect.value=previous;}
   function renderSchoolSearch(){const q=normalizeSearchText(els.schoolSearch.value);if(!q){state.schoolSearchHits=[];els.schoolSearchResults.classList.add('hidden');els.schoolSearchResults.innerHTML='';return;}const source=ratingVisibleSchools(),hits=source.filter(s=>schoolMatchesSearch(s,q)).slice(0,20);state.schoolSearchHits=hits;els.schoolSearchResults.innerHTML=hits.length?hits.map(s=>`<button class="school-search-item" type="button"><strong>${escapeHtml(s.name)}</strong><span>${escapeHtml(s.pref)} · Rating ${formatRating(s.rating)}${isAdmin()&&s.rating<PUBLIC_RATING_MIN?' · 管理者表示':''}</span></button>`).join(''):`<div class="school-search-empty">${isAdmin()?'該当する学校がありません。':`Rating ${PUBLIC_RATING_MIN}以上のRating検索対象に該当しません。下の戦績検索では全校を検索できます。`}</div>`;els.schoolSearchResults.classList.remove('hidden');els.schoolSearchResults.querySelectorAll('.school-search-item').forEach((b,i)=>b.onclick=()=>selectSchoolSearchHit(i));}
@@ -350,23 +389,46 @@
   }
   function syncSiteSettingsForm(){
     if(!els.siteSettingsForm)return;
-    if(els.siteQualifierK)els.siteQualifierK.value=qualifierK();
-    if(els.siteMainK)els.siteMainK.value=mainK();
-    els.siteSettingsForm.querySelectorAll('[data-setting]').forEach(input=>{input.checked=setting(input.dataset.setting)!==false;});
-    if(els.siteSettingsMessage&&!state.settingsAvailable)els.siteSettingsMessage.textContent='設定テーブルがまだありません。upgrade-site-settings.sql を一度実行してください。';
+    const pairs=[
+      [els.siteAutumnQualifierK,autumnQualifierK()],[els.siteAutumnRegionalK,autumnRegionalK()],[els.siteMeijiJinguK,meijiJinguK()],[els.siteSpringKoshienK,springKoshienK()],
+      [els.siteSpringQualifierK,springQualifierK()],[els.siteSpringRegionalK,springRegionalK()],[els.siteSummerQualifierK,summerQualifierK()],[els.siteSummerMainK,summerMainK()]
+    ];
+    pairs.forEach(([el,value])=>{if(el)el.value=value;});
+    syncPublicSettingToggles();
+    if(els.siteSettingsMessage&&!state.settingsAvailable)els.siteSettingsMessage.textContent='設定テーブルがまだありません。upgrade-site-settings-k8.sql を一度実行してください。';
   }
   async function handleSiteSettingsSave(e){
     e.preventDefault();if(!state.session?.user)return;
-    const q=Number(els.siteQualifierK?.value),m=Number(els.siteMainK?.value);
-    if(!Number.isFinite(q)||q<=0||!Number.isFinite(m)||m<=0)return setMessage(els.siteSettingsMessage,'K値は0より大きい数値を入力してください。','error');
-    const payload={id:1,qualifier_k:q,main_k:m,updated_at:new Date().toISOString()};
-    els.siteSettingsForm.querySelectorAll('[data-setting]').forEach(input=>payload[input.dataset.setting]=Boolean(input.checked));
+    const values={
+      autumn_qualifier_k:Number(els.siteAutumnQualifierK?.value),autumn_regional_k:Number(els.siteAutumnRegionalK?.value),meiji_jingu_k:Number(els.siteMeijiJinguK?.value),spring_koshien_k:Number(els.siteSpringKoshienK?.value),
+      spring_qualifier_k:Number(els.siteSpringQualifierK?.value),spring_regional_k:Number(els.siteSpringRegionalK?.value),summer_qualifier_k:Number(els.siteSummerQualifierK?.value),summer_main_k:Number(els.siteSummerMainK?.value)
+    };
+    if(Object.values(values).some(v=>!Number.isFinite(v)||v<=0))return setMessage(els.siteSettingsMessage,'K値はすべて0より大きい数値を入力してください。','error');
+    const payload={id:1,...values,qualifier_k:values.summer_qualifier_k,main_k:values.summer_main_k,k_scheme_version:2,updated_at:new Date().toISOString()};
     setMessage(els.siteSettingsMessage,'保存中…');
     const {data,error}=await state.client.from('site_settings').upsert(payload,{onConflict:'id'}).select().single();
-    if(error)return setMessage(els.siteSettingsMessage,`保存できませんでした: ${error.message}。upgrade-site-settings.sql を実行済みか確認してください。`,'error');
+    if(error)return setMessage(els.siteSettingsMessage,`保存できませんでした: ${error.message}。upgrade-site-settings-k8.sql を実行済みか確認してください。`,'error');
     state.settings={...DEFAULT_SITE_SETTINGS,...data};state.settingsAvailable=true;
     const r=buildRatings(state.matches);state.schoolMap=r.map;state.schools=r.schools;state.ranking=r.publicSchools;state.prefs=buildPrefStats(r.schools);
-    renderStaticConfig();renderAll();setMessage(els.siteSettingsMessage,'サイト設定を保存しました。一般画面にも反映されます。','success');
+    renderStaticConfig();renderAll();setMessage(els.siteSettingsMessage,'大会別K係数を保存しました。Ratingを再計算しました。','success');
+  }
+
+  async function handlePublicSettingChange(input){
+    if(!state.session?.user||!input?.dataset?.setting)return;
+    const key=input.dataset.setting,desired=Boolean(input.checked);
+    input.disabled=true;
+    const {data,error}=await state.client.from('site_settings').update({[key]:desired,updated_at:new Date().toISOString()}).eq('id',1).select().single();
+    if(error){
+      input.checked=!desired;
+      input.disabled=false;
+      alert(`公開設定を保存できませんでした: ${error.message}`);
+      return;
+    }
+    state.settings={...DEFAULT_SITE_SETTINGS,...data};
+    input.disabled=false;
+    renderStaticConfig();
+    applyPublicVisibility();
+    renderSchoolProfile();
   }
 
   async function restoreSession(){state.authMode=detectAuthModeFromUrl();const ae=getAuthErrorFromUrl();if(ae)showSetupNotice(`<strong>認証リンクを処理できませんでした。</strong> ${escapeHtml(ae)}`);state.client.auth.onAuthStateChange((event,session)=>{state.session=session;if(event==='PASSWORD_RECOVERY')state.authMode='recovery';else if(event==='SIGNED_IN'&&detectAuthModeFromUrl()==='invite')state.authMode='invite';renderAuth();if(state.ready)renderAll();});const {data,error}=await state.client.auth.getSession();if(!error){state.session=data.session;renderAuth();if(state.ready)renderAll();}}
@@ -391,11 +453,17 @@
   function findDuplicateForPayload(payload,excludeId=''){const sig=duplicateSignature(payload);return state.matches.find(m=>String(m.id)!==String(excludeId||'')&&duplicateSignature(m)===sig)||null;}
   function duplicateQuality(m){return (m.source_url?8:0)+(m.stage?3:0)+(m.k!==null&&m.k!==''?2:0)+(m.tournament_original&&m.tournament_original!==canonicalTournament(m.tournament_original)?0:1);}
   function duplicateKeeper(group){return [...group].sort((a,b)=>duplicateQuality(b)-duplicateQuality(a)||String(a.created_at||'').localeCompare(String(b.created_at||''))||String(a.id).localeCompare(String(b.id)))[0];}
+  function syncDuplicateSelectionState(){
+    const boxes=[...(els.duplicateMergeList?.querySelectorAll('.js-merge-duplicate')||[])],checked=boxes.filter(b=>b.checked).length;
+    if(els.duplicateSelectAll){els.duplicateSelectAll.disabled=!boxes.length;els.duplicateSelectAll.checked=Boolean(boxes.length)&&checked===boxes.length;els.duplicateSelectAll.indeterminate=checked>0&&checked<boxes.length;}
+    if(els.duplicateMergeButton){els.duplicateMergeButton.disabled=checked===0;els.duplicateMergeButton.textContent=checked?`選択した${checked}組を一括統合`:'選択した重複を一括統合';}
+  }
+  function setAllDuplicateChecks(checked){els.duplicateMergeList?.querySelectorAll('.js-merge-duplicate').forEach(b=>{b.checked=checked;});syncDuplicateSelectionState();}
   function renderDuplicateMergeList(){
     if(!els.duplicateMergeList)return;
-    if(!state.duplicateGroups.length){els.duplicateMergeList.innerHTML='<div class="empty">重複候補はありません。</div>';if(els.duplicateMergeButton)els.duplicateMergeButton.disabled=true;return;}
+    if(!state.duplicateGroups.length){els.duplicateMergeList.innerHTML='<div class="empty">重複候補はありません。</div>';if(els.duplicateSelectAll){els.duplicateSelectAll.checked=false;els.duplicateSelectAll.indeterminate=false;els.duplicateSelectAll.disabled=true;}if(els.duplicateMergeButton)els.duplicateMergeButton.disabled=true;return;}
     els.duplicateMergeList.innerHTML=state.duplicateGroups.map((group,i)=>{const keep=duplicateKeeper(group);return `<label class="duplicate-group"><input class="js-merge-duplicate" type="checkbox" data-index="${i}"><span><strong>${escapeHtml(group[0].date)} ${escapeHtml(group[0].team_a_display||group[0].team_a)} ${group[0].score_a}-${group[0].score_b} ${escapeHtml(group[0].team_b_display||group[0].team_b)}</strong><small>${group.length}件重複 · 残す候補: ${escapeHtml(keep.tournament)}${keep.source_url?' · 出典あり':''}</small>${group.map(m=>`<code>${escapeHtml(m.tournament)} / ${escapeHtml(m.stage||'—')} / ${escapeHtml(String(m.id))}</code>`).join('')}</span></label>`;}).join('');
-    if(els.duplicateMergeButton)els.duplicateMergeButton.disabled=false;
+    syncDuplicateSelectionState();
   }
   function updateDuplicateStatus(){
     state.duplicateGroups=findDuplicateGroups();const ids=new Set(state.duplicateGroups.flat().map(m=>String(m.id)));
@@ -413,7 +481,7 @@
     try{
       for(const idx of checked){const group=state.duplicateGroups[idx];if(!group?.length)continue;const keep=duplicateKeeper(group),others=group.filter(m=>String(m.id)!==String(keep.id));const merged={tournament:canonicalTournament(keep.tournament_original||keep.tournament),stage:keep.stage||others.find(x=>x.stage)?.stage||null,k:keep.k??others.find(x=>x.k!==null&&x.k!=='')?.k??null,source_url:keep.source_url||others.find(x=>x.source_url)?.source_url||null};const up=await state.client.from('matches').update(merged).eq('id',keep.id);if(up.error)throw up.error;const ids=others.map(x=>x.id);if(ids.length){const del=await state.client.from('matches').delete().in('id',ids);if(del.error)throw del.error;}}
       await loadMatches();await loadEditHistory();
-    }catch(e){alert(`重複統合に失敗しました: ${e.message||e}`);}finally{els.duplicateMergeButton.disabled=false;els.duplicateMergeButton.textContent='チェックした重複を統合';}
+    }catch(e){alert(`重複統合に失敗しました: ${e.message||e}`);}finally{syncDuplicateSelectionState();}
   }
 
   function parseOptionalK(value){
@@ -480,9 +548,9 @@
   function historyMatchLabel(row){const d=row.new_data||row.old_data||{};return `${d.date||'—'} ${d.team_a||'—'} ${d.score_a??'—'}-${d.score_b??'—'} ${d.team_b||'—'}`;}
   function renderEditHistory(){if(!els.editHistoryList)return;if(!state.editHistory.length){els.editHistoryList.innerHTML='<div class="empty">編集履歴はありません。</div>';return;}els.editHistoryList.innerHTML=state.editHistory.map(h=>{const old=h.old_data||{},nw=h.new_data||{},fields=['date','tournament','stage','team_a','pref_a','score_a','team_b','pref_b','score_b','k','source_url'];const changed=h.action==='UPDATE'?fields.filter(f=>JSON.stringify(old[f]??null)!==JSON.stringify(nw[f]??null)).map(f=>`${f}: ${old[f]??'—'} → ${nw[f]??'—'}`).join(' / '):h.action==='DELETE'?'削除':'新規登録';return `<div class="edit-history-item"><div class="match-meta">${escapeHtml(h.changed_at||'')} · ${escapeHtml(h.action)}</div><strong>${escapeHtml(historyMatchLabel(h))}</strong><p>${escapeHtml(changed||'変更内容なし')}</p></div>`;}).join('');}
 
-  function bindEvents(){els.siteSettingsForm?.addEventListener('submit',handleSiteSettingsSave);els.searchInput.addEventListener('input',renderRanking);els.prefFilter.addEventListener('change',renderRanking);els.prefSort?.addEventListener('change',renderPrefCards);els.schoolSearch?.addEventListener('input',renderSchoolSearch);els.schoolSearch?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.schoolSearchHits.length){e.preventDefault();selectSchoolSearchHit(0);}});els.recordSchoolSearch?.addEventListener('input',renderRecordSchoolSearch);els.recordSchoolSearch?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.recordSearchHits.length){e.preventDefault();selectRecordSearchHit(0);}});els.schoolSelect.addEventListener('change',()=>{state.selectedSchoolKey=els.schoolSelect.value;renderSchoolProfile();});els.historyRange?.addEventListener('click',e=>{const b=e.target.closest('[data-years]');if(!b)return;state.historyYears=b.dataset.years;els.historyRange.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));renderSchoolProfile();});els.matchYearFilter?.addEventListener('change',()=>renderSchoolProfile());els.rankCompareSearch?.addEventListener('input',renderRankCompareSearch);els.rankCompareSearch?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.rankCompareSearchHits.length){e.preventDefault();addRankCompareSchool(0);}});els.rankCompareRange?.addEventListener('click',e=>{const b=e.target.closest('[data-years]');if(!b)return;state.compareYears=b.dataset.years;els.rankCompareRange.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));renderRankCompareChart();});[els.ratingA,els.ratingB,els.kValue].forEach(i=>i.addEventListener('input',renderSimulator));els.kValue?.addEventListener('input',()=>{els.kValue.dataset.userEdited='1';});els.loginForm.addEventListener('submit',handleLogin);els.showResetButton.addEventListener('click',showResetRequest);els.resetRequestForm.addEventListener('submit',handleResetRequest);els.backToLoginButton.addEventListener('click',backToLogin);els.passwordSetupForm.addEventListener('submit',handlePasswordSetup);els.logoutButton.addEventListener('click',handleLogout);els.matchForm.addEventListener('submit',handleMatchSubmit);els.cancelEditButton.addEventListener('click',resetMatchForm);els.reloadButton.addEventListener('click',loadMatches);[els.adminMatchKeyword,els.adminMatchTournament,els.adminMatchSchool].forEach(x=>x?.addEventListener('input',renderAdminMatches));els.adminMatchDate?.addEventListener('change',renderAdminMatches);els.adminMatchClear?.addEventListener('click',clearAdminMatchSearch);els.duplicateScanButton?.addEventListener('click',toggleDuplicateView);els.duplicateMergeButton?.addEventListener('click',mergeCheckedDuplicates);els.normalizeTournamentButton?.addEventListener('click',normalizeTournamentNames);els.reloadProposalsButton?.addEventListener('click',loadProposals);els.reloadHistoryButton?.addEventListener('click',loadEditHistory);document.addEventListener('click',e=>{if(els.schoolSearchResults&&!e.target.closest('.school-search-wrap'))els.schoolSearchResults.classList.add('hidden');if(els.recordSchoolSearchResults&&!e.target.closest('.record-school-search-wrap'))els.recordSchoolSearchResults.classList.add('hidden');if(els.rankCompareSearchResults&&!e.target.closest('.rank-compare-search-wrap'))els.rankCompareSearchResults.classList.add('hidden');});}
+  function bindEvents(){els.siteSettingsForm?.addEventListener('submit',handleSiteSettingsSave);document.querySelectorAll('.admin-public-toggle [data-setting]').forEach(input=>input.addEventListener('change',()=>handlePublicSettingChange(input)));els.searchInput.addEventListener('input',renderRanking);els.prefFilter.addEventListener('change',renderRanking);els.prefSort?.addEventListener('change',()=>{state.prefExpanded=false;renderPrefCards();});els.prefShowMoreButton?.addEventListener('click',()=>{state.prefExpanded=!state.prefExpanded;renderPrefCards();});els.schoolSearch?.addEventListener('input',renderSchoolSearch);els.schoolSearch?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.schoolSearchHits.length){e.preventDefault();selectSchoolSearchHit(0);}});els.recordSchoolSearch?.addEventListener('input',renderRecordSchoolSearch);els.recordSchoolSearch?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.recordSearchHits.length){e.preventDefault();selectRecordSearchHit(0);}});els.schoolSelect.addEventListener('change',()=>{state.selectedSchoolKey=els.schoolSelect.value;renderSchoolProfile();});els.historyRange?.addEventListener('click',e=>{const b=e.target.closest('[data-years]');if(!b)return;state.historyYears=b.dataset.years;els.historyRange.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));renderSchoolProfile();});els.matchYearFilter?.addEventListener('change',()=>renderSchoolProfile());els.rankCompareSearch?.addEventListener('input',renderRankCompareSearch);els.rankCompareSearch?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.rankCompareSearchHits.length){e.preventDefault();addRankCompareSchool(0);}});els.rankCompareRange?.addEventListener('click',e=>{const b=e.target.closest('[data-years]');if(!b)return;state.compareYears=b.dataset.years;els.rankCompareRange.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));renderRankCompareChart();});[els.ratingA,els.ratingB,els.kValue].forEach(i=>i.addEventListener('input',renderSimulator));els.kValue?.addEventListener('input',()=>{els.kValue.dataset.userEdited='1';});els.loginForm.addEventListener('submit',handleLogin);els.showResetButton.addEventListener('click',showResetRequest);els.resetRequestForm.addEventListener('submit',handleResetRequest);els.backToLoginButton.addEventListener('click',backToLogin);els.passwordSetupForm.addEventListener('submit',handlePasswordSetup);els.logoutButton.addEventListener('click',handleLogout);els.matchForm.addEventListener('submit',handleMatchSubmit);els.cancelEditButton.addEventListener('click',resetMatchForm);els.reloadButton.addEventListener('click',loadMatches);[els.adminMatchKeyword,els.adminMatchTournament,els.adminMatchSchool].forEach(x=>x?.addEventListener('input',renderAdminMatches));els.adminMatchDate?.addEventListener('change',renderAdminMatches);els.adminMatchClear?.addEventListener('click',clearAdminMatchSearch);els.duplicateScanButton?.addEventListener('click',toggleDuplicateView);els.duplicateSelectAll?.addEventListener('change',()=>setAllDuplicateChecks(els.duplicateSelectAll.checked));els.duplicateMergeList?.addEventListener('change',e=>{if(e.target.closest('.js-merge-duplicate'))syncDuplicateSelectionState();});els.duplicateMergeButton?.addEventListener('click',mergeCheckedDuplicates);els.normalizeTournamentButton?.addEventListener('click',normalizeTournamentNames);els.reloadProposalsButton?.addEventListener('click',loadProposals);els.reloadHistoryButton?.addEventListener('click',loadEditHistory);document.addEventListener('click',e=>{if(els.schoolSearchResults&&!e.target.closest('.school-search-wrap'))els.schoolSearchResults.classList.add('hidden');if(els.recordSchoolSearchResults&&!e.target.closest('.record-school-search-wrap'))els.recordSchoolSearchResults.classList.add('hidden');if(els.rankCompareSearchResults&&!e.target.closest('.rank-compare-search-wrap'))els.rankCompareSearchResults.classList.add('hidden');});}
 
-  function renderStaticConfig(){const q=qualifierK(),m=mainK(),showK=featureVisible('k_values');els.heroInitial.textContent=ratingCfg.initial;els.heroDivisor.textContent=ratingCfg.divisor;els.heroK.textContent=showK?`${q} / ${m}`:'非公開';els.heroFormula.textContent="R' = R + K × (W − We)";if(!els.kValue.dataset.userEdited)els.kValue.value=showK?q:ratingCfg.defaultK;if(els.matchK)els.matchK.placeholder=`自動判定（予選${q} / 本戦${m}）`;if(els.matchKValues)els.matchKValues.innerHTML=`<option value="${q}"></option><option value="${m}"></option>`;if(els.methodKText)els.methodKText.textContent=showK?`K値：大会予選${q}、本戦${m}。春夏秋で大会の格による差はつけず、地区・全国の本戦を${m}、それ以前の予選を${q}として扱います。`:'K値は管理者設定に基づいて大会予選と本戦で自動調整します。';syncSiteSettingsForm();}
+  function renderStaticConfig(){const showK=featureVisible('k_values'),vals=configuredKValues(),lo=Math.min(...vals),hi=Math.max(...vals);els.heroInitial.textContent=ratingCfg.initial;els.heroDivisor.textContent=ratingCfg.divisor;els.heroK.textContent=showK?`大会別 ${lo}〜${hi}`:'非公開';els.heroFormula.textContent="R' = R + K × (W − We)";if(!els.kValue.dataset.userEdited)els.kValue.value=showK?summerQualifierK():ratingCfg.defaultK;if(els.matchK)els.matchK.placeholder='大会区分から自動判定（空欄でOK）';if(els.matchKValues)els.matchKValues.innerHTML=[...new Set(vals)].sort((a,b)=>a-b).map(v=>`<option value="${v}"></option>`).join('');if(els.methodKText)els.methodKText.textContent=showK?`K値：秋季予選${autumnQualifierK()} / 秋季地区${autumnRegionalK()} / 神宮${meijiJinguK()} / 春甲子園${springKoshienK()} / 春季予選${springQualifierK()} / 春季地区${springRegionalK()} / 夏予選${summerQualifierK()} / 夏甲子園${summerMainK()}。各試合の手動Kがある場合は手動値を優先します。`:'K値は管理者設定に基づいて大会区分ごとに自動調整します。';syncSiteSettingsForm();}
   async function init(){bindEvents();renderStaticConfig();renderSimulator();resetMatchForm();if(!isConfigReady()){setDataStatus('要設定');showSetupNotice('<strong>Supabaseの接続情報が未設定です。</strong> config.js を設定してください。');els.loginPanel.classList.add('hidden');els.adminUnavailable.textContent='config.jsを設定すると利用できます。';els.adminUnavailable.classList.remove('hidden');return;}state.client=window.supabase.createClient(cfg.supabaseUrl,cfg.supabasePublishableKey);els.adminUnavailable.classList.add('hidden');await loadSiteSettings();await Promise.all([restoreSession(),loadMatches()]);}
   init().catch(e=>{console.error(e);setDataStatus('エラー');showSetupNotice(`<code>${escapeHtml(e.message||e)}</code>`);});
 })();

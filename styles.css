@@ -1338,3 +1338,84 @@ footer {
 @media (max-width: 720px) {
   .site-k-grid, .feature-toggle-grid { grid-template-columns: 1fr; }
 }
+
+/* ===== 2026-09-12 rev12: 大会別K / 重複一括選択 ===== */
+.site-k-grid-eight {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.duplicate-bulk-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.duplicate-select-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: .86rem;
+  font-weight: 800;
+  color: var(--muted);
+  cursor: pointer;
+}
+.duplicate-select-all input { width: 17px; height: 17px; }
+@media (max-width: 980px) {
+  .site-k-grid-eight { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+  .site-k-grid-eight { grid-template-columns: 1fr; }
+  .duplicate-bulk-actions { align-items: stretch; flex-direction: column; }
+}
+
+/* ===== 2026-09-12 rev13: 都道府県6件表示 / 公開設定を各タイトル横へ ===== */
+.title-with-public-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.title-with-public-toggle h2,
+.title-with-public-toggle h3,
+.title-with-public-toggle h4 {
+  margin-bottom: 0;
+}
+.admin-public-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 4px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--muted);
+  font-size: .74rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.admin-public-toggle input {
+  width: 15px;
+  height: 15px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--accent);
+}
+.admin-public-toggle:has(input:checked) {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  background: color-mix(in srgb, var(--accent) 8%, #fff);
+  color: var(--accent-dark);
+}
+.pref-more-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+.record-search-label.title-with-public-toggle {
+  justify-content: space-between;
+}
+@media (max-width: 720px) {
+  .admin-public-toggle { font-size: .7rem; }
+}
