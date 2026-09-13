@@ -25,7 +25,7 @@
   <meta name="twitter:title" content="高校野球レーティング｜全国ランキング・学校別戦績" />
   <meta name="twitter:description" content="全国の高校野球公式戦結果から独自レーティングを算出。全国ランキング、学校別戦績、Rating・順位推移を公開。" />
 
-  <link rel="stylesheet" href="styles.css?v=20260913-27" />
+  <link rel="stylesheet" href="styles.css?v=20260913-28" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -687,7 +687,7 @@
             <div class="school-normalize-head">
               <div>
                 <strong>学校名の名称辞書・自動提案</strong>
-                <p class="muted">同じ高校を指す名称1・名称2・名称3…をまとめ、サイトでは1つの統一略称で表示します。照合は必ず同じ都道府県内だけで行います。</p>
+                <p class="muted">同じ高校を指す名称1・名称2・名称3をまとめ、サイトでは1つの統一略称で表示します。照合は必ず同じ都道府県内だけで行います。</p>
               </div>
               <button id="aliasRefreshButton" class="btn secondary small" type="button">再検出</button>
             </div>
@@ -696,14 +696,20 @@
               <label>名称1<input id="aliasName1" type="text" placeholder="例：専修大松戸" autocomplete="off" /></label>
               <label>名称2<input id="aliasName2" type="text" placeholder="例：専修大学松戸" autocomplete="off" /></label>
               <label>名称3<input id="aliasName3" type="text" placeholder="例：専修大学松戸高等学校" autocomplete="off" /></label>
-              <label class="span-2">名称4以降（任意・1行に1名称）<textarea id="aliasMoreNames" rows="3" placeholder="専大松戸高&#10;その他の表記"></textarea></label>
               <label>統一略称<input id="aliasCanonical" type="text" placeholder="例：専大松戸" autocomplete="off" /></label>
               <div class="school-normalize-actions"><button id="aliasAddButton" class="btn primary small" type="button">名称グループを登録</button></div>
             </div>
             <div id="aliasMessage" class="muted school-normalize-status" aria-live="polite"></div>
             <div class="school-alias-columns">
               <div>
-                <h4>変更候補</h4>
+                <div class="alias-list-heading">
+                  <h4>変更候補</h4>
+                  <label class="alias-pref-filter">都道府県
+                    <select id="aliasSuggestionPrefFilter">
+                      <option value="">すべて</option>
+                    </select>
+                  </label>
+                </div>
                 <div id="aliasSuggestionList" class="school-alias-list"><div class="empty">名称辞書を読み込むと自動検出します。</div></div>
               </div>
               <div>
@@ -796,6 +802,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=20260913-27"></script>
+  <script src="app.js?v=20260913-28"></script>
 </body>
 </html>
