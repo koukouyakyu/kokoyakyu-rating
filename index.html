@@ -217,6 +217,46 @@
             </select>
           </div>
           <div id="recentMatches" class="recent-matches-scroll" tabindex="0" aria-label="戦績一覧。最大5試合分の高さでスクロールできます"></div>
+
+          <div id="publicCorrectionProposal" class="public-correction-proposal" data-public-subfeature="correction_proposals">
+            <div class="public-correction-head">
+              <div>
+                <h4>一般からの修正提案</h4>
+                <p class="muted">自由記述ではなく、登録済み学校から選択して提案します。同一校の別名提案は同じ都道府県の学校同士だけ選択できます。</p>
+              </div>
+            </div>
+            <form id="schoolMergeProposalForm" class="school-merge-proposal-form">
+              <label class="proposal-type-field">
+                修正の種類
+                <select id="schoolMergeProposalType">
+                  <option value="same_school_different_names">同じ高校が別の名前で登録されている</option>
+                </select>
+              </label>
+              <div class="school-merge-picker-grid">
+                <div class="school-merge-picker">
+                  <label for="mergeProposalSchoolA">学校A</label>
+                  <div class="school-search-wrap proposal-school-search-wrap">
+                    <input id="mergeProposalSchoolA" type="search" placeholder="学校名を検索" autocomplete="off" />
+                    <div id="mergeProposalSchoolAResults" class="school-search-results hidden" aria-live="polite"></div>
+                  </div>
+                  <div id="mergeProposalSchoolASelected" class="proposal-school-selected muted">未選択</div>
+                </div>
+                <div class="school-merge-picker">
+                  <label for="mergeProposalSchoolB">学校B</label>
+                  <div class="school-search-wrap proposal-school-search-wrap">
+                    <input id="mergeProposalSchoolB" type="search" placeholder="学校名を検索" autocomplete="off" />
+                    <div id="mergeProposalSchoolBResults" class="school-search-results hidden" aria-live="polite"></div>
+                  </div>
+                  <div id="mergeProposalSchoolBSelected" class="proposal-school-selected muted">未選択</div>
+                </div>
+              </div>
+              <div class="form-actions proposal-submit-actions">
+                <button id="schoolMergeProposalSubmit" class="btn primary small" type="submit" disabled>この2校を同一校として提案</button>
+                <button id="schoolMergeProposalClear" class="btn secondary small" type="button">選択をクリア</button>
+              </div>
+              <p id="schoolMergeProposalMessage" class="form-message" aria-live="polite"></p>
+            </form>
+          </div>
         </article>
       </div>
     </section>
@@ -568,7 +608,14 @@
                 <div id="aliasSuggestionList" class="school-alias-list"><div class="empty">別名辞書を読み込むと自動検出します。</div></div>
               </div>
               <div>
-                <h4>登録済み別名</h4>
+                <div class="alias-list-heading">
+                  <h4>登録済み別名</h4>
+                  <label class="alias-pref-filter">都道府県
+                    <select id="aliasListPrefFilter">
+                      <option value="">すべて</option>
+                    </select>
+                  </label>
+                </div>
                 <div id="aliasList" class="school-alias-list"><div class="empty">登録済み別名はありません。</div></div>
               </div>
             </div>

@@ -1776,3 +1776,151 @@ footer {
 @media (max-width: 620px) {
   #aliasList { max-height: 300px; }
 }
+
+/* ===== 2026-09-13 rev23: 選択式修正提案 / 別名都道府県検索 / スマホ最適化 ===== */
+.public-correction-proposal {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.public-correction-head h4 { margin: 0 0 4px; }
+.public-correction-head p { margin-bottom: 12px; }
+.school-merge-proposal-form {
+  display: grid;
+  gap: 12px;
+}
+.proposal-type-field,
+.school-merge-picker > label {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 800;
+}
+.proposal-type-field { max-width: 520px; }
+.school-merge-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.school-merge-picker { min-width: 0; }
+.proposal-school-search-wrap { width: 100%; max-width: none; }
+.proposal-school-search-wrap input { width: 100%; min-width: 0; }
+.proposal-school-selected {
+  min-height: 38px;
+  margin-top: 7px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-soft);
+  overflow-wrap: anywhere;
+}
+.proposal-submit-actions { margin-top: 2px; }
+.alias-list-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.alias-list-heading h4 { margin: 0; }
+.alias-pref-filter {
+  display: grid;
+  gap: 3px;
+  min-width: 150px;
+  color: var(--muted);
+  font-size: .75rem;
+  font-weight: 800;
+}
+.alias-pref-filter select { width: 100%; min-width: 0; }
+
+/* 画面全体が横にはみ出さない。横長コンテンツは個別スクロールに限定する。 */
+html { -webkit-text-size-adjust: 100%; }
+body { max-width: 100%; overflow-x: hidden; }
+img, svg, canvas { max-width: 100%; }
+.table-card,
+.rank-chart-scroll,
+.recent-matches-scroll,
+.admin-matches-scroll { max-width: 100%; }
+
+@media (max-width: 760px) {
+  .school-merge-picker-grid { grid-template-columns: 1fr; }
+  .alias-list-heading { align-items: stretch; flex-direction: column; }
+  .alias-pref-filter { width: 100%; min-width: 0; }
+}
+
+@media (max-width: 640px) {
+  body { font-size: 15px; }
+  .wrap { width: calc(100% - 20px); }
+  .site-header { position: sticky; }
+  .header-inner { gap: 10px; padding: 10px 0; }
+  .brand-block { width: 100%; min-width: 0; }
+  .brand { overflow: hidden; text-overflow: ellipsis; }
+  .nav {
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2px 0 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  .nav a { flex: 0 0 auto; white-space: nowrap; }
+  .hero { padding: 42px 0 38px; }
+  h1 { font-size: clamp(2rem, 11vw, 2.55rem); overflow-wrap: anywhere; }
+  h2 { font-size: clamp(1.55rem, 8vw, 2rem); overflow-wrap: anywhere; }
+  h3, h4 { overflow-wrap: anywhere; }
+  .section { padding: 48px 0; }
+  .profile-card,
+  .matches-card,
+  .sim-card,
+  .panel,
+  .rank-compare-card { padding: 15px; border-radius: 14px; }
+  .section-head { gap: 10px; margin-bottom: 20px; }
+  .section-copy { width: 100%; max-width: none; }
+  input,
+  select,
+  textarea,
+  button { max-width: 100%; }
+  input,
+  select,
+  textarea { font-size: 16px; }
+  .form-actions { align-items: stretch; }
+  .form-actions .btn { flex: 1 1 100%; width: 100%; }
+  .panel-head,
+  .admin-bar,
+  .school-normalize-head,
+  .duplicate-merge-head { align-items: stretch; flex-direction: column; }
+  .panel-head-actions,
+  .duplicate-bulk-actions { width: 100%; }
+  .panel-head-actions .btn,
+  .duplicate-bulk-actions .btn { width: 100%; }
+  .site-k-grid,
+  .site-k-grid-eight,
+  .admin-match-search,
+  .school-normalize-grid { grid-template-columns: 1fr !important; }
+  .table-card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table-card table { min-width: 680px; }
+  .admin-matches-scroll table { min-width: 760px; }
+  .rank-chart-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #rankCompareChart { min-width: 680px; }
+  .history-wrap { overflow-x: auto; }
+  #historyChart { min-width: 620px; }
+  .school-search-results { max-width: calc(100vw - 40px); }
+  .school-alias-panel,
+  .school-normalize-panel,
+  .duplicate-merge-panel { padding: 12px; }
+  #aliasList { max-height: 280px; }
+  .proposal-type-field { max-width: none; }
+  .proposal-submit-actions .btn { width: 100%; }
+  .ranking-date-filter { align-items: stretch; flex-direction: column; }
+  .ranking-date-filter label { width: 100%; }
+  .ranking-date-filter .btn { width: 100%; }
+  .rank-compare-date-range { flex-direction: column; }
+  .rank-date-separator { display: none; }
+  .rank-compare-date-range .btn { width: 100%; }
+  .summary-strip > div { padding: 12px; }
+  th, td { padding: 10px 11px; }
+}
