@@ -2044,3 +2044,22 @@ img, svg, canvas { max-width: 100%; }
 @media (max-width: 760px) {
   .result-score-grid { grid-template-columns: 1fr; }
 }
+
+/* ===== 2026-09-13 rev27: 名称1・名称2・名称3…方式 ===== */
+.school-name-variants-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+}
+.school-name-variants-grid .span-2 { grid-column: span 2; }
+.school-name-variants-grid textarea {
+  width: 100%;
+  min-height: 78px;
+  resize: vertical;
+}
+@media (max-width: 820px) {
+  .school-name-variants-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 620px) {
+  .school-name-variants-grid { grid-template-columns: 1fr; }
+  .school-name-variants-grid .span-2 { grid-column: auto; }
+}

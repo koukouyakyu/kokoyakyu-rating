@@ -3,31 +3,52 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>高校野球レーティング | 全国高校野球レーティング</title>
+  <title>高校野球レーティング｜全国ランキング・学校別戦績</title>
   <meta
     name="description"
-    content="全国の高校野球公式戦結果をもとに独自算出したRating、全国ランキング、学校別戦績、順位推移を公開する非公式データ分析サイトです。"
+    content="全国の高校野球公式戦結果から独自レーティングを算出。全国ランキング、都道府県比較、学校別戦績、Rating・順位推移を公開する非公式データ分析サイトです。"
   />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+  <meta name="googlebot" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
   <meta name="theme-color" content="#1d6b45" />
   <link rel="canonical" href="https://koukouyakyu.github.io/kokoyakyu-rating/" />
+  <link rel="sitemap" type="application/xml" title="Sitemap" href="https://koukouyakyu.github.io/kokoyakyu-rating/sitemap.xml" />
+
   <meta property="og:locale" content="ja_JP" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="高校野球レーティング" />
-  <meta property="og:title" content="高校野球レーティング | 全国高校野球レーティング" />
-  <meta property="og:description" content="全国の高校野球公式戦結果から独自算出したRating、全国ランキング、学校別戦績、順位推移を公開。" />
+  <meta property="og:title" content="高校野球レーティング｜全国ランキング・学校別戦績" />
+  <meta property="og:description" content="全国の高校野球公式戦結果から独自レーティングを算出。全国ランキング、学校別戦績、Rating・順位推移を公開。" />
   <meta property="og:url" content="https://koukouyakyu.github.io/kokoyakyu-rating/" />
+
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="高校野球レーティング | 全国高校野球レーティング" />
-  <meta name="twitter:description" content="全国の高校野球公式戦結果から独自算出したRatingとランキングを公開。" />
-  <link rel="stylesheet" href="styles.css?v=20260913-26" />
+  <meta name="twitter:title" content="高校野球レーティング｜全国ランキング・学校別戦績" />
+  <meta name="twitter:description" content="全国の高校野球公式戦結果から独自レーティングを算出。全国ランキング、学校別戦績、Rating・順位推移を公開。" />
+
+  <link rel="stylesheet" href="styles.css?v=20260913-27" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "高校野球レーティング",
-    "url": "https://koukouyakyu.github.io/kokoyakyu-rating/",
-    "description": "全国の高校野球公式戦結果をもとに独自算出したRatingとランキングを公開する非公式データ分析サイト"
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://koukouyakyu.github.io/kokoyakyu-rating/#website",
+        "url": "https://koukouyakyu.github.io/kokoyakyu-rating/",
+        "name": "高校野球レーティング",
+        "alternateName": "全国高校野球レーティング",
+        "description": "全国の高校野球公式戦結果から独自レーティングを算出し、全国ランキング、都道府県比較、学校別戦績、Rating・順位推移を公開する非公式データ分析サイトです。",
+        "inLanguage": "ja"
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://koukouyakyu.github.io/kokoyakyu-rating/#webpage",
+        "url": "https://koukouyakyu.github.io/kokoyakyu-rating/",
+        "name": "高校野球レーティング｜全国ランキング・学校別戦績",
+        "description": "全国の高校野球公式戦結果から独自レーティングを算出。全国ランキング、都道府県比較、学校別戦績、Rating・順位推移を公開。",
+        "isPartOf": {"@id": "https://koukouyakyu.github.io/kokoyakyu-rating/#website"},
+        "inLanguage": "ja"
+      }
+    ]
   }
   </script>
 </head>
@@ -662,37 +683,39 @@
             </div>
           </div>
 
-          <div class="school-alias-panel" aria-label="学校名の別名辞書">
+          <div class="school-alias-panel" aria-label="学校名の名称辞書">
             <div class="school-normalize-head">
               <div>
-                <strong>学校名の別名辞書・自動提案</strong>
-                <p class="muted">CSVの学校名・別表記を正式名称へ対応させ、サイトでは登録した統一略称で表示します。照合は必ず同じ都道府県内だけで行います。</p>
+                <strong>学校名の名称辞書・自動提案</strong>
+                <p class="muted">同じ高校を指す名称1・名称2・名称3…をまとめ、サイトでは1つの統一略称で表示します。照合は必ず同じ都道府県内だけで行います。</p>
               </div>
               <button id="aliasRefreshButton" class="btn secondary small" type="button">再検出</button>
             </div>
-            <div class="school-alias-grid">
+            <div class="school-alias-grid school-name-variants-grid">
               <label>都道府県<input id="aliasPref" type="text" placeholder="例：千葉" autocomplete="off" /></label>
-              <label>CSV名・別表記<input id="aliasName" type="text" placeholder="例：専修大松戸" autocomplete="off" /></label>
-              <label>正式名称<input id="aliasOfficial" type="text" placeholder="例：専修大学松戸高等学校" autocomplete="off" /></label>
+              <label>名称1<input id="aliasName1" type="text" placeholder="例：専修大松戸" autocomplete="off" /></label>
+              <label>名称2<input id="aliasName2" type="text" placeholder="例：専修大学松戸" autocomplete="off" /></label>
+              <label>名称3<input id="aliasName3" type="text" placeholder="例：専修大学松戸高等学校" autocomplete="off" /></label>
+              <label class="span-2">名称4以降（任意・1行に1名称）<textarea id="aliasMoreNames" rows="3" placeholder="専大松戸高&#10;その他の表記"></textarea></label>
               <label>統一略称<input id="aliasCanonical" type="text" placeholder="例：専大松戸" autocomplete="off" /></label>
-              <div class="school-normalize-actions"><button id="aliasAddButton" class="btn primary small" type="button">対応を登録</button></div>
+              <div class="school-normalize-actions"><button id="aliasAddButton" class="btn primary small" type="button">名称グループを登録</button></div>
             </div>
             <div id="aliasMessage" class="muted school-normalize-status" aria-live="polite"></div>
             <div class="school-alias-columns">
               <div>
                 <h4>変更候補</h4>
-                <div id="aliasSuggestionList" class="school-alias-list"><div class="empty">別名辞書を読み込むと自動検出します。</div></div>
+                <div id="aliasSuggestionList" class="school-alias-list"><div class="empty">名称辞書を読み込むと自動検出します。</div></div>
               </div>
               <div>
                 <div class="alias-list-heading">
-                  <h4>登録済み別名</h4>
+                  <h4>登録済み名称グループ</h4>
                   <label class="alias-pref-filter">都道府県
                     <select id="aliasListPrefFilter">
                       <option value="">すべて</option>
                     </select>
                   </label>
                 </div>
-                <div id="aliasList" class="school-alias-list"><div class="empty">登録済み別名はありません。</div></div>
+                <div id="aliasList" class="school-alias-list"><div class="empty">登録済み名称グループはありません。</div></div>
               </div>
             </div>
           </div>
@@ -773,6 +796,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=20260913-26"></script>
+  <script src="app.js?v=20260913-27"></script>
 </body>
 </html>

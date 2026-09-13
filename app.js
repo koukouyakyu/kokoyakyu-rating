@@ -35,7 +35,7 @@
 
   const state = {
     client: null, session: null, authMode: null, matches: [], schools: [], schoolMap: new Map(),
-    ranking: [], prefs: [], proposals: [], editHistory: [], schoolAliases: [], schoolAliasMap: new Map(), schoolMasters: [], schoolMasterById: new Map(), schoolNameMap: new Map(), aliasSuggestions: [], aliasesAvailable: true, schoolMasterAvailable: true, correctionProposalAvailable: true, ready: false, historyYears: '1', compareStartDate: '', compareEndDate: '', rankingDate: '', rankingDateIsLatest: true, selectedSchoolKey: null, schoolSearchHits: [], recordSearchHits: [], compareSchoolKeys: [], rankCompareSearchHits: [], showDuplicatesOnly: false, duplicateGroups: [], prefExpanded: false, rankingPage: 1, rankingPageSize: 20, rankSnapshotCache: new Map(), historicalRankingCache: new Map(), deferredRenderHandle: null, duplicateCacheDirty: true, matchSortCache: null,
+    ranking: [], prefs: [], proposals: [], editHistory: [], schoolAliases: [], schoolAliasMap: new Map(), schoolMasters: [], schoolMasterById: new Map(), schoolNameMap: new Map(), aliasSuggestions: [], aliasesAvailable: true, schoolVariantAvailable: true, schoolMasterAvailable: true, correctionProposalAvailable: true, ready: false, historyYears: '1', compareStartDate: '', compareEndDate: '', rankingDate: '', rankingDateIsLatest: true, selectedSchoolKey: null, schoolSearchHits: [], recordSearchHits: [], compareSchoolKeys: [], rankCompareSearchHits: [], showDuplicatesOnly: false, duplicateGroups: [], prefExpanded: false, rankingPage: 1, rankingPageSize: 20, rankSnapshotCache: new Map(), historicalRankingCache: new Map(), deferredRenderHandle: null, duplicateCacheDirty: true, matchSortCache: null,
     settings: {...DEFAULT_SITE_SETTINGS}, settingsAvailable: true,
     kSettings: {...DEFAULT_K_SETTINGS}, kSettingsAvailable: true, missingTournamentTypeCount: 0,
     mergeProposalAKey: null, mergeProposalBKey: null, mergeProposalAHits: [], mergeProposalBHits: [], mergeProposalAvailable: true, resultProposalMatchId: null, resultProposalHits: []
@@ -66,7 +66,7 @@
     saveMatchButton:$('saveMatchButton'), cancelEditButton:$('cancelEditButton'), matchFormMessage:$('matchFormMessage'), adminMatchesBody:$('adminMatchesBody'),
     adminMatchKeyword:$('adminMatchKeyword'), adminMatchDate:$('adminMatchDate'), adminMatchTournament:$('adminMatchTournament'), adminMatchSchool:$('adminMatchSchool'),
     adminMatchSearchStatus:$('adminMatchSearchStatus'), adminMatchClear:$('adminMatchClear'), duplicateStatus:$('duplicateStatus'), duplicateScanButton:$('duplicateScanButton'),
-    reloadButton:$('reloadButton'), reloadProposalsButton:$('reloadProposalsButton'), proposalAdminList:$('proposalAdminList'), duplicateMergeList:$('duplicateMergeList'), duplicateSelectAll:$('duplicateSelectAll'), duplicateMergeButton:$('duplicateMergeButton'), normalizeTournamentButton:$('normalizeTournamentButton'), normalizeTournamentStatus:$('normalizeTournamentStatus'), aliasPref:$('aliasPref'), aliasName:$('aliasName'), aliasOfficial:$('aliasOfficial'), aliasCanonical:$('aliasCanonical'), aliasAddButton:$('aliasAddButton'), aliasRefreshButton:$('aliasRefreshButton'), aliasMessage:$('aliasMessage'), aliasList:$('aliasList'), aliasListPrefFilter:$('aliasListPrefFilter'), aliasSuggestionList:$('aliasSuggestionList'), schoolReplaceFrom:$('schoolReplaceFrom'), schoolReplaceTo:$('schoolReplaceTo'), schoolReplaceMode:$('schoolReplaceMode'), schoolReplacePreviewButton:$('schoolReplacePreviewButton'), schoolReplaceApplyButton:$('schoolReplaceApplyButton'), schoolReplaceStatus:$('schoolReplaceStatus'), schoolReplacePreview:$('schoolReplacePreview'), reloadHistoryButton:$('reloadHistoryButton'), editHistoryList:$('editHistoryList'), heroInitial:$('heroInitial'), heroDivisor:$('heroDivisor'), heroK:$('heroK'), heroFormula:$('heroFormula'), methodKText:$('methodKText'),
+    reloadButton:$('reloadButton'), reloadProposalsButton:$('reloadProposalsButton'), proposalAdminList:$('proposalAdminList'), duplicateMergeList:$('duplicateMergeList'), duplicateSelectAll:$('duplicateSelectAll'), duplicateMergeButton:$('duplicateMergeButton'), normalizeTournamentButton:$('normalizeTournamentButton'), normalizeTournamentStatus:$('normalizeTournamentStatus'), aliasPref:$('aliasPref'), aliasName1:$('aliasName1'), aliasName2:$('aliasName2'), aliasName3:$('aliasName3'), aliasMoreNames:$('aliasMoreNames'), aliasCanonical:$('aliasCanonical'), aliasAddButton:$('aliasAddButton'), aliasRefreshButton:$('aliasRefreshButton'), aliasMessage:$('aliasMessage'), aliasList:$('aliasList'), aliasListPrefFilter:$('aliasListPrefFilter'), aliasSuggestionList:$('aliasSuggestionList'), schoolReplaceFrom:$('schoolReplaceFrom'), schoolReplaceTo:$('schoolReplaceTo'), schoolReplaceMode:$('schoolReplaceMode'), schoolReplacePreviewButton:$('schoolReplacePreviewButton'), schoolReplaceApplyButton:$('schoolReplaceApplyButton'), schoolReplaceStatus:$('schoolReplaceStatus'), schoolReplacePreview:$('schoolReplacePreview'), reloadHistoryButton:$('reloadHistoryButton'), editHistoryList:$('editHistoryList'), heroInitial:$('heroInitial'), heroDivisor:$('heroDivisor'), heroK:$('heroK'), heroFormula:$('heroFormula'), methodKText:$('methodKText'),
     siteSettingsForm:$('siteSettingsForm'), siteAutumnQualifierK:$('siteAutumnQualifierK'), siteAutumnRegionalK:$('siteAutumnRegionalK'), siteMeijiJinguK:$('siteMeijiJinguK'), siteSpringKoshienEarlyK:$('siteSpringKoshienEarlyK'), siteSpringKoshienFinalK:$('siteSpringKoshienFinalK'), siteSpringQualifierK:$('siteSpringQualifierK'), siteSpringRegionalK:$('siteSpringRegionalK'), siteSummerQualifierK:$('siteSummerQualifierK'), siteSummerMainEarlyK:$('siteSummerMainEarlyK'), siteSummerMainFinalK:$('siteSummerMainFinalK'), siteKokuspoK:$('siteKokuspoK'), siteSettingsMessage:$('siteSettingsMessage'), matchKValues:$('matchKValues'), recordSearchBlock:$('recordSearchBlock'), ratingHistoryBlock:$('ratingHistoryBlock')
   };
 
@@ -775,7 +775,7 @@
     e.preventDefault();if(!state.session?.user)return setMessage(els.matchFormMessage,'管理者ログインが必要です。','error');
     let p=readMatchForm(),ve=validateMatchPayload(p);if(ve)return setMessage(els.matchFormMessage,ve,'error');delete p._kError;
     const aliasCheck=applyKnownAliasesToPayload(p);
-    if(aliasCheck.changes.length&&confirm(`学校名マスターに一致しました。\n\n${aliasCheck.changes.join('\n')}\n\n統一略称に変更して登録しますか？`))p=aliasCheck.payload;
+    if(aliasCheck.changes.length&&confirm(`学校名の名称辞書に一致しました。\n\n${aliasCheck.changes.join('\n')}\n\n統一略称に変更して登録しますか？`))p=aliasCheck.payload;
     const id=els.editingMatchId.value,dup=findDuplicateForPayload(p,id);if(dup)return setMessage(els.matchFormMessage,`重複の可能性が高い試合が既に登録されています：${dup.date} ${dup.team_a_display||dup.team_a} ${dup.score_a}-${dup.score_b} ${dup.team_b_display||dup.team_b}（${dup.tournament}）`,'error');
     setMessage(els.matchFormMessage,id?'更新中…':'登録中…');const columns='id,date,tournament,tournament_type,stage,team_a,pref_a,score_a,team_b,pref_b,score_b,k,source_url,created_at';const q=id?state.client.from('matches').update(p).eq('id',id).select(columns).single():state.client.from('matches').insert(p).select(columns).single();const r=await q;if(r.error)return setMessage(els.matchFormMessage,r.error.message,'error');if(id){const at=state.matches.findIndex(m=>String(m.id)===String(id));if(at>=0)state.matches[at]=r.data;else state.matches.push(r.data);}else state.matches.push(r.data);rebuildFromLocalMatches(true);resetMatchForm();setMessage(els.matchFormMessage,id?'試合を更新しました。':'試合を登録しました。','success');renderAliasSuggestions();await loadEditHistory();
   }
@@ -828,64 +828,176 @@
   function aliasPrefKey(pref){return canonicalPref(String(pref??'').trim());}
   function aliasNameKey(name){return normalizeSearchText(name);}
   function schoolAliasLookupKey(pref,name){return `${aliasPrefKey(pref)}||${aliasNameKey(name)}`;}
-  function schoolTargetFromMaster(master){return master?{master_id:String(master.id),prefecture:aliasPrefKey(master.prefecture),official_name:String(master.official_name||'').trim(),display_name:String(master.display_name||master.official_name||'').trim()}:null;}
+  function schoolTargetFromMaster(master){
+    return master?{
+      master_id:String(master.id),
+      prefecture:aliasPrefKey(master.prefecture),
+      primary_name:String((state.schoolVariantAvailable?master.display_name:master.official_name)||master.display_name||'').trim(),
+      display_name:String(master.display_name||master.official_name||'').trim()
+    }:null;
+  }
   function rebuildSchoolAliasMap(){
     state.schoolAliasMap=new Map();state.schoolMasterById=new Map();state.schoolNameMap=new Map();
-    for(const master of state.schoolMasters){state.schoolMasterById.set(String(master.id),master);const target=schoolTargetFromMaster(master);for(const name of [target?.official_name,target?.display_name]){const key=schoolAliasLookupKey(target?.prefecture,name);if(name&&key&&!key.endsWith('||')&&!state.schoolNameMap.has(key))state.schoolNameMap.set(key,target);}}
-    for(const a of state.schoolAliases){const master=a.school_id?state.schoolMasterById.get(String(a.school_id)):null,target=schoolTargetFromMaster(master)||{master_id:null,prefecture:aliasPrefKey(a.prefecture),official_name:String(a.official_name||a.canonical_name||'').trim(),display_name:String(a.display_name||a.canonical_name||'').trim()};a.official_name=target.official_name;a.display_name=target.display_name;const key=schoolAliasLookupKey(a.prefecture,a.alias_name);if(key&&!key.endsWith('||')&&aliasNameKey(a.alias_name)!==aliasNameKey(target.display_name)){state.schoolAliasMap.set(key,a);if(!state.schoolNameMap.has(key))state.schoolNameMap.set(key,target);}}
+    for(const master of state.schoolMasters){
+      state.schoolMasterById.set(String(master.id),master);
+      const target=schoolTargetFromMaster(master);
+      for(const name of [target?.primary_name,target?.display_name]){
+        const key=schoolAliasLookupKey(target?.prefecture,name);
+        if(name&&key&&!key.endsWith('||')&&!state.schoolNameMap.has(key))state.schoolNameMap.set(key,target);
+      }
+    }
+    for(const a of state.schoolAliases){
+      const master=a.school_id?state.schoolMasterById.get(String(a.school_id)):null;
+      const target=schoolTargetFromMaster(master)||{
+        master_id:null,
+        prefecture:aliasPrefKey(a.prefecture),
+        primary_name:String(a.canonical_name||'').trim(),
+        display_name:String(a.canonical_name||'').trim()
+      };
+      a.display_name=target.display_name;
+      const key=schoolAliasLookupKey(a.prefecture,a.alias_name);
+      if(key&&!key.endsWith('||')&&aliasNameKey(a.alias_name)!==aliasNameKey(target.display_name)){
+        state.schoolAliasMap.set(key,a);
+        if(!state.schoolNameMap.has(key))state.schoolNameMap.set(key,target);
+      }
+    }
   }
-  function resolveSingleSchoolIdentity(name,pref){const raw=String(name??'').trim(),target=state.schoolNameMap.get(schoolAliasLookupKey(pref,raw));return target?{name:target.display_name||raw,officialName:target.official_name||null,masterId:target.master_id||null,matched:true}:{name:raw,officialName:null,masterId:null,matched:false};}
+  function resolveSingleSchoolIdentity(name,pref){
+    const raw=String(name??'').trim(),target=state.schoolNameMap.get(schoolAliasLookupKey(pref,raw));
+    return target?{name:target.display_name||raw,officialName:target.primary_name||null,masterId:target.master_id||null,matched:true}:{name:raw,officialName:null,masterId:null,matched:false};
+  }
   function resolveTeamIdentity(name,pref){
     const raw=String(name??'').trim(),direct=resolveSingleSchoolIdentity(raw,pref);if(direct.matched)return {...direct,isJoint:false};
     const joint=normalizeJointName(raw);if(!joint.isJoint)return {name:joint.name,officialName:null,masterId:null,matched:false,isJoint:false};
-    const parts=joint.members.map(part=>resolveSingleSchoolIdentity(part,pref).name),sorted=[...new Set(parts)].sort((a,b)=>a.localeCompare(b,'ja'));return {name:sorted.join('・'),officialName:null,masterId:null,matched:parts.some((x,i)=>x!==joint.members[i]),isJoint:true};
+    const parts=joint.members.map(part=>resolveSingleSchoolIdentity(part,pref).name),sorted=[...new Set(parts)].sort((a,b)=>a.localeCompare(b,'ja'));
+    return {name:sorted.join('・'),officialName:null,masterId:null,matched:parts.some((x,i)=>x!==joint.members[i]),isJoint:true};
   }
   function findKnownAlias(name,pref){const key=schoolAliasLookupKey(pref,name);if(!key||key.endsWith('||'))return null;return state.schoolAliasMap.get(key)||null;}
   async function loadSchoolNameDictionary(){
     if(!state.client)return;
-    const [masterRes,aliasRes]=await Promise.all([
-      state.client.from('school_name_master').select('id,prefecture,official_name,display_name,created_at,updated_at').order('prefecture',{ascending:true}).order('display_name',{ascending:true}),
-      state.client.from('school_aliases').select('id,prefecture,alias_name,canonical_name,school_id,created_at').order('prefecture',{ascending:true}).order('alias_name',{ascending:true})
-    ]);
-    state.schoolMasterAvailable=!masterRes.error;state.aliasesAvailable=!aliasRes.error;state.schoolMasters=masterRes.error?[]:(masterRes.data||[]);state.schoolAliases=aliasRes.error?[]:(aliasRes.data||[]);rebuildSchoolAliasMap();
-    if(masterRes.error||aliasRes.error)console.warn('school name dictionary unavailable:',masterRes.error?.message||aliasRes.error?.message);
+    const masterRes=await state.client.from('school_name_master').select('id,prefecture,official_name,display_name,created_at,updated_at').order('prefecture',{ascending:true}).order('display_name',{ascending:true});
+    let variantRes=await state.client.from('school_name_variants').select('id,school_id,prefecture,name,created_at').order('prefecture',{ascending:true}).order('id',{ascending:true});
+    state.schoolVariantAvailable=!variantRes.error;
+    if(variantRes.error){
+      const legacyRes=await state.client.from('school_aliases').select('id,prefecture,alias_name,canonical_name,school_id,created_at').order('prefecture',{ascending:true}).order('alias_name',{ascending:true});
+      state.aliasesAvailable=!legacyRes.error;variantRes=legacyRes.error?{data:[]}:{data:(legacyRes.data||[]).map(a=>({...a,name:a.alias_name}))};
+    }else state.aliasesAvailable=true;
+    state.schoolMasterAvailable=!masterRes.error;state.schoolMasters=masterRes.error?[]:(masterRes.data||[]);
+    state.schoolAliases=(variantRes.data||[]).map(a=>({...a,alias_name:String(a.name||a.alias_name||'').trim(),canonical_name:String(a.canonical_name||'').trim()}));
+    rebuildSchoolAliasMap();
+    if(masterRes.error||!state.schoolVariantAvailable)console.warn('school name dictionary:',masterRes.error?.message||'school_name_variants is not available; legacy fallback is active');
   }
   async function loadSchoolAliases(){
-    await loadSchoolNameDictionary();renderAliasPrefFilter();renderAliasList();renderAliasSuggestions();if(els.aliasMessage){if(!state.schoolMasterAvailable||!state.aliasesAvailable)els.aliasMessage.textContent='学校名マスターを有効にするには upgrade-school-name-master-result-proposals.sql を一度実行してください。';else els.aliasMessage.textContent='';}
+    await loadSchoolNameDictionary();renderAliasPrefFilter();renderAliasList();renderAliasSuggestions();
+    if(els.aliasMessage){
+      if(!state.schoolMasterAvailable)els.aliasMessage.textContent='学校名の名称辞書がありません。upgrade-rev27.sql を一度実行してください。';
+      else if(!state.schoolVariantAvailable)els.aliasMessage.textContent='名称1・名称2・名称3…方式を有効にするには upgrade-rev27.sql を一度実行してください。';
+      else els.aliasMessage.textContent='';
+    }
   }
   function renderAliasPrefFilter(){
-    if(!els.aliasListPrefFilter)return;const previous=els.aliasListPrefFilter.value,prefs=[...new Set([...state.schoolMasters.map(a=>a.prefecture),...state.schoolAliases.map(a=>a.prefecture)].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ja'));els.aliasListPrefFilter.innerHTML='<option value="">すべて</option>'+prefs.map(p=>`<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');if(prefs.includes(previous))els.aliasListPrefFilter.value=previous;
+    if(!els.aliasListPrefFilter)return;
+    const previous=els.aliasListPrefFilter.value,prefs=[...new Set([...state.schoolMasters.map(a=>a.prefecture),...state.schoolAliases.map(a=>a.prefecture)].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ja'));
+    els.aliasListPrefFilter.innerHTML='<option value="">すべて</option>'+prefs.map(p=>`<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');
+    if(prefs.includes(previous))els.aliasListPrefFilter.value=previous;
+  }
+  function namesForSchoolMaster(master){
+    if(!master)return [];
+    const linked=state.schoolAliases.filter(a=>String(a.school_id||'')===String(master.id)).map(a=>String(a.alias_name||'').trim()).filter(Boolean);
+    const names=state.schoolVariantAvailable?linked:[String(master.official_name||'').trim(),...linked].filter(Boolean);
+    const seen=new Set();return names.filter(name=>{const key=aliasNameKey(name);if(!key||seen.has(key)||key===aliasNameKey(master.display_name))return false;seen.add(key);return true;});
   }
   function renderAliasList(){
-    if(!els.aliasList)return;if(!state.schoolMasterAvailable||!state.aliasesAvailable){els.aliasList.innerHTML='<div class="empty">upgrade-school-name-master-result-proposals.sql の実行後に利用できます。</div>';return;}
-    const pref=els.aliasListPrefFilter?.value||'',rows=state.schoolAliases.filter(a=>!pref||a.prefecture===pref);
-    if(!rows.length){els.aliasList.innerHTML='<div class="empty">この条件の登録済み対応はありません。</div>';return;}
-    els.aliasList.innerHTML=rows.map(a=>`<div class="school-alias-item"><div class="school-alias-item-main"><strong>${escapeHtml(a.prefecture)}：${escapeHtml(a.alias_name)} <span class="school-alias-arrow">→</span> ${escapeHtml(a.official_name||a.canonical_name)} <span class="school-alias-arrow">→</span> ${escapeHtml(a.display_name||a.canonical_name)}</strong><small>CSV名・別表記 → 正式名称 → 統一略称。同じ都道府県内だけで照合</small></div><button class="btn secondary small js-alias-delete" type="button" data-id="${escapeHtml(a.id)}">削除</button></div>`).join('');
-    els.aliasList.querySelectorAll('.js-alias-delete').forEach(b=>b.onclick=()=>deleteSchoolAlias(b.dataset.id));
+    if(!els.aliasList)return;
+    if(!state.schoolMasterAvailable||!state.aliasesAvailable){els.aliasList.innerHTML='<div class="empty">upgrade-rev27.sql の実行後に利用できます。</div>';return;}
+    const pref=els.aliasListPrefFilter?.value||'',masters=state.schoolMasters.filter(m=>!pref||m.prefecture===pref);
+    if(!masters.length){els.aliasList.innerHTML='<div class="empty">この条件の登録済み名称グループはありません。</div>';return;}
+    els.aliasList.innerHTML=masters.map(master=>{
+      const names=namesForSchoolMaster(master),labels=names.length?names.map((name,i)=>`名称${i+1}：${escapeHtml(name)}`).join(' / '):'名称：未登録';
+      return `<div class="school-alias-item"><div class="school-alias-item-main"><strong>${escapeHtml(master.prefecture)}：${labels} <span class="school-alias-arrow">→</span> 統一略称：${escapeHtml(master.display_name)}</strong><small>名称はすべて同格として照合。同じ都道府県内だけで統一略称へ集約します。</small></div><button class="btn secondary small js-alias-group-delete" type="button" data-master-id="${escapeHtml(master.id)}">グループ削除</button></div>`;
+    }).join('');
+    els.aliasList.querySelectorAll('.js-alias-group-delete').forEach(b=>b.onclick=()=>deleteSchoolNameGroup(b.dataset.masterId));
   }
   function collectAliasSuggestions(){
-    if(!state.schoolAliases.length||!state.matches.length)return [];const groups=new Map();for(const a of state.schoolAliases)groups.set(String(a.id),{alias:a,matches:new Map(),appearances:0});
-    for(const m of state.matches){for(const side of ['a','b']){const teamField=`team_${side}`,rawField=`team_${side}_display`,prefField=`pref_${side}`,raw=m[rawField]||m[teamField],alias=findKnownAlias(raw,m[prefField]);if(!alias)continue;const target=alias.display_name||alias.canonical_name;if(aliasNameKey(raw)===aliasNameKey(target))continue;const g=groups.get(String(alias.id));if(!g)continue;if(!g.matches.has(String(m.id)))g.matches.set(String(m.id),{match:m,fields:[]});g.matches.get(String(m.id)).fields.push(teamField);g.appearances++;}}
+    if(!state.schoolNameMap.size||!state.matches.length)return [];
+    const groups=new Map();
+    for(const m of state.matches){
+      for(const side of ['a','b']){
+        const teamField=`team_${side}`,rawField=`team_${side}_display`,prefField=`pref_${side}`,raw=String(m[rawField]||m[teamField]||'').trim(),pref=m[prefField];
+        if(!raw)continue;
+        const target=state.schoolNameMap.get(schoolAliasLookupKey(pref,raw));
+        if(!target||aliasNameKey(raw)===aliasNameKey(target.display_name))continue;
+        const groupKey=schoolAliasLookupKey(pref,raw);
+        if(!groups.has(groupKey))groups.set(groupKey,{alias:{prefecture:aliasPrefKey(pref),alias_name:raw,display_name:target.display_name},matches:new Map(),appearances:0});
+        const g=groups.get(groupKey);if(!g.matches.has(String(m.id)))g.matches.set(String(m.id),{match:m,fields:[]});g.matches.get(String(m.id)).fields.push(teamField);g.appearances++;
+      }
+    }
     return [...groups.values()].filter(g=>g.appearances>0).sort((a,b)=>b.appearances-a.appearances||String(a.alias.prefecture).localeCompare(String(b.alias.prefecture),'ja'));
   }
   function renderAliasSuggestions(){
-    if(!els.aliasSuggestionList||!state.session?.user)return;if(!state.aliasesAvailable){els.aliasSuggestionList.innerHTML='<div class="empty">学校名マスターを作成すると自動検出できます。</div>';return;}state.aliasSuggestions=collectAliasSuggestions();if(!state.aliasSuggestions.length){els.aliasSuggestionList.innerHTML='<div class="empty">現在、登録済み対応に一致する未統一のCSV表記はありません。</div>';return;}
-    els.aliasSuggestionList.innerHTML=state.aliasSuggestions.map((g,i)=>`<div class="school-alias-item"><div class="school-alias-item-main"><strong>${escapeHtml(g.alias.prefecture)}：${escapeHtml(g.alias.alias_name)} <span class="school-alias-arrow">→</span> ${escapeHtml(g.alias.official_name||g.alias.canonical_name)} <span class="school-alias-arrow">→</span> ${escapeHtml(g.alias.display_name||g.alias.canonical_name)}</strong><small>${g.matches.size.toLocaleString('ja-JP')}試合・${g.appearances.toLocaleString('ja-JP')}箇所を検出。表示上はすでに統一略称へ集約されています。</small></div><button class="btn primary small js-alias-apply" type="button" data-index="${i}">DBの表記も統一</button></div>`).join('');els.aliasSuggestionList.querySelectorAll('.js-alias-apply').forEach(b=>b.onclick=()=>applyAliasSuggestion(Number(b.dataset.index)));
+    if(!els.aliasSuggestionList||!state.session?.user)return;
+    if(!state.schoolMasterAvailable){els.aliasSuggestionList.innerHTML='<div class="empty">学校名の名称辞書を作成すると自動検出できます。</div>';return;}
+    state.aliasSuggestions=collectAliasSuggestions();
+    if(!state.aliasSuggestions.length){els.aliasSuggestionList.innerHTML='<div class="empty">現在、登録済み名称に一致する未統一のDB表記はありません。</div>';return;}
+    els.aliasSuggestionList.innerHTML=state.aliasSuggestions.map((g,i)=>`<div class="school-alias-item"><div class="school-alias-item-main"><strong>${escapeHtml(g.alias.prefecture)}：${escapeHtml(g.alias.alias_name)} <span class="school-alias-arrow">→</span> ${escapeHtml(g.alias.display_name)}</strong><small>${g.matches.size.toLocaleString('ja-JP')}試合・${g.appearances.toLocaleString('ja-JP')}箇所を検出。表示とRating計算はすでに統一略称へ集約されています。</small></div><button class="btn primary small js-alias-apply" type="button" data-index="${i}">DBの表記も統一</button></div>`).join('');
+    els.aliasSuggestionList.querySelectorAll('.js-alias-apply').forEach(b=>b.onclick=()=>applyAliasSuggestion(Number(b.dataset.index)));
+  }
+  function schoolVariantInputNames(){
+    const base=[els.aliasName1?.value,els.aliasName2?.value,els.aliasName3?.value];
+    const more=String(els.aliasMoreNames?.value||'').split(/\r?\n/);
+    const seen=new Set(),out=[];
+    for(const value of [...base,...more]){const name=String(value||'').trim();const key=aliasNameKey(name);if(!name||!key||seen.has(key))continue;seen.add(key);out.push(name);}
+    return out;
+  }
+  function findMasterForVariantGroup(prefecture,names,displayName){
+    const prefKey=aliasPrefKey(prefecture),displayKey=aliasNameKey(displayName),nameKeys=new Set(names.map(aliasNameKey));
+    const direct=state.schoolMasters.find(m=>aliasPrefKey(m.prefecture)===prefKey&&(aliasNameKey(m.display_name)===displayKey||(!state.schoolVariantAvailable&&nameKeys.has(aliasNameKey(m.official_name)))));
+    if(direct)return direct;
+    for(const name of names){const target=state.schoolNameMap.get(schoolAliasLookupKey(prefKey,name));if(target?.master_id){const m=state.schoolMasterById.get(String(target.master_id));if(m)return m;}}
+    return null;
   }
   async function addSchoolAlias(){
-    if(!state.session?.user||!state.aliasesAvailable||!state.schoolMasterAvailable)return;const prefecture=aliasPrefKey(els.aliasPref?.value),alias_name=String(els.aliasName?.value||'').trim(),official_name=String(els.aliasOfficial?.value||'').trim(),display_name=String(els.aliasCanonical?.value||'').trim();
-    if(!prefecture||!alias_name||!official_name||!display_name)return setMessage(els.aliasMessage,'都道府県・CSV名/別表記・正式名称・統一略称をすべて入力してください。','error');setMessage(els.aliasMessage,'登録中…');
-    const masterRes=await state.client.from('school_name_master').upsert({prefecture,official_name,display_name,updated_at:new Date().toISOString()},{onConflict:'prefecture,official_name'}).select('id,prefecture,official_name,display_name').single();if(masterRes.error)return setMessage(els.aliasMessage,`正式名称を登録できませんでした: ${masterRes.error.message}`,'error');
-    const sameAsRegistered=[official_name,display_name].some(x=>aliasNameKey(x)===aliasNameKey(alias_name));if(!sameAsRegistered){const {error}=await state.client.from('school_aliases').upsert({prefecture,alias_name,canonical_name:display_name,school_id:masterRes.data.id,updated_at:new Date().toISOString()},{onConflict:'prefecture,alias_name'});if(error)return setMessage(els.aliasMessage,`別表記を登録できませんでした: ${error.message}`,'error');}
-    if(els.aliasPref)els.aliasPref.value=prefecture;if(els.aliasName)els.aliasName.value='';if(els.aliasOfficial)els.aliasOfficial.value='';if(els.aliasCanonical)els.aliasCanonical.value='';await loadSchoolAliases();await loadMatches();setMessage(els.aliasMessage,sameAsRegistered?'正式名称と統一略称を登録しました。':'CSV表記 → 正式名称 → 統一略称の対応を登録しました。ランキングも再集約しました。','success');
+    if(!state.session?.user||!state.schoolVariantAvailable||!state.schoolMasterAvailable)return;
+    const prefecture=aliasPrefKey(els.aliasPref?.value),names=schoolVariantInputNames(),display_name=String(els.aliasCanonical?.value||'').trim();
+    if(!prefecture||!names.length||!display_name)return setMessage(els.aliasMessage,'都道府県・名称1・統一略称は必須です。名称2以降は必要な分だけ入力してください。','error');
+    setMessage(els.aliasMessage,'登録中…');
+    let master=findMasterForVariantGroup(prefecture,names,display_name);
+    if(!master){
+      const {data,error}=await state.client.from('school_name_master').insert({prefecture,official_name:display_name,display_name,updated_at:new Date().toISOString()}).select('id,prefecture,official_name,display_name').single();
+      if(error)return setMessage(els.aliasMessage,`名称グループを登録できませんでした: ${error.message}`,'error');master=data;
+    }else if(aliasNameKey(master.display_name)!==aliasNameKey(display_name)){
+      const {data,error}=await state.client.from('school_name_master').update({display_name,updated_at:new Date().toISOString()}).eq('id',master.id).select('id,prefecture,official_name,display_name').single();
+      if(error)return setMessage(els.aliasMessage,`統一略称を更新できませんでした: ${error.message}`,'error');master=data;
+      
+    }
+    const displayKey=aliasNameKey(display_name);
+    for(const name of names){
+      const key=aliasNameKey(name);if(!key||key===displayKey)continue;
+      const {error}=await state.client.from('school_name_variants').upsert({school_id:master.id,prefecture,name,updated_at:new Date().toISOString()},{onConflict:'prefecture,name'});
+      if(error)return setMessage(els.aliasMessage,`「${name}」を登録できませんでした: ${error.message}`,'error');
+    }
+    if(els.aliasPref)els.aliasPref.value=prefecture;
+    for(const el of [els.aliasName1,els.aliasName2,els.aliasName3,els.aliasMoreNames,els.aliasCanonical])if(el)el.value='';
+    await loadSchoolAliases();await loadMatches();setMessage(els.aliasMessage,`${names.length}件の名称を「${display_name}」へ対応付けました。ランキングも統一略称で再集約しました。`,'success');
   }
-  async function deleteSchoolAlias(id){const alias=state.schoolAliases.find(a=>String(a.id)===String(id));if(!alias)return;if(!confirm(`${alias.prefecture}：${alias.alias_name} → ${alias.official_name||alias.canonical_name} → ${alias.display_name||alias.canonical_name}\nこの別名対応を削除しますか？`))return;const {error}=await state.client.from('school_aliases').delete().eq('id',id);if(error)return alert(error.message);await loadSchoolAliases();await loadMatches();}
+  async function deleteSchoolNameGroup(masterId){
+    const master=state.schoolMasterById.get(String(masterId));if(!master)return;
+    const names=namesForSchoolMaster(master);
+    if(!confirm(`${master.prefecture}：${names.join(' / ')} → ${master.display_name}\nこの名称グループを削除しますか？\n試合データ自体は削除されません。`))return;
+    if(state.aliasesAvailable)await state.client.from('school_aliases').delete().eq('school_id',master.id);
+    const masterDelete=await state.client.from('school_name_master').delete().eq('id',master.id);if(masterDelete.error)return alert(masterDelete.error.message);
+    await loadSchoolAliases();await loadMatches();
+  }
   async function applyAliasSuggestion(index){
-    const g=state.aliasSuggestions[index];if(!g)return;const {alias}=g,target=alias.display_name||alias.canonical_name;if(!confirm(`${alias.prefecture}の「${alias.alias_name}」をDB上でも「${target}」へ統一します。\n対象：${g.matches.size}試合・${g.appearances}箇所\n\nサイト表示とRating計算は、実行前から統一略称で集約されています。DBの元表記も揃えてよろしいですか？`))return;if(els.aliasMessage)setMessage(els.aliasMessage,'修正中…');
+    const g=state.aliasSuggestions[index];if(!g)return;const {alias}=g,target=alias.display_name;
+    if(!confirm(`${alias.prefecture}の「${alias.alias_name}」をDB上でも「${target}」へ統一します。\n対象：${g.matches.size}試合・${g.appearances}箇所\n\nサイト表示とRating計算は、実行前から統一略称で集約されています。DBの元表記も揃えてよろしいですか？`))return;
+    if(els.aliasMessage)setMessage(els.aliasMessage,'修正中…');
     try{let done=0;for(const {match,fields} of g.matches.values()){const payload={};for(const field of fields)payload[field]=target;const {error}=await state.client.from('matches').update(payload).eq('id',match.id);if(error)throw error;done++;if(els.aliasMessage&&(done===g.matches.size||done%25===0))els.aliasMessage.textContent=`修正中… ${done} / ${g.matches.size}試合`;}await loadMatches();await loadEditHistory();renderAliasSuggestions();setMessage(els.aliasMessage,`${g.matches.size}試合のDB表記を「${target}」へ統一しました。`,'success');}catch(e){setMessage(els.aliasMessage,`修正に失敗しました: ${e.message||e}`,'error');}
   }
   function applyKnownAliasesToPayload(payload){
-    const p={...payload},changes=[];for(const side of ['a','b']){const teamField=`team_${side}`,prefField=`pref_${side}`,resolved=resolveTeamIdentity(p[teamField],p[prefField]);if(!resolved.matched||resolved.name===p[teamField])continue;const raw=p[teamField],known=findKnownAlias(raw,p[prefField]),official=known?.official_name||resolved.officialName||resolved.name;changes.push(`${aliasPrefKey(p[prefField])}：${raw} → ${official} → ${resolved.name}`);p[teamField]=resolved.name;}return {payload:p,changes};
+    const p={...payload},changes=[];
+    for(const side of ['a','b']){const teamField=`team_${side}`,prefField=`pref_${side}`,resolved=resolveTeamIdentity(p[teamField],p[prefField]);if(!resolved.matched||resolved.name===p[teamField])continue;const raw=p[teamField];changes.push(`${aliasPrefKey(p[prefField])}：${raw} → ${resolved.name}`);p[teamField]=resolved.name;}
+    return {payload:p,changes};
   }
 
   function schoolReplacementSpec(){
