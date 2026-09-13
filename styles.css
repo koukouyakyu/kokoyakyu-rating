@@ -1762,3 +1762,17 @@ footer {
   .school-alias-grid { grid-template-columns: 1fr; }
   .school-alias-item { align-items: flex-start; flex-direction: column; }
 }
+
+
+/* ===== 2026-09-13 rev22: 登録済み別名スクロール ===== */
+#aliasList {
+  max-height: 360px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+  scrollbar-gutter: stable;
+}
+@media (max-width: 620px) {
+  #aliasList { max-height: 300px; }
+}

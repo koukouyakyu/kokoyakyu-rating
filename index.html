@@ -390,14 +390,16 @@
               <label>秋季大会予選 K<input id="siteAutumnQualifierK" type="text" inputmode="decimal" autocomplete="off" required /></label>
               <label>秋季大会地区大会 K<input id="siteAutumnRegionalK" type="text" inputmode="decimal" autocomplete="off" required /></label>
               <label>明治神宮大会 K<input id="siteMeijiJinguK" type="text" inputmode="decimal" autocomplete="off" required /></label>
-              <label>春の甲子園 K<input id="siteSpringKoshienK" type="text" inputmode="decimal" autocomplete="off" required /></label>
+              <label>春の甲子園 1回戦〜準々決勝 K<input id="siteSpringKoshienEarlyK" type="text" inputmode="decimal" autocomplete="off" required /></label>
+              <label>春の甲子園 準決勝・決勝 K<input id="siteSpringKoshienFinalK" type="text" inputmode="decimal" autocomplete="off" required /></label>
               <label>春季大会予選 K<input id="siteSpringQualifierK" type="text" inputmode="decimal" autocomplete="off" required /></label>
               <label>春季大会地区大会 K<input id="siteSpringRegionalK" type="text" inputmode="decimal" autocomplete="off" required /></label>
               <label>夏の甲子園予選 K<input id="siteSummerQualifierK" type="text" inputmode="decimal" autocomplete="off" required /></label>
-              <label>夏の甲子園本戦 K<input id="siteSummerMainK" type="text" inputmode="decimal" autocomplete="off" required /></label>
+              <label>夏の甲子園本戦 1回戦〜準々決勝 K<input id="siteSummerMainEarlyK" type="text" inputmode="decimal" autocomplete="off" required /></label>
+              <label>夏の甲子園本戦 準決勝・決勝 K<input id="siteSummerMainFinalK" type="text" inputmode="decimal" autocomplete="off" required /></label>
               <label>国民スポーツ大会 K<input id="siteKokuspoK" type="text" inputmode="decimal" autocomplete="off" required /></label>
             </div>
-            <p class="muted settings-help">9区分を個別に変更できます。各試合は大会名ではなく大会タグで分類します。手動K値が保存されている場合だけ手動値が最優先です。</p>
+            <p class="muted settings-help">11区分を個別に変更できます。各試合は大会名ではなく大会タグで分類します。手動K値が保存されている場合だけ手動値が最優先です。</p>
             <div class="form-actions settings-actions">
               <button class="btn primary" type="submit">K係数を保存</button>
             </div>
@@ -421,17 +423,19 @@
             </label>
 
             <label>
-              大会区分（9種類のタグ）
+              大会区分（11種類のタグ）
               <select id="tournamentType" required>
                 <option value="">選択してください</option>
                 <option value="autumn_qualifier">秋季大会予選</option>
                 <option value="autumn_regional">秋季大会地区大会</option>
                 <option value="meiji_jingu">明治神宮大会</option>
-                <option value="spring_koshien">春の甲子園</option>
+                <option value="spring_koshien_early">春の甲子園 1回戦〜準々決勝</option>
+                <option value="spring_koshien_final">春の甲子園 準決勝・決勝</option>
                 <option value="spring_qualifier">春季大会予選</option>
                 <option value="spring_regional">春季大会地区大会</option>
                 <option value="summer_qualifier">夏の甲子園予選</option>
-                <option value="summer_main">夏の甲子園本戦</option>
+                <option value="summer_main_early">夏の甲子園本戦 1回戦〜準々決勝</option>
+                <option value="summer_main_final">夏の甲子園本戦 準決勝・決勝</option>
                 <option value="kokuspo">国民スポーツ大会</option>
               </select>
             </label>
