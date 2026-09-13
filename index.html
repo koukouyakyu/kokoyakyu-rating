@@ -655,15 +655,16 @@
             <div class="school-normalize-head">
               <div>
                 <strong>学校名の別名辞書・自動提案</strong>
-                <p class="muted">同じ学校の名称を最大3件までまとめて登録し、1つの統一名に揃えます。候補検出とDB統合は同じ都道府県内だけを対象にします。</p>
+                <p class="muted">同じ学校の名称を何件でも登録し、1つの統一名に揃えます。既存の登録名称もすべて読み込み、候補検出とDB統合は同じ都道府県内だけを対象にします。</p>
               </div>
               <button id="aliasRefreshButton" class="btn secondary small" type="button">候補を再検出</button>
             </div>
             <div class="school-alias-grid school-alias-multi-grid">
               <label>都道府県<input id="aliasPref" type="text" placeholder="例：千葉" autocomplete="off" /></label>
-              <label>名称1<input id="aliasName" type="text" placeholder="例：専修大松戸" autocomplete="off" /></label>
-              <label>名称2<input id="aliasName2" type="text" placeholder="例：専修大学松戸" autocomplete="off" /></label>
-              <label>名称3<input id="aliasName3" type="text" placeholder="任意" autocomplete="off" /></label>
+              <div class="alias-names-editor">
+                <div class="alias-names-editor-head"><strong>同じ学校の名称</strong><button id="aliasAddNameButton" class="btn secondary small" type="button">＋名称を追加</button></div>
+                <div id="aliasNamesContainer" class="alias-names-container"></div>
+              </div>
               <label class="school-alias-canonical">統一名<input id="aliasCanonical" type="text" placeholder="例：専大松戸" autocomplete="off" /></label>
               <div class="school-normalize-actions">
                 <button id="aliasAddButton" class="btn primary small" type="button">名称辞書に登録</button>

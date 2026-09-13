@@ -2220,3 +2220,40 @@ img, svg, canvas { max-width: 100%; }
   .school-alias-multi-grid .school-normalize-actions { grid-column: auto; }
   .alias-unified-heading { align-items: stretch; flex-direction: column; }
 }
+
+
+/* rev29: school-name dictionary recovery / unlimited variants */
+.alias-names-editor {
+  grid-column: span 3;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--surface-soft);
+}
+.alias-names-editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+.alias-names-container { display: grid; gap: 8px; }
+.alias-name-row {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  gap: 8px;
+  align-items: end;
+}
+.alias-name-row label { min-width: 0; }
+.alias-name-row label span { display: block; margin-bottom: 5px; }
+.alias-name-row input { width: 100%; min-width: 0; }
+@media (max-width: 860px) {
+  .alias-names-editor { grid-column: span 2; }
+}
+@media (max-width: 640px) {
+  .alias-names-editor { grid-column: auto; }
+  .alias-names-editor-head { align-items: stretch; flex-direction: column; }
+  .alias-name-row { grid-template-columns: 1fr; }
+  .alias-name-row .alias-name-remove { width: 100%; }
+}
