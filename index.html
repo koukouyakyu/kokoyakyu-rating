@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="高校野球レーティング | 全国ランキング" />
   <meta name="twitter:description" content="全国の高校野球公式戦結果から独自算出したRatingとランキングを公開。" />
-  <link rel="stylesheet" href="styles.css?v=20260913-25" />
+  <link rel="stylesheet" href="styles.css?v=20260913-31" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -73,6 +73,7 @@
           <div class="metric-row"><span>初期Rating</span><strong id="heroInitial">1500</strong></div>
           <div class="metric-row"><span>期待値の除数</span><strong id="heroDivisor">600</strong></div>
           <div class="metric-row"><span>K値（大会別）</span><strong id="heroK">読込中</strong></div>
+          <div class="metric-row"><span>新チーム継承率</span><strong id="heroRetention">85%</strong></div>
           <div class="metric-row"><span>データ</span><strong id="dataStatus">接続中…</strong></div>
         </div>
       </div>
@@ -405,12 +406,18 @@
           </article>
 
           <article class="method-card">
-            <h3>3. データの保存</h3>
+            <h3>3. 新チームへの移行</h3>
+            <div class="formula">R<sub>new</sub> = 1500 + (R<sub>old</sub> − 1500) × 継承率</div>
+            <p id="methodRetentionText">3年生引退後の秋季大会開始時に、1500からの差を一定割合だけ引き継ぎます。</p>
+          </article>
+
+          <article class="method-card">
+            <h3>4. データの保存</h3>
             <p>試合結果だけをSupabaseに保存し、Ratingはブラウザで全試合を古い順に再計算します。</p>
           </article>
 
           <article class="method-card">
-            <h3>4. 訂正への対応</h3>
+            <h3>5. 訂正への対応</h3>
             <p>過去の試合を修正・削除した場合も、再読み込み時に全Ratingが自動で再計算されます。</p>
           </article>
         </div>
@@ -510,6 +517,7 @@
           </div>
           <form id="siteSettingsForm">
             <div class="site-k-grid site-k-grid-eight">
+              <label>新チーム移行時のレーティング継承率（%）<input id="siteNewTeamRetention" type="number" min="0" max="100" step="1" value="85" autocomplete="off" required /></label>
               <label>秋季大会予選 K<input id="siteAutumnQualifierK" type="text" inputmode="decimal" autocomplete="off" required /></label>
               <label>秋季大会地区大会 K<input id="siteAutumnRegionalK" type="text" inputmode="decimal" autocomplete="off" required /></label>
               <label>明治神宮大会 K<input id="siteMeijiJinguK" type="text" inputmode="decimal" autocomplete="off" required /></label>
@@ -522,9 +530,9 @@
               <label>夏の甲子園本戦 準決勝・決勝 K<input id="siteSummerMainFinalK" type="text" inputmode="decimal" autocomplete="off" required /></label>
               <label>国民スポーツ大会 K<input id="siteKokuspoK" type="text" inputmode="decimal" autocomplete="off" required /></label>
             </div>
-            <p class="muted settings-help">11区分を個別に変更できます。各試合は大会名ではなく大会タグで分類します。手動K値が保存されている場合だけ手動値が最優先です。</p>
+            <p class="muted settings-help">継承率は、秋の新チーム開始時に1500からの差を何%残すかを指定します（85%なら差を15%縮小、100%なら補正なし）。K値は11区分を個別に変更でき、各試合は大会名ではなく大会タグで分類します。</p>
             <div class="form-actions settings-actions">
-              <button class="btn primary" type="submit">K係数を保存</button>
+              <button class="btn primary" type="submit">計算設定を保存</button>
             </div>
             <p id="siteSettingsMessage" class="form-message" aria-live="polite"></p>
           </form>
@@ -813,6 +821,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=20260913-24"></script>
+  <script src="app.js?v=20260913-31"></script>
 </body>
 </html>
