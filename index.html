@@ -655,37 +655,34 @@
             <div class="school-normalize-head">
               <div>
                 <strong>学校名の別名辞書・自動提案</strong>
-                <p class="muted">別名は都道府県込みで登録します。表記揺れ候補は必ず同じ都道府県内だけで検出し、別都道府県の似た学校は提案しません。</p>
+                <p class="muted">同じ学校の名称を最大3件までまとめて登録し、1つの統一名に揃えます。候補検出とDB統合は同じ都道府県内だけを対象にします。</p>
               </div>
-              <button id="aliasRefreshButton" class="btn secondary small" type="button">再検出</button>
+              <button id="aliasRefreshButton" class="btn secondary small" type="button">候補を再検出</button>
             </div>
-            <div class="school-alias-grid">
+            <div class="school-alias-grid school-alias-multi-grid">
               <label>都道府県<input id="aliasPref" type="text" placeholder="例：千葉" autocomplete="off" /></label>
-              <label>別表記<input id="aliasName" type="text" placeholder="例：専修大松戸" autocomplete="off" /></label>
-              <label>統一名<input id="aliasCanonical" type="text" placeholder="例：専大松戸" autocomplete="off" /></label>
+              <label>名称1<input id="aliasName" type="text" placeholder="例：専修大松戸" autocomplete="off" /></label>
+              <label>名称2<input id="aliasName2" type="text" placeholder="例：専修大学松戸" autocomplete="off" /></label>
+              <label>名称3<input id="aliasName3" type="text" placeholder="任意" autocomplete="off" /></label>
+              <label class="school-alias-canonical">統一名<input id="aliasCanonical" type="text" placeholder="例：専大松戸" autocomplete="off" /></label>
               <div class="school-normalize-actions">
-                <button id="aliasAddButton" class="btn primary small" type="button">別名を登録</button>
+                <button id="aliasAddButton" class="btn primary small" type="button">名称辞書に登録</button>
                 <button id="aliasCancelEditButton" class="btn secondary small hidden" type="button">編集をキャンセル</button>
               </div>
             </div>
             <div id="aliasMessage" class="muted school-normalize-status" aria-live="polite"></div>
-            <div class="school-alias-columns">
+            <div class="alias-list-heading alias-unified-heading">
               <div>
-                <h4>変更候補</h4>
-                <div id="aliasSuggestionList" class="school-alias-list"><div class="empty">別名辞書を読み込むと自動検出します。</div></div>
+                <h4>名称辞書・自動提案一覧</h4>
+                <p class="muted">登録した名称と、現在の試合データに一致する候補数を同じ一覧に表示します。</p>
               </div>
-              <div>
-                <div class="alias-list-heading">
-                  <h4>登録済み別名</h4>
-                  <label class="alias-pref-filter">都道府県
-                    <select id="aliasListPrefFilter">
-                      <option value="">すべて</option>
-                    </select>
-                  </label>
-                </div>
-                <div id="aliasList" class="school-alias-list"><div class="empty">登録済み別名はありません。</div></div>
-              </div>
+              <label class="alias-pref-filter">都道府県で絞り込み
+                <select id="aliasListPrefFilter">
+                  <option value="">すべて</option>
+                </select>
+              </label>
             </div>
+            <div id="aliasList" class="school-alias-list"><div class="empty">登録済み名称辞書はありません。</div></div>
           </div>
 
           <div class="tournament-alias-panel" aria-label="大会名の名称辞書">

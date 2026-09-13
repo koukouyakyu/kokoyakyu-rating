@@ -2183,3 +2183,40 @@ img, svg, canvas { max-width: 100%; }
   .tournament-alias-canonical { grid-column: auto; }
   .tournament-alias-list-head { align-items: stretch; flex-direction: column; }
 }
+
+/* ===== rev27: 名称辞書UI統合 / 候補数表示 ===== */
+.school-alias-multi-grid {
+  grid-template-columns: minmax(110px,.7fr) repeat(3,minmax(150px,1fr));
+}
+.school-alias-multi-grid .school-alias-canonical { grid-column: span 2; }
+.school-alias-multi-grid .school-normalize-actions {
+  grid-column: span 2;
+  align-self: end;
+}
+.alias-unified-heading {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.alias-unified-heading > div { min-width: 0; }
+.alias-unified-heading p { margin: 4px 0 0; }
+.dictionary-match-breakdown {
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.school-alias-item .btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+@media (max-width: 900px) {
+  .school-alias-multi-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .school-alias-multi-grid .school-alias-canonical { grid-column: span 2; }
+  .school-alias-multi-grid .school-normalize-actions { grid-column: span 2; }
+}
+@media (max-width: 620px) {
+  .school-alias-multi-grid { grid-template-columns: 1fr; }
+  .school-alias-multi-grid .school-alias-canonical,
+  .school-alias-multi-grid .school-normalize-actions { grid-column: auto; }
+  .alias-unified-heading { align-items: stretch; flex-direction: column; }
+}

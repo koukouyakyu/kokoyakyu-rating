@@ -67,7 +67,7 @@
     saveMatchButton:$('saveMatchButton'), cancelEditButton:$('cancelEditButton'), matchFormMessage:$('matchFormMessage'), adminMatchesBody:$('adminMatchesBody'),
     adminMatchKeyword:$('adminMatchKeyword'), adminMatchDate:$('adminMatchDate'), adminMatchTournament:$('adminMatchTournament'), adminMatchSchool:$('adminMatchSchool'),
     adminMatchSearchStatus:$('adminMatchSearchStatus'), adminMatchClear:$('adminMatchClear'), duplicateStatus:$('duplicateStatus'), duplicateScanButton:$('duplicateScanButton'),
-    reloadButton:$('reloadButton'), reloadProposalsButton:$('reloadProposalsButton'), proposalAdminList:$('proposalAdminList'), duplicateMergeList:$('duplicateMergeList'), duplicateSelectAll:$('duplicateSelectAll'), duplicateMergeButton:$('duplicateMergeButton'), normalizeTournamentButton:$('normalizeTournamentButton'), normalizeTournamentStatus:$('normalizeTournamentStatus'), aliasPref:$('aliasPref'), aliasName:$('aliasName'), aliasCanonical:$('aliasCanonical'), aliasAddButton:$('aliasAddButton'), aliasCancelEditButton:$('aliasCancelEditButton'), aliasRefreshButton:$('aliasRefreshButton'), aliasMessage:$('aliasMessage'), aliasList:$('aliasList'), aliasListPrefFilter:$('aliasListPrefFilter'), aliasSuggestionList:$('aliasSuggestionList'), tournamentAliasYear:$('tournamentAliasYear'), tournamentAliasName1:$('tournamentAliasName1'), tournamentAliasName2:$('tournamentAliasName2'), tournamentAliasName3:$('tournamentAliasName3'), tournamentAliasName4:$('tournamentAliasName4'), tournamentAliasName5:$('tournamentAliasName5'), tournamentAliasName6:$('tournamentAliasName6'), tournamentAliasCanonical:$('tournamentAliasCanonical'), tournamentAliasSaveButton:$('tournamentAliasSaveButton'), tournamentAliasCancelEditButton:$('tournamentAliasCancelEditButton'), tournamentAliasRefreshButton:$('tournamentAliasRefreshButton'), tournamentAliasMessage:$('tournamentAliasMessage'), tournamentAliasYearFilter:$('tournamentAliasYearFilter'), tournamentAliasList:$('tournamentAliasList'), schoolReplaceFrom:$('schoolReplaceFrom'), schoolReplaceTo:$('schoolReplaceTo'), schoolReplaceMode:$('schoolReplaceMode'), schoolReplacePreviewButton:$('schoolReplacePreviewButton'), schoolReplaceApplyButton:$('schoolReplaceApplyButton'), schoolReplaceStatus:$('schoolReplaceStatus'), schoolReplacePreview:$('schoolReplacePreview'), reloadHistoryButton:$('reloadHistoryButton'), editHistoryList:$('editHistoryList'), heroInitial:$('heroInitial'), heroDivisor:$('heroDivisor'), heroK:$('heroK'), heroFormula:$('heroFormula'), methodKText:$('methodKText'),
+    reloadButton:$('reloadButton'), reloadProposalsButton:$('reloadProposalsButton'), proposalAdminList:$('proposalAdminList'), duplicateMergeList:$('duplicateMergeList'), duplicateSelectAll:$('duplicateSelectAll'), duplicateMergeButton:$('duplicateMergeButton'), normalizeTournamentButton:$('normalizeTournamentButton'), normalizeTournamentStatus:$('normalizeTournamentStatus'), aliasPref:$('aliasPref'), aliasName:$('aliasName'), aliasName2:$('aliasName2'), aliasName3:$('aliasName3'), aliasCanonical:$('aliasCanonical'), aliasAddButton:$('aliasAddButton'), aliasCancelEditButton:$('aliasCancelEditButton'), aliasRefreshButton:$('aliasRefreshButton'), aliasMessage:$('aliasMessage'), aliasList:$('aliasList'), aliasListPrefFilter:$('aliasListPrefFilter'), aliasSuggestionList:$('aliasSuggestionList'), tournamentAliasYear:$('tournamentAliasYear'), tournamentAliasName1:$('tournamentAliasName1'), tournamentAliasName2:$('tournamentAliasName2'), tournamentAliasName3:$('tournamentAliasName3'), tournamentAliasName4:$('tournamentAliasName4'), tournamentAliasName5:$('tournamentAliasName5'), tournamentAliasName6:$('tournamentAliasName6'), tournamentAliasCanonical:$('tournamentAliasCanonical'), tournamentAliasSaveButton:$('tournamentAliasSaveButton'), tournamentAliasCancelEditButton:$('tournamentAliasCancelEditButton'), tournamentAliasRefreshButton:$('tournamentAliasRefreshButton'), tournamentAliasMessage:$('tournamentAliasMessage'), tournamentAliasYearFilter:$('tournamentAliasYearFilter'), tournamentAliasList:$('tournamentAliasList'), schoolReplaceFrom:$('schoolReplaceFrom'), schoolReplaceTo:$('schoolReplaceTo'), schoolReplaceMode:$('schoolReplaceMode'), schoolReplacePreviewButton:$('schoolReplacePreviewButton'), schoolReplaceApplyButton:$('schoolReplaceApplyButton'), schoolReplaceStatus:$('schoolReplaceStatus'), schoolReplacePreview:$('schoolReplacePreview'), reloadHistoryButton:$('reloadHistoryButton'), editHistoryList:$('editHistoryList'), heroInitial:$('heroInitial'), heroDivisor:$('heroDivisor'), heroK:$('heroK'), heroFormula:$('heroFormula'), methodKText:$('methodKText'),
     siteSettingsForm:$('siteSettingsForm'), siteAutumnQualifierK:$('siteAutumnQualifierK'), siteAutumnRegionalK:$('siteAutumnRegionalK'), siteMeijiJinguK:$('siteMeijiJinguK'), siteSpringKoshienEarlyK:$('siteSpringKoshienEarlyK'), siteSpringKoshienFinalK:$('siteSpringKoshienFinalK'), siteSpringQualifierK:$('siteSpringQualifierK'), siteSpringRegionalK:$('siteSpringRegionalK'), siteSummerQualifierK:$('siteSummerQualifierK'), siteSummerMainEarlyK:$('siteSummerMainEarlyK'), siteSummerMainFinalK:$('siteSummerMainFinalK'), siteKokuspoK:$('siteKokuspoK'), siteSettingsMessage:$('siteSettingsMessage'), matchKValues:$('matchKValues'), recordSearchBlock:$('recordSearchBlock'), ratingHistoryBlock:$('ratingHistoryBlock')
   };
 
@@ -848,97 +848,87 @@
     if(error){state.schoolAliases=[];state.schoolAliasMap=new Map();state.aliasSuggestions=[];state.aliasesAvailable=false;renderAliasPrefFilter();renderAliasList();renderAliasSuggestions();if(els.aliasMessage)els.aliasMessage.textContent='別名辞書テーブルがありません。upgrade-school-aliases.sql を一度実行してください。';return;}
     state.schoolAliases=data||[];rebuildSchoolAliasMap();state.aliasesAvailable=true;if(els.aliasMessage)els.aliasMessage.textContent='';renderAliasPrefFilter();renderAliasList();renderAliasSuggestions();
   }
+  function schoolAliasGroupKey(pref,canonical){return encodeURIComponent(JSON.stringify([aliasPrefKey(pref),String(canonical||'').trim()]));}
+  function schoolAliasGroups(){
+    const map=new Map();
+    for(const a of state.schoolAliases){
+      const pref=aliasPrefKey(a.prefecture),canonical=String(a.canonical_name||'').trim();if(!pref||!canonical)continue;
+      const key=schoolAliasGroupKey(pref,canonical);
+      if(!map.has(key))map.set(key,{key,prefecture:pref,canonical_name:canonical,rows:[],aliases:[]});
+      const g=map.get(key);g.rows.push(a);if(!g.aliases.includes(a.alias_name))g.aliases.push(a.alias_name);
+    }
+    return [...map.values()].sort((a,b)=>a.prefecture.localeCompare(b.prefecture,'ja')||a.canonical_name.localeCompare(b.canonical_name,'ja'));
+  }
+  function schoolAliasGroupByKey(key){return schoolAliasGroups().find(g=>g.key===String(key))||null;}
+  function schoolAliasGroupStats(group){
+    const aliasSet=new Set(group.aliases.map(x=>String(x||'').trim()).filter(Boolean)),perName=new Map([...aliasSet].map(n=>[n,0])),matchIds=new Set();let appearances=0;
+    for(const m of state.matches){
+      for(const [teamField,prefField] of [['team_a','pref_a'],['team_b','pref_b']]){
+        if(canonicalPref(m[prefField])!==group.prefecture)continue;
+        const team=String(m[teamField]||'').trim();if(!aliasSet.has(team))continue;
+        appearances++;perName.set(team,(perName.get(team)||0)+1);matchIds.add(String(m.id));
+      }
+    }
+    return {matches:matchIds.size,appearances,perName};
+  }
   function renderAliasPrefFilter(){
-    if(!els.aliasListPrefFilter)return;const previous=els.aliasListPrefFilter.value,prefs=[...new Set(state.schoolAliases.map(a=>a.prefecture).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ja'));els.aliasListPrefFilter.innerHTML='<option value="">すべて</option>'+prefs.map(p=>`<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');if(prefs.includes(previous))els.aliasListPrefFilter.value=previous;
+    if(!els.aliasListPrefFilter)return;const previous=els.aliasListPrefFilter.value,prefs=[...new Set(state.schoolAliases.map(a=>aliasPrefKey(a.prefecture)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ja'));els.aliasListPrefFilter.innerHTML='<option value="">すべて</option>'+prefs.map(p=>`<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');if(prefs.includes(previous))els.aliasListPrefFilter.value=previous;
   }
   function renderAliasList(){
     if(!els.aliasList)return;
     if(!state.aliasesAvailable){els.aliasList.innerHTML='<div class="empty">upgrade-school-aliases.sql の実行後に利用できます。</div>';return;}
-    if(!state.schoolAliases.length){els.aliasList.innerHTML='<div class="empty">登録済み別名はありません。</div>';return;}
-    const pref=els.aliasListPrefFilter?.value||'',rows=state.schoolAliases.filter(a=>!pref||a.prefecture===pref);
-    if(!rows.length){els.aliasList.innerHTML='<div class="empty">この都道府県の登録済み別名はありません。</div>';return;}
-    els.aliasList.innerHTML=rows.map(a=>`<div class="school-alias-item"><div class="school-alias-item-main"><strong>${escapeHtml(a.prefecture)}：${escapeHtml(a.alias_name)} <span class="school-alias-arrow">→</span> ${escapeHtml(a.canonical_name)}</strong><small>この都道府県内だけで照合</small></div><div class="dictionary-row-actions"><button class="btn secondary small js-alias-edit" type="button" data-id="${escapeHtml(a.id)}">編集</button><button class="btn primary small js-alias-integrate" type="button" data-id="${escapeHtml(a.id)}">DB統合</button><button class="btn danger small js-alias-delete" type="button" data-id="${escapeHtml(a.id)}">削除</button></div></div>`).join('');
-    els.aliasList.querySelectorAll('.js-alias-edit').forEach(b=>b.onclick=()=>beginEditSchoolAlias(b.dataset.id));
-    els.aliasList.querySelectorAll('.js-alias-integrate').forEach(b=>b.onclick=()=>integrateSchoolAlias(b.dataset.id));
-    els.aliasList.querySelectorAll('.js-alias-delete').forEach(b=>b.onclick=()=>deleteSchoolAlias(b.dataset.id));
+    const pref=els.aliasListPrefFilter?.value||'',groups=schoolAliasGroups().filter(g=>!pref||g.prefecture===pref);
+    if(!groups.length){els.aliasList.innerHTML=`<div class="empty">${pref?'この都道府県の名称辞書はありません。':'登録済み名称辞書はありません。'}</div>`;return;}
+    els.aliasList.innerHTML=groups.map(g=>{
+      const stats=schoolAliasGroupStats(g),counts=g.aliases.map(n=>`${escapeHtml(n)} ${Number(stats.perName.get(n)||0).toLocaleString('ja-JP')}箇所`).join(' / '),status=stats.appearances?`候補 ${stats.matches.toLocaleString('ja-JP')}試合・${stats.appearances.toLocaleString('ja-JP')}箇所（${counts}）`:'候補 0件（現在の試合データに未統合の一致なし）';
+      return `<div class="school-alias-item"><div class="school-alias-item-main"><strong>${escapeHtml(g.prefecture)}：${g.aliases.map(escapeHtml).join(' / ')} <span class="school-alias-arrow">→</span> ${escapeHtml(g.canonical_name)}</strong><small>${status}</small></div><div class="dictionary-row-actions"><button class="btn secondary small js-alias-edit" type="button" data-key="${escapeHtml(g.key)}">編集</button><button class="btn primary small js-alias-integrate" type="button" data-key="${escapeHtml(g.key)}" ${stats.appearances?'':'disabled'}>DB統合</button><button class="btn danger small js-alias-delete" type="button" data-key="${escapeHtml(g.key)}">削除</button></div></div>`;
+    }).join('');
+    els.aliasList.querySelectorAll('.js-alias-edit').forEach(b=>b.onclick=()=>beginEditSchoolAlias(b.dataset.key));
+    els.aliasList.querySelectorAll('.js-alias-integrate').forEach(b=>b.onclick=()=>integrateSchoolAlias(b.dataset.key));
+    els.aliasList.querySelectorAll('.js-alias-delete').forEach(b=>b.onclick=()=>deleteSchoolAlias(b.dataset.key));
   }
-  function collectAliasSuggestions(){
-    if(!state.schoolAliases.length||!state.matches.length)return [];
-    const groups=new Map();
-    for(const a of state.schoolAliases)groups.set(String(a.id),{alias:a,matches:new Map(),appearances:0});
-    for(const m of state.matches){
-      const sides=[['team_a','pref_a'],['team_b','pref_b']];
-      for(const [teamField,prefField] of sides){
-        const alias=findKnownAlias(m[teamField],m[prefField]);if(!alias)continue;
-        const g=groups.get(String(alias.id));if(!g)continue;
-        if(!g.matches.has(String(m.id)))g.matches.set(String(m.id),{match:m,fields:[]});
-        g.matches.get(String(m.id)).fields.push(teamField);g.appearances++;
-      }
-    }
-    return [...groups.values()].filter(g=>g.appearances>0).sort((a,b)=>b.appearances-a.appearances||String(a.alias.prefecture).localeCompare(String(b.alias.prefecture),'ja'));
-  }
-  function renderAliasSuggestions(){
-    if(!els.aliasSuggestionList||!state.session?.user)return;
-    if(!state.aliasesAvailable){els.aliasSuggestionList.innerHTML='<div class="empty">別名辞書テーブルを作成すると自動検出できます。</div>';return;}
-    state.aliasSuggestions=collectAliasSuggestions();
-    if(!state.aliasSuggestions.length){els.aliasSuggestionList.innerHTML='<div class="empty">現在、登録済み別名に一致する表記揺れはありません。</div>';return;}
-    els.aliasSuggestionList.innerHTML=state.aliasSuggestions.map((g,i)=>`<div class="school-alias-item"><div class="school-alias-item-main"><strong>${escapeHtml(g.alias.prefecture)}：${escapeHtml(g.alias.alias_name)} <span class="school-alias-arrow">→</span> ${escapeHtml(g.alias.canonical_name)}</strong><small>${g.matches.size.toLocaleString('ja-JP')}試合・${g.appearances.toLocaleString('ja-JP')}箇所を検出。同じ都道府県の試合だけが対象です。</small></div><button class="btn primary small js-alias-apply" type="button" data-index="${i}">この候補を適用</button></div>`).join('');
-    els.aliasSuggestionList.querySelectorAll('.js-alias-apply').forEach(b=>b.onclick=()=>applyAliasSuggestion(Number(b.dataset.index)));
-  }
+  function renderAliasSuggestions(){renderAliasList();}
   function resetSchoolAliasEditor(clear=true){
     state.editingSchoolAliasId=null;
-    if(clear){if(els.aliasPref)els.aliasPref.value='';if(els.aliasName)els.aliasName.value='';if(els.aliasCanonical)els.aliasCanonical.value='';}
-    if(els.aliasAddButton)els.aliasAddButton.textContent='別名を登録';
+    if(clear){[els.aliasPref,els.aliasName,els.aliasName2,els.aliasName3,els.aliasCanonical].forEach(x=>{if(x)x.value='';});}
+    if(els.aliasAddButton)els.aliasAddButton.textContent='名称辞書に登録';
     els.aliasCancelEditButton?.classList.add('hidden');
   }
-  function beginEditSchoolAlias(id){
-    const row=state.schoolAliases.find(a=>String(a.id)===String(id));if(!row)return;
-    state.editingSchoolAliasId=String(row.id);
-    if(els.aliasPref)els.aliasPref.value=row.prefecture||'';if(els.aliasName)els.aliasName.value=row.alias_name||'';if(els.aliasCanonical)els.aliasCanonical.value=row.canonical_name||'';
-    if(els.aliasAddButton)els.aliasAddButton.textContent='変更を保存';els.aliasCancelEditButton?.classList.remove('hidden');
-    els.aliasPref?.focus();
+  function beginEditSchoolAlias(key){
+    const g=schoolAliasGroupByKey(key);if(!g)return;state.editingSchoolAliasId=g.key;
+    if(els.aliasPref)els.aliasPref.value=g.prefecture||'';if(els.aliasName)els.aliasName.value=g.aliases[0]||'';if(els.aliasName2)els.aliasName2.value=g.aliases[1]||'';if(els.aliasName3)els.aliasName3.value=g.aliases[2]||'';if(els.aliasCanonical)els.aliasCanonical.value=g.canonical_name||'';
+    if(els.aliasAddButton)els.aliasAddButton.textContent='変更を保存';els.aliasCancelEditButton?.classList.remove('hidden');els.aliasPref?.focus();
+    if(g.aliases.length>3)setMessage(els.aliasMessage,'この登録には4件以上の旧別名があります。編集欄には先頭3件を表示しています。保存すると表示中の3件へ整理されます。');
+  }
+  function schoolAliasEditorNames(){
+    const raw=[els.aliasName?.value,els.aliasName2?.value,els.aliasName3?.value].map(x=>String(x||'').trim()).filter(Boolean),seen=new Set(),out=[];
+    for(const n of raw){const k=aliasNameKey(n);if(!k||seen.has(k))continue;seen.add(k);out.push(n);}return out;
   }
   async function addSchoolAlias(){
     if(!state.session?.user||!state.aliasesAvailable)return;
-    const prefecture=aliasPrefKey(els.aliasPref?.value),alias_name=String(els.aliasName?.value||'').trim(),canonical_name=String(els.aliasCanonical?.value||'').trim();
-    if(!prefecture||!alias_name||!canonical_name)return setMessage(els.aliasMessage,'都道府県・別表記・統一名をすべて入力してください。','error');
-    if(aliasNameKey(alias_name)===aliasNameKey(canonical_name))return setMessage(els.aliasMessage,'別表記と統一名が同じです。','error');
-    setMessage(els.aliasMessage,state.editingSchoolAliasId?'更新中…':'登録中…');
-    const payload={prefecture,alias_name,canonical_name,updated_at:new Date().toISOString()};
-    const result=state.editingSchoolAliasId?await state.client.from('school_aliases').update(payload).eq('id',state.editingSchoolAliasId):await state.client.from('school_aliases').upsert(payload,{onConflict:'prefecture,alias_name'});
-    if(result.error)return setMessage(els.aliasMessage,`保存できませんでした: ${result.error.message}`,'error');
-    const wasEdit=Boolean(state.editingSchoolAliasId);resetSchoolAliasEditor(true);await loadSchoolAliases();setMessage(els.aliasMessage,wasEdit?'別名辞書を更新しました。':'別名を登録しました。登録済み試合を再検出しました。','success');
+    const prefecture=aliasPrefKey(els.aliasPref?.value),names=schoolAliasEditorNames(),canonical_name=String(els.aliasCanonical?.value||'').trim();
+    if(!prefecture||!names.length||!canonical_name)return setMessage(els.aliasMessage,'都道府県・名称1以上・統一名を入力してください。','error');
+    if(names.some(n=>aliasNameKey(n)===aliasNameKey(canonical_name)))return setMessage(els.aliasMessage,'名称1〜3には統一名と同じ名称を入れないでください。','error');
+    const oldGroup=state.editingSchoolAliasId?schoolAliasGroupByKey(state.editingSchoolAliasId):null,oldIds=new Set((oldGroup?.rows||[]).map(r=>String(r.id)));
+    for(const name of names){const conflict=state.schoolAliases.find(a=>aliasPrefKey(a.prefecture)===prefecture&&aliasNameKey(a.alias_name)===aliasNameKey(name)&&!oldIds.has(String(a.id)));if(conflict)return setMessage(els.aliasMessage,`${prefecture}の「${name}」はすでに「${conflict.canonical_name}」の名称として登録されています。`,'error');}
+    setMessage(els.aliasMessage,oldGroup?'更新中…':'登録中…');
+    const now=new Date().toISOString(),payloads=names.map(alias_name=>({prefecture,alias_name,canonical_name,updated_at:now}));
+    const up=await state.client.from('school_aliases').upsert(payloads,{onConflict:'prefecture,alias_name'});if(up.error)return setMessage(els.aliasMessage,`保存できませんでした: ${up.error.message}`,'error');
+    if(oldGroup){const keep=new Set(names.map(n=>`${prefecture}||${aliasNameKey(n)}`)),obsolete=oldGroup.rows.filter(r=>!keep.has(`${prefecture}||${aliasNameKey(r.alias_name)}`)).map(r=>r.id);if(obsolete.length){const del=await state.client.from('school_aliases').delete().in('id',obsolete);if(del.error)return setMessage(els.aliasMessage,`旧名称の整理に失敗しました: ${del.error.message}`,'error');}}
+    const wasEdit=Boolean(oldGroup);resetSchoolAliasEditor(true);await loadSchoolAliases();setMessage(els.aliasMessage,wasEdit?'学校名の名称辞書を更新しました。候補数も再計算しました。':'学校名の名称辞書に登録しました。候補数も表示しています。','success');
   }
-  async function integrateSchoolAlias(id){
-    const alias=state.schoolAliases.find(a=>String(a.id)===String(id));if(!alias)return;
-    const pref=alias.prefecture,from=alias.alias_name,to=alias.canonical_name;
-    const count=state.matches.reduce((n,m)=>n+((canonicalPref(m.pref_a)===pref&&String(m.team_a||'').trim()===from)?1:0)+((canonicalPref(m.pref_b)===pref&&String(m.team_b||'').trim()===from)?1:0),0);
-    if(!count){setMessage(els.aliasMessage,'この別名に一致する未統合データはありません。','success');return;}
-    if(!confirm(`${pref}の「${from}」を「${to}」へデータベース統合します。\n対象 ${count.toLocaleString('ja-JP')}箇所。\n\n試合データを更新し、Ratingを再計算します。よろしいですか？`))return;
-    setMessage(els.aliasMessage,'データベース統合中…');
-    const prefVariants=rawPrefVariants(pref);const a=await state.client.from('matches').update({team_a:to}).in('pref_a',prefVariants).eq('team_a',from);if(a.error)return setMessage(els.aliasMessage,`統合に失敗しました: ${a.error.message}`,'error');
-    const b=await state.client.from('matches').update({team_b:to}).in('pref_b',prefVariants).eq('team_b',from);if(b.error)return setMessage(els.aliasMessage,`統合に失敗しました: ${b.error.message}`,'error');
-    await loadMatches();await loadEditHistory();await loadSchoolAliases();setMessage(els.aliasMessage,`${count.toLocaleString('ja-JP')}箇所を「${to}」へ統合し、Ratingを再計算しました。`,'success');
+  async function integrateSchoolAlias(key){
+    const g=schoolAliasGroupByKey(key);if(!g)return;const names=g.aliases.filter(n=>aliasNameKey(n)!==aliasNameKey(g.canonical_name)),stats=schoolAliasGroupStats(g);
+    if(!stats.appearances){setMessage(els.aliasMessage,'この名称辞書に一致する未統合データはありません。','success');return;}
+    if(!confirm(`${g.prefecture}の「${names.join(' / ')}」を「${g.canonical_name}」へデータベース統合します。\n対象 ${stats.matches.toLocaleString('ja-JP')}試合・${stats.appearances.toLocaleString('ja-JP')}箇所。\n\n試合データを更新し、Ratingを再計算します。よろしいですか？`))return;
+    setMessage(els.aliasMessage,'データベース統合中…');const prefVariants=rawPrefVariants(g.prefecture);
+    const a=await state.client.from('matches').update({team_a:g.canonical_name}).in('pref_a',prefVariants).in('team_a',names);if(a.error)return setMessage(els.aliasMessage,`統合に失敗しました: ${a.error.message}`,'error');
+    const b=await state.client.from('matches').update({team_b:g.canonical_name}).in('pref_b',prefVariants).in('team_b',names);if(b.error)return setMessage(els.aliasMessage,`統合に失敗しました: ${b.error.message}`,'error');
+    await loadMatches();await loadEditHistory();await loadSchoolAliases();setMessage(els.aliasMessage,`${stats.matches.toLocaleString('ja-JP')}試合・${stats.appearances.toLocaleString('ja-JP')}箇所を「${g.canonical_name}」へ統合し、Ratingを再計算しました。`,'success');
   }
-  async function deleteSchoolAlias(id){
-    const alias=state.schoolAliases.find(a=>String(a.id)===String(id));if(!alias)return;
-    if(!confirm(`${alias.prefecture}：${alias.alias_name} → ${alias.canonical_name}\nこの別名登録を削除しますか？`))return;
-    const {error}=await state.client.from('school_aliases').delete().eq('id',id);if(error)return alert(error.message);if(String(state.editingSchoolAliasId)===String(id))resetSchoolAliasEditor(true);await loadSchoolAliases();
-  }
-  async function applyAliasSuggestion(index){
-    const g=state.aliasSuggestions[index];if(!g)return;
-    const {alias}=g;
-    if(!confirm(`${alias.prefecture}の「${alias.alias_name}」を「${alias.canonical_name}」へ統一します。\n対象：${g.matches.size}試合・${g.appearances}箇所\n\n別の都道府県の同名・類似名には一切変更を加えません。よろしいですか？`))return;
-    if(els.aliasMessage)setMessage(els.aliasMessage,'修正中…');
-    try{
-      let done=0;
-      for(const {match,fields} of g.matches.values()){
-        const payload={};for(const field of fields)payload[field]=alias.canonical_name;
-        const {error}=await state.client.from('matches').update(payload).eq('id',match.id);if(error)throw error;
-        done++;if(els.aliasMessage&&(done===g.matches.size||done%25===0))els.aliasMessage.textContent=`修正中… ${done} / ${g.matches.size}試合`;
-      }
-      await loadMatches();await loadEditHistory();renderAliasSuggestions();setMessage(els.aliasMessage,`${g.matches.size}試合を「${alias.canonical_name}」へ統一しました。Ratingも再計算済みです。`,'success');
-    }catch(e){setMessage(els.aliasMessage,`修正に失敗しました: ${e.message||e}`,'error');}
+  async function deleteSchoolAlias(key){
+    const g=schoolAliasGroupByKey(key);if(!g)return;if(!confirm(`${g.prefecture}：${g.aliases.join(' / ')} → ${g.canonical_name}\nこの名称辞書をまとめて削除しますか？`))return;
+    const ids=g.rows.map(r=>r.id);const {error}=await state.client.from('school_aliases').delete().in('id',ids);if(error)return alert(error.message);if(String(state.editingSchoolAliasId)===String(key))resetSchoolAliasEditor(true);await loadSchoolAliases();
   }
   function applyKnownAliasesToPayload(payload){
     const p={...payload},changes=[];
@@ -965,11 +955,17 @@
   function renderTournamentAliasYearFilter(){
     if(!els.tournamentAliasYearFilter)return;const old=els.tournamentAliasYearFilter.value,years=[...new Set(state.tournamentAliases.map(r=>String(r.year)).filter(Boolean))].sort((a,b)=>Number(b)-Number(a));els.tournamentAliasYearFilter.innerHTML='<option value="">すべて</option>'+years.map(y=>`<option value="${escapeHtml(y)}">${escapeHtml(y)}</option>`).join('');if(years.includes(old))els.tournamentAliasYearFilter.value=old;
   }
+  function tournamentAliasStats(row){
+    const allNames=tournamentAliasNames(row),names=allNames.filter(n=>n!==String(row.canonical_name||'').trim()),perName=new Map(allNames.map(n=>[n,0]));
+    const start=`${row.year}-01-01`,end=`${Number(row.year)+1}-01-01`;let candidateMatches=0,canonicalMatches=0;
+    for(const m of state.matches){const date=String(m.date||'');if(date<start||date>=end)continue;const t=String(m.tournament||m.tournament_original||'').trim();if(t===String(row.canonical_name||'').trim())canonicalMatches++;if(names.includes(t)){candidateMatches++;perName.set(t,(perName.get(t)||0)+1);}else if(perName.has(t)){perName.set(t,(perName.get(t)||0)+1);}}
+    return {candidateMatches,canonicalMatches,perName,names};
+  }
   function renderTournamentAliasList(){
     if(!els.tournamentAliasList)return;if(!state.tournamentAliasesAvailable){els.tournamentAliasList.innerHTML='<div class="empty">upgrade-tournament-aliases.sql の実行後に利用できます。</div>';return;}
     const year=els.tournamentAliasYearFilter?.value||'',rows=state.tournamentAliases.filter(r=>!year||String(r.year)===year);
     if(!rows.length){els.tournamentAliasList.innerHTML='<div class="empty">登録済み大会名はありません。</div>';return;}
-    els.tournamentAliasList.innerHTML=rows.map(r=>{const names=tournamentAliasNames(r);return `<div class="school-alias-item tournament-alias-item"><div class="school-alias-item-main"><strong>${escapeHtml(r.year)}年度：${escapeHtml(names.join(' / ')||'—')} <span class="school-alias-arrow">→</span> ${escapeHtml(r.canonical_name)}</strong><small>名称 ${names.length}件を登録</small></div><div class="dictionary-row-actions"><button class="btn secondary small js-tournament-alias-edit" type="button" data-id="${escapeHtml(r.id)}">編集</button><button class="btn primary small js-tournament-alias-integrate" type="button" data-id="${escapeHtml(r.id)}">DB統合</button><button class="btn danger small js-tournament-alias-delete" type="button" data-id="${escapeHtml(r.id)}">削除</button></div></div>`;}).join('');
+    els.tournamentAliasList.innerHTML=rows.map(r=>{const names=tournamentAliasNames(r),stats=tournamentAliasStats(r),detail=names.map((n,i)=>`大会名${i+1}「${escapeHtml(n)}」 ${Number(stats.perName.get(n)||0).toLocaleString('ja-JP')}試合`).join(' / ');return `<div class="school-alias-item tournament-alias-item"><div class="school-alias-item-main"><strong>${escapeHtml(r.year)}年度：${escapeHtml(names.join(' / ')||'—')} <span class="school-alias-arrow">→</span> ${escapeHtml(r.canonical_name)}</strong><small><b>候補 ${stats.candidateMatches.toLocaleString('ja-JP')}試合</b> ／ 統一済み ${stats.canonicalMatches.toLocaleString('ja-JP')}試合</small><small class="dictionary-match-breakdown">${detail||'登録名称なし'}</small></div><div class="dictionary-row-actions"><button class="btn secondary small js-tournament-alias-edit" type="button" data-id="${escapeHtml(r.id)}">編集</button><button class="btn primary small js-tournament-alias-integrate" type="button" data-id="${escapeHtml(r.id)}" ${stats.candidateMatches?'':'disabled'}>DB統合</button><button class="btn danger small js-tournament-alias-delete" type="button" data-id="${escapeHtml(r.id)}">削除</button></div></div>`;}).join('');
     els.tournamentAliasList.querySelectorAll('.js-tournament-alias-edit').forEach(b=>b.onclick=()=>beginEditTournamentAlias(b.dataset.id));
     els.tournamentAliasList.querySelectorAll('.js-tournament-alias-integrate').forEach(b=>b.onclick=()=>integrateTournamentAlias(b.dataset.id));
     els.tournamentAliasList.querySelectorAll('.js-tournament-alias-delete').forEach(b=>b.onclick=()=>deleteTournamentAlias(b.dataset.id));
@@ -983,7 +979,10 @@
     setMessage(els.tournamentAliasMessage,state.editingTournamentAliasId?'更新中…':'登録中…');const result=state.editingTournamentAliasId?await state.client.from('tournament_aliases').update(payload).eq('id',state.editingTournamentAliasId):await state.client.from('tournament_aliases').insert(payload);if(result.error)return setMessage(els.tournamentAliasMessage,`保存できませんでした: ${result.error.message}`,'error');const edited=Boolean(state.editingTournamentAliasId);resetTournamentAliasEditor(true);await loadTournamentAliases();setMessage(els.tournamentAliasMessage,edited?'大会名辞書を更新しました。':'大会名辞書に登録しました。','success');
   }
   async function integrateTournamentAlias(id){
-    const r=state.tournamentAliases.find(x=>String(x.id)===String(id));if(!r)return;const names=tournamentAliasNames(r).filter(n=>n!==r.canonical_name);if(!names.length)return setMessage(els.tournamentAliasMessage,'統合対象の別名がありません。','success');const start=`${r.year}-01-01`,end=`${Number(r.year)+1}-01-01`;const count=state.matches.filter(m=>String(m.date||'')>=start&&String(m.date||'')<end&&names.includes(String(m.tournament_original||m.tournament||'').trim())).length;if(!count)return setMessage(els.tournamentAliasMessage,'この年度に一致する未統合の大会名はありません。','success');if(!confirm(`${r.year}年度の大会名 ${names.length}種類を「${r.canonical_name}」へ統合します。\n対象 ${count.toLocaleString('ja-JP')}試合。\nよろしいですか？`))return;setMessage(els.tournamentAliasMessage,'データベース統合中…');const {error}=await state.client.from('matches').update({tournament:r.canonical_name}).gte('date',start).lt('date',end).in('tournament',names);if(error)return setMessage(els.tournamentAliasMessage,`統合に失敗しました: ${error.message}`,'error');await loadMatches();await loadEditHistory();setMessage(els.tournamentAliasMessage,`${count.toLocaleString('ja-JP')}試合の大会名を「${r.canonical_name}」へ統合しました。`,'success');
+    const r=state.tournamentAliases.find(x=>String(x.id)===String(id));if(!r)return;const stats=tournamentAliasStats(r),names=stats.names;
+    if(!names.length)return setMessage(els.tournamentAliasMessage,'統合対象の別名がありません。','success');if(!stats.candidateMatches)return setMessage(els.tournamentAliasMessage,'この年度に一致する未統合の大会名はありません。','success');
+    const start=`${r.year}-01-01`,end=`${Number(r.year)+1}-01-01`;if(!confirm(`${r.year}年度の大会名 ${names.length}種類を「${r.canonical_name}」へ統合します。\n対象 ${stats.candidateMatches.toLocaleString('ja-JP')}試合。\nよろしいですか？`))return;
+    setMessage(els.tournamentAliasMessage,'データベース統合中…');const {error}=await state.client.from('matches').update({tournament:r.canonical_name}).gte('date',start).lt('date',end).in('tournament',names);if(error)return setMessage(els.tournamentAliasMessage,`統合に失敗しました: ${error.message}`,'error');await loadMatches();await loadEditHistory();renderTournamentAliasList();setMessage(els.tournamentAliasMessage,`${stats.candidateMatches.toLocaleString('ja-JP')}試合の大会名を「${r.canonical_name}」へ統合しました。候補数も更新しました。`,'success');
   }
   async function deleteTournamentAlias(id){const r=state.tournamentAliases.find(x=>String(x.id)===String(id));if(!r)return;if(!confirm(`${r.year}年度「${r.canonical_name}」の名称辞書を削除しますか？`))return;const {error}=await state.client.from('tournament_aliases').delete().eq('id',id);if(error)return alert(error.message);if(String(state.editingTournamentAliasId)===String(id))resetTournamentAliasEditor(true);await loadTournamentAliases();}
 
