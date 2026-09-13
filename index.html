@@ -3,19 +3,40 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>高校野球 Rating</title>
+  <title>高校野球 Rating | 全国高校野球レーティング</title>
   <meta
     name="description"
-    content="公開された公式戦結果から独自算出する高校野球レーティング"
+    content="全国の高校野球公式戦結果をもとに独自算出したRating、全国ランキング、学校別戦績、順位推移を公開する非公式データ分析サイトです。"
   />
-  <link rel="stylesheet" href="styles.css?v=20260913-21" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <meta name="theme-color" content="#1d6b45" />
+  <link rel="canonical" href="https://koukouyakyu.github.io/kokoyakyu-rating/" />
+  <meta property="og:locale" content="ja_JP" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="高校野球 Rating" />
+  <meta property="og:title" content="高校野球 Rating | 全国高校野球レーティング" />
+  <meta property="og:description" content="全国の高校野球公式戦結果から独自算出したRating、全国ランキング、学校別戦績、順位推移を公開。" />
+  <meta property="og:url" content="https://koukouyakyu.github.io/kokoyakyu-rating/" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="高校野球 Rating | 全国高校野球レーティング" />
+  <meta name="twitter:description" content="全国の高校野球公式戦結果から独自算出したRatingとランキングを公開。" />
+  <link rel="stylesheet" href="styles.css?v=20260913-25" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "高校野球 Rating",
+    "url": "https://koukouyakyu.github.io/kokoyakyu-rating/",
+    "description": "全国の高校野球公式戦結果をもとに独自算出したRatingとランキングを公開する非公式データ分析サイト"
+  }
+  </script>
 </head>
 <body>
+  <a class="skip-link" href="#mainContent">本文へ移動</a>
   <header class="site-header">
     <div class="wrap header-inner">
       <div class="brand-block">
         <a href="./" class="brand" title="サイトを更新してトップへ戻る">高校野球 Rating</a>
-        <span class="badge">BETA</span>
       </div>
       <nav class="nav" aria-label="メインナビゲーション">
         <a href="#ranking" data-public-feature-nav="ranking">全国ランキング</a>
@@ -23,25 +44,26 @@
         <a href="#schools" data-public-feature-nav="school_details">学校詳細</a>
         <a href="#rank-compare" data-public-feature-nav="rank_compare">順位推移比較</a>
         <a href="#simulator" data-public-feature-nav="simulator">シミュレーター</a>
-        <a href="#admin">試合登録</a>
         <a href="#method" data-public-feature-nav="methodology">計算方法</a>
       </nav>
     </div>
   </header>
 
-  <main id="top">
-    <section class="hero">
+  <main id="mainContent">
+    <section class="hero hero-compact">
       <div class="wrap hero-grid">
-        <div>
-          <p class="eyebrow">HIGH SCHOOL BASEBALL RATING</p>
-          <h1>試合結果から、<br />高校野球の「現在地」を見る。</h1>
-          <p class="lead">
-            Supabaseに保存された試合結果を古い順に読み込み、
-            対戦相手とのRating差と勝敗から全校のRatingを自動計算します。
+        <div class="hero-intro-block">
+          <h1 class="sr-only">高校野球 Rating</h1>
+          <p class="hero-intro">
+            全国の高校野球公式戦の結果をもとに学校ごとのRatingを独自算出し、
+            全国ランキング・学校別戦績・順位推移を公開しています。
+          </p>
+          <p class="hero-note">
+            大会や地域をまたいだ試合結果を同じ基準で積み重ね、各校の現在のRatingを確認できます。
           </p>
           <div class="hero-actions">
-            <a class="btn primary" href="#ranking">ランキングを見る</a>
-            <a class="btn secondary" href="#admin">試合結果を登録</a>
+            <a class="btn primary" href="#ranking">全国ランキングを見る</a>
+            <a class="btn secondary" href="#method">Ratingの計算方法</a>
           </div>
         </div>
 
@@ -56,10 +78,9 @@
       </div>
     </section>
 
-    <section class="notice wrap">
-      <strong>非公式サイトです。</strong>
-      本Ratingは高野連・学校・新聞社等による公式ランキングではありません。
-      Ratingは登録された試合結果から独自計算します。
+    <section class="notice wrap public-notice">
+      <strong>本サイトは非公式のデータ分析サイトです。</strong>
+      高野連・各学校・大会主催者・新聞社等とは関係ありません。Ratingは登録した試合結果をもとに独自計算しており、公式な評価・順位を示すものではありません。
     </section>
 
     <section id="setupNotice" class="setup-notice wrap hidden" aria-live="polite"></section>
@@ -334,14 +355,49 @@
       </div>
     </section>
 
-    <section id="admin" class="section wrap">
+    <section id="method" class="section section-alt" data-public-feature="methodology">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">METHODOLOGY</p>
+            <div class="title-with-public-toggle"><h2>Ratingの計算方法</h2><label class="admin-public-toggle hidden"><input type="checkbox" data-setting="public_methodology" /><span>一般公開</span></label></div>
+          </div>
+        </div>
+
+        <div class="method-grid">
+          <article class="method-card">
+            <h3>1. 期待値</h3>
+            <div class="formula">We = 1 / (1 + 10<sup>−D/600</sup>)</div>
+            <p>D は「自校Rating − 相手Rating」です。</p>
+          </article>
+
+          <article class="method-card">
+            <h3>2. 試合後の更新</h3>
+            <div class="formula">R' = R + K × (W − We)</div>
+            <p id="methodKText">勝=1、引き分け=0.5、負=0。K値は大会レベルに応じて自動調整します。</p>
+          </article>
+
+          <article class="method-card">
+            <h3>3. データの保存</h3>
+            <p>試合結果だけをSupabaseに保存し、Ratingはブラウザで全試合を古い順に再計算します。</p>
+          </article>
+
+          <article class="method-card">
+            <h3>4. 訂正への対応</h3>
+            <p>過去の試合を修正・削除した場合も、再読み込み時に全Ratingが自動で再計算されます。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="admin" class="section wrap operator-section">
       <div class="section-head">
         <div>
-          <p class="eyebrow">ADMIN</p>
-          <h2>試合結果の登録</h2>
+          <p class="eyebrow">SITE OPERATOR</p>
+          <h2>運営者ログイン・管理</h2>
         </div>
         <p class="section-copy">
-          閲覧は誰でも可能。登録・修正・削除はSupabase Authでログインした管理者だけが行えます。
+          ここから先はサイト運営者専用です。試合の登録・修正・削除や各種設定には管理者ログインが必要です。
         </p>
       </div>
 
@@ -679,54 +735,24 @@
       </div>
     </section>
 
-    <section id="method" class="section section-alt" data-public-feature="methodology">
-      <div class="wrap">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">METHODOLOGY</p>
-            <div class="title-with-public-toggle"><h2>Ratingの計算方法</h2><label class="admin-public-toggle hidden"><input type="checkbox" data-setting="public_methodology" /><span>一般公開</span></label></div>
-          </div>
-        </div>
-
-        <div class="method-grid">
-          <article class="method-card">
-            <h3>1. 期待値</h3>
-            <div class="formula">We = 1 / (1 + 10<sup>−D/600</sup>)</div>
-            <p>D は「自校Rating − 相手Rating」です。</p>
-          </article>
-
-          <article class="method-card">
-            <h3>2. 試合後の更新</h3>
-            <div class="formula">R' = R + K × (W − We)</div>
-            <p id="methodKText">勝=1、引き分け=0.5、負=0。K値は大会レベルに応じて自動調整します。</p>
-          </article>
-
-          <article class="method-card">
-            <h3>3. データの保存</h3>
-            <p>試合結果だけをSupabaseに保存し、Ratingはブラウザで全試合を古い順に再計算します。</p>
-          </article>
-
-          <article class="method-card">
-            <h3>4. 訂正への対応</h3>
-            <p>過去の試合を修正・削除した場合も、再読み込み時に全Ratingが自動で再計算されます。</p>
-          </article>
-        </div>
-      </div>
-    </section>
   </main>
 
   <footer>
     <div class="wrap footer-inner">
       <div>
         <strong>高校野球 Rating</strong><br />
-        <span>Unofficial rating project</span>
+        <span>非公式・独自算出の高校野球データ分析サイト</span>
       </div>
-      <div>© 2026</div>
+      <div class="footer-links">
+        <a href="#method">計算方法</a>
+        <a href="#admin">運営者ログイン</a>
+        <span>© 2026</span>
+      </div>
     </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=20260913-21"></script>
+  <script src="app.js?v=20260913-24"></script>
 </body>
 </html>
