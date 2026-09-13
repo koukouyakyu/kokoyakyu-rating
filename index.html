@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="高校野球レーティング | 全国ランキング" />
   <meta name="twitter:description" content="全国の高校野球公式戦結果から独自算出したRatingとランキングを公開。" />
-  <link rel="stylesheet" href="styles.css?v=20260913-31" />
+  <link rel="stylesheet" href="styles.css?v=20260913-33" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -226,8 +226,8 @@
 
           <div id="ratingHistoryBlock" class="history-wrap" data-public-subfeature="rating_history">
             <div class="history-head">
-              <div class="title-with-public-toggle"><h4>Rating推移</h4><label class="admin-public-toggle hidden"><input type="checkbox" data-setting="public_rating_history" /><span>一般公開</span></label></div>
-              <div id="historyRange" class="range-buttons" aria-label="Rating表示期間">
+              <div class="title-with-public-toggle"><h4>レーティング推移</h4><label class="admin-public-toggle hidden"><input type="checkbox" data-setting="public_rating_history" /><span>一般公開</span></label></div>
+              <div id="historyRange" class="range-buttons" aria-label="レーティング表示期間">
                 <button class="range-btn active" type="button" data-years="1">1年</button>
                 <button class="range-btn" type="button" data-years="3">3年</button>
                 <button class="range-btn" type="button" data-years="5">5年</button>
@@ -235,7 +235,11 @@
               </div>
             </div>
             <div id="historyRangeStatus" class="history-range-status" aria-live="polite"></div>
-            <svg id="historyChart" viewBox="0 0 720 240" role="img" aria-label="Rating推移グラフ"></svg>
+            <div class="history-chart-legend" aria-label="レーティング推移の凡例">
+              <span><i class="history-legend-normal" aria-hidden="true"></i>通常の試合</span>
+              <span><i class="history-legend-regression" aria-hidden="true"></i>新チーム移行（平均回帰あり）</span>
+            </div>
+            <svg id="historyChart" viewBox="0 0 720 240" role="img" aria-label="レーティング推移グラフ"></svg>
           </div>
         </article>
 
@@ -408,7 +412,7 @@
           <article class="method-card">
             <h3>3. 新チームへの移行</h3>
             <div class="formula">R<sub>new</sub> = 1500 + (R<sub>old</sub> − 1500) × 継承率</div>
-            <p id="methodRetentionText">3年生引退後の秋季大会開始時に、1500からの差を一定割合だけ引き継ぎます。</p>
+            <p id="methodRetentionText">3年生引退後は1500からの差を一定割合だけ引き継ぎます。秋に不出場でも、次の公式戦で未反映の世代交代回数をまとめて適用します。</p>
           </article>
 
           <article class="method-card">
@@ -530,7 +534,7 @@
               <label>夏の甲子園本戦 準決勝・決勝 K<input id="siteSummerMainFinalK" type="text" inputmode="decimal" autocomplete="off" required /></label>
               <label>国民スポーツ大会 K<input id="siteKokuspoK" type="text" inputmode="decimal" autocomplete="off" required /></label>
             </div>
-            <p class="muted settings-help">継承率は、秋の新チーム開始時に1500からの差を何%残すかを指定します（85%なら差を15%縮小、100%なら補正なし）。K値は11区分を個別に変更でき、各試合は大会名ではなく大会タグで分類します。</p>
+            <p class="muted settings-help">継承率は、新チーム移行1回につき1500からの差を何%残すかを指定します（85%なら差を15%縮小、2世代空けば85%²を適用、100%なら補正なし）。K値は11区分を個別に変更でき、各試合は大会名ではなく大会タグで分類します。</p>
             <div class="form-actions settings-actions">
               <button class="btn primary" type="submit">計算設定を保存</button>
             </div>
@@ -821,6 +825,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=20260913-31"></script>
+  <script src="app.js?v=20260913-33"></script>
 </body>
 </html>

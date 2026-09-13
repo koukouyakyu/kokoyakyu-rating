@@ -542,6 +542,47 @@ tbody tr:hover td {
   stroke-width: 2;
 }
 
+.chart-regression-dot {
+  fill: #fff4e5;
+  stroke: #b45309;
+  stroke-width: 2.4;
+}
+
+.history-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 6px 0 4px;
+  color: var(--muted);
+  font-size: .76rem;
+}
+
+.history-chart-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.history-legend-normal,
+.history-legend-regression {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  background: #fff;
+  flex: 0 0 auto;
+}
+
+.history-legend-normal {
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+}
+
+.history-legend-regression {
+  border: 2px solid #b45309;
+  background: #fff4e5;
+  transform: rotate(45deg);
+}
+
 .chart-label {
   fill: var(--muted);
   font-size: 12px;
