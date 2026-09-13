@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>高校野球 Rating | 全国高校野球レーティング</title>
+  <title>高校野球レーティング | 全国高校野球レーティング</title>
   <meta
     name="description"
     content="全国の高校野球公式戦結果をもとに独自算出したRating、全国ランキング、学校別戦績、順位推移を公開する非公式データ分析サイトです。"
@@ -13,19 +13,19 @@
   <link rel="canonical" href="https://koukouyakyu.github.io/kokoyakyu-rating/" />
   <meta property="og:locale" content="ja_JP" />
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="高校野球 Rating" />
-  <meta property="og:title" content="高校野球 Rating | 全国高校野球レーティング" />
+  <meta property="og:site_name" content="高校野球レーティング" />
+  <meta property="og:title" content="高校野球レーティング | 全国高校野球レーティング" />
   <meta property="og:description" content="全国の高校野球公式戦結果から独自算出したRating、全国ランキング、学校別戦績、順位推移を公開。" />
   <meta property="og:url" content="https://koukouyakyu.github.io/kokoyakyu-rating/" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="高校野球 Rating | 全国高校野球レーティング" />
+  <meta name="twitter:title" content="高校野球レーティング | 全国高校野球レーティング" />
   <meta name="twitter:description" content="全国の高校野球公式戦結果から独自算出したRatingとランキングを公開。" />
-  <link rel="stylesheet" href="styles.css?v=20260913-25" />
+  <link rel="stylesheet" href="styles.css?v=20260913-26" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "高校野球 Rating",
+    "name": "高校野球レーティング",
     "url": "https://koukouyakyu.github.io/kokoyakyu-rating/",
     "description": "全国の高校野球公式戦結果をもとに独自算出したRatingとランキングを公開する非公式データ分析サイト"
   }
@@ -36,7 +36,7 @@
   <header class="site-header">
     <div class="wrap header-inner">
       <div class="brand-block">
-        <a href="./" class="brand" title="サイトを更新してトップへ戻る">高校野球 Rating</a>
+        <a href="./" class="brand" title="サイトを更新してトップへ戻る">高校野球レーティング</a>
       </div>
       <nav class="nav" aria-label="メインナビゲーション">
         <a href="#ranking" data-public-feature-nav="ranking">全国ランキング</a>
@@ -53,7 +53,7 @@
     <section class="hero hero-compact">
       <div class="wrap hero-grid">
         <div class="hero-intro-block">
-          <h1 class="sr-only">高校野球 Rating</h1>
+          <h1 class="sr-only">高校野球レーティング</h1>
           <p class="hero-intro">
             全国の高校野球公式戦の結果をもとに学校ごとのRatingを独自算出し、
             全国ランキング・学校別戦績・順位推移を公開しています。
@@ -242,8 +242,8 @@
           <div id="publicCorrectionProposal" class="public-correction-proposal" data-public-subfeature="correction_proposals">
             <div class="public-correction-head">
               <div>
-                <h4>一般からの修正提案</h4>
-                <p class="muted">自由記述ではなく、登録済み学校から選択して提案します。同一校の別名提案は同じ都道府県の学校同士だけ選択できます。</p>
+                <h4>修正提案</h4>
+                <p class="muted">修正内容を選んで提案できます。同一校の別名提案は同じ都道府県の学校同士だけ、試合結果の修正は登録済み試合から対象を選択します。</p>
               </div>
             </div>
             <form id="schoolMergeProposalForm" class="school-merge-proposal-form">
@@ -251,9 +251,10 @@
                 修正の種類
                 <select id="schoolMergeProposalType">
                   <option value="same_school_different_names">同じ高校が別の名前で登録されている</option>
+                  <option value="match_result">試合結果の修正</option>
                 </select>
               </label>
-              <div class="school-merge-picker-grid">
+              <div id="schoolMergeProposalFields" class="school-merge-picker-grid">
                 <div class="school-merge-picker">
                   <label for="mergeProposalSchoolA">学校A</label>
                   <div class="school-search-wrap proposal-school-search-wrap">
@@ -271,6 +272,24 @@
                   <div id="mergeProposalSchoolBSelected" class="proposal-school-selected muted">未選択</div>
                 </div>
               </div>
+
+              <div id="matchResultProposalFields" class="match-result-proposal-fields hidden">
+                <label class="proposal-match-search-field">
+                  対象試合
+                  <div class="school-search-wrap proposal-match-search-wrap">
+                    <input id="resultProposalMatchSearch" type="search" placeholder="日付・大会名・学校名で検索" autocomplete="off" />
+                    <div id="resultProposalMatchResults" class="school-search-results hidden" aria-live="polite"></div>
+                  </div>
+                </label>
+                <div id="resultProposalMatchSelected" class="proposal-school-selected muted">未選択</div>
+                <div class="result-score-grid">
+                  <label>A校の正しい得点<input id="resultProposalScoreA" type="number" min="0" step="1" /></label>
+                  <label>B校の正しい得点<input id="resultProposalScoreB" type="number" min="0" step="1" /></label>
+                </div>
+                <label>出典URL（任意）<input id="resultProposalSourceUrl" type="url" placeholder="https://..." /></label>
+                <label>補足（任意）<textarea id="resultProposalComment" rows="3" placeholder="どこが誤っているか、確認できる情報など"></textarea></label>
+              </div>
+
               <div class="form-actions proposal-submit-actions">
                 <button id="schoolMergeProposalSubmit" class="btn primary small" type="submit" disabled>この2校を同一校として提案</button>
                 <button id="schoolMergeProposalClear" class="btn secondary small" type="button">選択をクリア</button>
@@ -597,7 +616,7 @@
 
         <article class="panel">
           <div class="panel-head">
-            <h3>一般からの修正提案</h3>
+            <h3>修正提案</h3>
             <button id="reloadProposalsButton" class="btn secondary small" type="button">提案を再読み込み</button>
           </div>
           <div id="proposalAdminList" class="proposal-admin-list">
@@ -647,15 +666,16 @@
             <div class="school-normalize-head">
               <div>
                 <strong>学校名の別名辞書・自動提案</strong>
-                <p class="muted">別名は都道府県込みで登録します。表記揺れ候補は必ず同じ都道府県内だけで検出し、別都道府県の似た学校は提案しません。</p>
+                <p class="muted">CSVの学校名・別表記を正式名称へ対応させ、サイトでは登録した統一略称で表示します。照合は必ず同じ都道府県内だけで行います。</p>
               </div>
               <button id="aliasRefreshButton" class="btn secondary small" type="button">再検出</button>
             </div>
             <div class="school-alias-grid">
               <label>都道府県<input id="aliasPref" type="text" placeholder="例：千葉" autocomplete="off" /></label>
-              <label>別表記<input id="aliasName" type="text" placeholder="例：専修大松戸" autocomplete="off" /></label>
-              <label>統一名<input id="aliasCanonical" type="text" placeholder="例：専大松戸" autocomplete="off" /></label>
-              <div class="school-normalize-actions"><button id="aliasAddButton" class="btn primary small" type="button">別名を登録</button></div>
+              <label>CSV名・別表記<input id="aliasName" type="text" placeholder="例：専修大松戸" autocomplete="off" /></label>
+              <label>正式名称<input id="aliasOfficial" type="text" placeholder="例：専修大学松戸高等学校" autocomplete="off" /></label>
+              <label>統一略称<input id="aliasCanonical" type="text" placeholder="例：専大松戸" autocomplete="off" /></label>
+              <div class="school-normalize-actions"><button id="aliasAddButton" class="btn primary small" type="button">対応を登録</button></div>
             </div>
             <div id="aliasMessage" class="muted school-normalize-status" aria-live="polite"></div>
             <div class="school-alias-columns">
@@ -740,7 +760,7 @@
   <footer>
     <div class="wrap footer-inner">
       <div>
-        <strong>高校野球 Rating</strong><br />
+        <strong>高校野球レーティング</strong><br />
         <span>非公式・独自算出の高校野球データ分析サイト</span>
       </div>
       <div class="footer-links">
@@ -753,6 +773,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=20260913-24"></script>
+  <script src="app.js?v=20260913-26"></script>
 </body>
 </html>

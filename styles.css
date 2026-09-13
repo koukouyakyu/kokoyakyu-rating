@@ -1723,7 +1723,7 @@ footer {
 }
 .school-alias-grid {
   display: grid;
-  grid-template-columns: minmax(110px,.7fr) minmax(180px,1fr) minmax(180px,1fr) auto;
+  grid-template-columns: minmax(110px,.65fr) minmax(160px,.9fr) minmax(220px,1.25fr) minmax(160px,.9fr) auto;
   gap: 10px;
   align-items: end;
   margin-top: 12px;
@@ -2012,4 +2012,35 @@ img, svg, canvas { max-width: 100%; }
   .hero-compact { padding: 28px 0 30px; }
   .hero-intro { font-size: 1.15rem; line-height: 1.6; }
   .hero-note { font-size: 0.92rem; line-height: 1.7; }
+}
+
+
+/* ===== 2026-09-13 rev26: 正式校名マスター / 試合結果修正提案 ===== */
+.match-result-proposal-fields {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-soft);
+}
+.match-result-proposal-fields.hidden { display: none; }
+.match-result-proposal-fields > label,
+.result-score-grid label,
+.proposal-match-search-field {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 800;
+}
+.proposal-match-search-wrap { width: 100%; max-width: none; }
+.proposal-match-search-wrap input { width: 100%; min-width: 0; }
+.result-score-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 760px) {
+  .result-score-grid { grid-template-columns: 1fr; }
 }
