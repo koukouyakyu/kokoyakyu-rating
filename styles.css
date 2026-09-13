@@ -2257,3 +2257,34 @@ img, svg, canvas { max-width: 100%; }
   .alias-name-row { grid-template-columns: 1fr; }
   .alias-name-row .alias-name-remove { width: 100%; }
 }
+
+
+/* ===== rev30: 試合結果の修正提案 ===== */
+.match-result-proposal-fields {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-soft);
+}
+.match-result-proposal-fields.hidden { display: none; }
+.match-result-proposal-fields > label,
+.result-score-grid label,
+.proposal-match-search-field {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 800;
+}
+.proposal-match-search-wrap { width: 100%; max-width: none; }
+.proposal-match-search-wrap input { width: 100%; min-width: 0; }
+.result-score-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 760px) {
+  .result-score-grid { grid-template-columns: 1fr; }
+}
