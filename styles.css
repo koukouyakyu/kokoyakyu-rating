@@ -2125,7 +2125,18 @@ img, svg, canvas { max-width: 100%; }
   border-color: var(--accent);
   background: rgba(29,107,69,.08);
 }
-.ranking-pref-option input { margin: 0; }
+/* チェックボックスに共通 input の width:100% / min-height:44px を継承させない */
+.ranking-pref-option input[type="checkbox"] {
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin: 0;
+  padding: 0;
+  border-radius: 4px;
+  flex: 0 0 18px;
+  accent-color: var(--accent);
+}
 
 .ranking-page-numbers {
   display: flex;
@@ -2328,4 +2339,14 @@ img, svg, canvas { max-width: 100%; }
 }
 @media (max-width: 760px) {
   .result-score-grid { grid-template-columns: 1fr; }
+}
+
+
+/* ===== rev34: 都道府県チェック欄の安定化 ===== */
+.ranking-pref-option:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(29,107,69,.10);
+}
+.ranking-pref-option input[type="checkbox"]:focus {
+  outline: none;
 }

@@ -193,26 +193,49 @@
     const type=effectiveTournamentType(match);
     const year=Number(String(match?.date||'').slice(0,4));
     if(!Number.isInteger(year)||year<1900||year>2100||!type)return null;
-    // 秋季大会・明治神宮大会は、その年の秋に始まった新チーム。
     if(['autumn_qualifier','autumn_regional','meiji_jingu'].includes(type))return year;
-    // 国スポは夏までのチーム（3年生を含む）として扱い、世代移行判定には使わない。
     if(type==='kokuspo')return null;
-    // 春・夏は前年秋に始まった同じ世代。
     return year-1;
   }
-  function applyPendingNewTeamTransitions(school,match){
-    if(!school)return 0;
-    const generationYear=teamGenerationYear(match);
-    if(generationYear===null)return 0;
-    // 初登場時は初期Rating=1500なので、過去の不明な世代交代は遡って補正しない。
-    if(school.lastGenerationYear===null){school.lastGenerationYear=generationYear;return 0;}
-    if(generationYear<=school.lastGenerationYear)return 0;
-    const transitions=generationYear-school.lastGenerationYear;
+  function transitionTargetYearBeforeMatch(match){
+    const type=effectiveTournamentType(match);
+    const year=Number(String(match?.date||'').slice(0,4));
+    if(!Number.isInteger(year)||year<1900||year>2100||!type)return null;
+    if(['autumn_qualifier','autumn_regional','meiji_jingu'].includes(type))return year;
+    if(['spring_koshien_early','spring_koshien_final','spring_qualifier','spring_regional','summer_qualifier','summer_main_early','summer_main_final'].includes(type))return year-1;
+    return null;
+  }
+  function applyTransitionCount(school,count){
+    const transitions=Math.max(0,Number(count)||0);
+    if(!school||!transitions)return 0;
     const rate=newTeamRetentionRate();
     school.rating=ratingCfg.initial+(school.rating-ratingCfg.initial)*Math.pow(rate,transitions);
-    school.lastGenerationYear=generationYear;
     return transitions;
   }
+  function applyMissingTransitionsBeforeMatch(school,match){
+    if(!school)return 0;
+    const targetYear=transitionTargetYearBeforeMatch(match);
+    if(targetYear===null)return 0;
+    if(school.lastTransitionYear===null){school.lastTransitionYear=targetYear;return 0;}
+    if(targetYear<=school.lastTransitionYear)return 0;
+    const transitions=targetYear-school.lastTransitionYear;
+    applyTransitionCount(school,transitions);
+    school.lastTransitionYear=targetYear;
+    return transitions;
+  }
+  function applySummerTransitionAfterMatch(school,year){
+    if(!school||!Number.isInteger(year))return 0;
+    if(school.lastTransitionYear===null){
+      school.lastTransitionYear=year-1;
+    }
+    if(year<=school.lastTransitionYear)return 0;
+    const transitions=year-school.lastTransitionYear;
+    applyTransitionCount(school,transitions);
+    school.lastTransitionYear=year;
+    return transitions;
+  }
+  function isAutumnType(type){return ['autumn_qualifier','autumn_regional','meiji_jingu'].includes(type);}
+  function isSummerType(type){return ['summer_qualifier','summer_main_early','summer_main_final'].includes(type);}
   function normalizeMatch(m){
     const prefA=canonicalPref(String(m.pref_a??'').trim()),prefB=canonicalPref(String(m.pref_b??'').trim());
     const rawA=String(m.team_a??'').trim(),rawB=String(m.team_b??'').trim();
@@ -221,7 +244,7 @@
     return {...m,team_a:a.name,team_b:b.name,team_a_display:rawA,team_b_display:rawB,team_a_official:a.officialName||null,team_b_official:b.officialName||null,joint_a:a.isJoint,joint_b:b.isJoint,pref_a:prefA,pref_b:prefB,tournament_original:tournamentOriginal,tournament:canonicalTournament(tournamentOriginal),tournament_type:TOURNAMENT_TYPES[tournamentType]?tournamentType:null,stage:String(m.stage??'').trim(),score_a:Number(m.score_a),score_b:Number(m.score_b),k:m.k===null||m.k===''?null:Number(m.k)};
   }
   function compareMatches(a,b){return String(a.date).localeCompare(String(b.date))||String(a.created_at||'').localeCompare(String(b.created_at||''))||String(a.id||'').localeCompare(String(b.id||''));}
-  function getOrCreateSchool(map,name,pref,isJoint=false){const key=schoolKey(name,pref);if(!map.has(key)){map.set(key,{key,name:canonicalTeam(name).name,pref:canonicalPref(pref),rating:ratingCfg.initial,lastDelta:0,wins:0,losses:0,draws:0,history:[],games:[],isJoint:Boolean(isJoint),areas:new Set([String(pref||'').trim()]),lastGenerationYear:null});}else if(isJoint){map.get(key).isJoint=true;}return map.get(key);}
+  function getOrCreateSchool(map,name,pref,isJoint=false){const key=schoolKey(name,pref);if(!map.has(key)){map.set(key,{key,name:canonicalTeam(name).name,pref:canonicalPref(pref),rating:ratingCfg.initial,lastDelta:0,wins:0,losses:0,draws:0,history:[],games:[],isJoint:Boolean(isJoint),areas:new Set([String(pref||'').trim()]),lastTransitionYear:null,autumnSeasonYears:new Set()});}else if(isJoint){map.get(key).isJoint=true;}return map.get(key);}
   function addSchoolArea(school,pref,tournament){
     if(!school)return;const p=String(pref||'').trim(),t=String(tournament||'').replace(/\s+/g,'');
     if(p)school.areas.add(p);
@@ -232,20 +255,46 @@
 
   function buildRatings(raw){
     const map=new Map(), matches=raw.map(normalizeMatch).sort(compareMatches);
-    for(const m of matches){
+    const lastSummerIndex=new Map();
+    matches.forEach((m,index)=>{
+      const type=effectiveTournamentType(m),year=Number(String(m.date||'').slice(0,4));
+      if(!isSummerType(type)||!Number.isInteger(year))return;
+      if(m.team_a&&m.pref_a)lastSummerIndex.set(`${schoolKey(m.team_a,m.pref_a)}|${year}`,index);
+      if(m.team_b&&m.pref_b)lastSummerIndex.set(`${schoolKey(m.team_b,m.pref_b)}|${year}`,index);
+    });
+    for(let matchIndex=0;matchIndex<matches.length;matchIndex++){
+      const m=matches[matchIndex];
       if(!m.date||!m.team_a||!m.team_b||!m.pref_a||!m.pref_b||!Number.isFinite(m.score_a)||!Number.isFinite(m.score_b))continue;
       const a=getOrCreateSchool(map,m.team_a,m.pref_a,m.joint_a),b=getOrCreateSchool(map,m.team_b,m.pref_b,m.joint_b);
       addSchoolArea(a,m.pref_a,m.tournament);addSchoolArea(b,m.pref_b,m.tournament);
-      const regressionFromA=a.rating,regressionFromB=b.rating;
-      const transitionCountA=applyPendingNewTeamTransitions(a,m),transitionCountB=applyPendingNewTeamTransitions(b,m);
-      const regressionToA=a.rating,regressionToB=b.rating;
+      const type=effectiveTournamentType(m),year=Number(String(m.date||'').slice(0,4));
+      const autumnYear=isAutumnType(type)&&Number.isInteger(year)?year:null;
+      const autumnFirstA=autumnYear!==null&&!a.autumnSeasonYears.has(autumnYear);
+      const autumnFirstB=autumnYear!==null&&!b.autumnSeasonYears.has(autumnYear);
+      if(autumnFirstA)a.autumnSeasonYears.add(autumnYear);
+      if(autumnFirstB)b.autumnSeasonYears.add(autumnYear);
+
+      const preRegressionFromA=a.rating,preRegressionFromB=b.rating;
+      const preTransitionsA=applyMissingTransitionsBeforeMatch(a,m),preTransitionsB=applyMissingTransitionsBeforeMatch(b,m);
+      const preRegressionToA=a.rating,preRegressionToB=b.rating;
+
       const beforeA=a.rating,beforeB=b.rating,eA=expectation(beforeA,beforeB); let rA=.5,rB=.5,cA='D',cB='D';
       if(m.score_a>m.score_b){rA=1;rB=0;cA='W';cB='L';a.wins++;b.losses++;}else if(m.score_a<m.score_b){rA=0;rB=1;cA='L';cB='W';a.losses++;b.wins++;}else{a.draws++;b.draws++;}
       const k=inferK(m),dA=k*(rA-eA),dB=k*(rB-(1-eA)); a.rating+=dA;b.rating+=dB;a.lastDelta=dA;b.lastDelta=dB;
-      a.history.push({date:m.date,rating:a.rating,delta:dA,opponent:b.name,matchId:m.id,newTeamTransitions:transitionCountA,regressionFrom:transitionCountA?regressionFromA:null,regressionTo:transitionCountA?regressionToA:null});
-      b.history.push({date:m.date,rating:b.rating,delta:dB,opponent:a.name,matchId:m.id,newTeamTransitions:transitionCountB,regressionFrom:transitionCountB?regressionFromB:null,regressionTo:transitionCountB?regressionToB:null});
-      a.games.push({match:m,result:cA,opponent:b.name,opponentPref:b.pref,opponentKey:b.key,scored:m.score_a,allowed:m.score_b,before:beforeA,after:a.rating,delta:dA,newTeamTransitions:transitionCountA,regressionFrom:transitionCountA?regressionFromA:null,regressionTo:transitionCountA?regressionToA:null});
-      b.games.push({match:m,result:cB,opponent:a.name,opponentPref:a.pref,opponentKey:a.key,scored:m.score_b,allowed:m.score_a,before:beforeB,after:b.rating,delta:dB,newTeamTransitions:transitionCountB,regressionFrom:transitionCountB?regressionFromB:null,regressionTo:transitionCountB?regressionToB:null});
+      const matchAfterA=a.rating,matchAfterB=b.rating;
+
+      const lastSummerA=isSummerType(type)&&Number.isInteger(year)&&lastSummerIndex.get(`${a.key}|${year}`)===matchIndex;
+      const lastSummerB=isSummerType(type)&&Number.isInteger(year)&&lastSummerIndex.get(`${b.key}|${year}`)===matchIndex;
+      const postRegressionFromA=a.rating,postRegressionFromB=b.rating;
+      const postTransitionsA=lastSummerA?applySummerTransitionAfterMatch(a,year):0;
+      const postTransitionsB=lastSummerB?applySummerTransitionAfterMatch(b,year):0;
+      const postRegressionToA=a.rating,postRegressionToB=b.rating;
+
+      const transitionCountA=preTransitionsA+postTransitionsA,transitionCountB=preTransitionsB+postTransitionsB;
+      a.history.push({date:m.date,rating:a.rating,delta:dA,opponent:b.name,matchId:m.id,newTeamTransitions:transitionCountA,preNewTeamTransitions:preTransitionsA,postNewTeamTransitions:postTransitionsA,regressionFrom:transitionCountA?(preTransitionsA?preRegressionFromA:postRegressionFromA):null,regressionTo:transitionCountA?(postTransitionsA?postRegressionToA:preRegressionToA):null,preRegressionFrom:preTransitionsA?preRegressionFromA:null,preRegressionTo:preTransitionsA?preRegressionToA:null,postRegressionFrom:postTransitionsA?postRegressionFromA:null,postRegressionTo:postTransitionsA?postRegressionToA:null,matchAfter:matchAfterA,isAutumnFirstGame:autumnFirstA,tournamentType:type});
+      b.history.push({date:m.date,rating:b.rating,delta:dB,opponent:a.name,matchId:m.id,newTeamTransitions:transitionCountB,preNewTeamTransitions:preTransitionsB,postNewTeamTransitions:postTransitionsB,regressionFrom:transitionCountB?(preTransitionsB?preRegressionFromB:postRegressionFromB):null,regressionTo:transitionCountB?(postTransitionsB?postRegressionToB:preRegressionToB):null,preRegressionFrom:preTransitionsB?preRegressionFromB:null,preRegressionTo:preTransitionsB?preRegressionToB:null,postRegressionFrom:postTransitionsB?postRegressionFromB:null,postRegressionTo:postTransitionsB?postRegressionToB:null,matchAfter:matchAfterB,isAutumnFirstGame:autumnFirstB,tournamentType:type});
+      a.games.push({match:m,result:cA,opponent:b.name,opponentPref:b.pref,opponentKey:b.key,scored:m.score_a,allowed:m.score_b,before:beforeA,matchAfter:matchAfterA,after:a.rating,delta:dA,newTeamTransitions:transitionCountA,preNewTeamTransitions:preTransitionsA,postNewTeamTransitions:postTransitionsA,regressionFrom:transitionCountA?(preTransitionsA?preRegressionFromA:postRegressionFromA):null,regressionTo:transitionCountA?(postTransitionsA?postRegressionToA:preRegressionToA):null,isAutumnFirstGame:autumnFirstA});
+      b.games.push({match:m,result:cB,opponent:a.name,opponentPref:a.pref,opponentKey:a.key,scored:m.score_b,allowed:m.score_a,before:beforeB,matchAfter:matchAfterB,after:b.rating,delta:dB,newTeamTransitions:transitionCountB,preNewTeamTransitions:preTransitionsB,postNewTeamTransitions:postTransitionsB,regressionFrom:transitionCountB?(preTransitionsB?preRegressionFromB:postRegressionFromB):null,regressionTo:transitionCountB?(postTransitionsB?postRegressionToB:preRegressionToB):null,isAutumnFirstGame:autumnFirstB});
     }
     const schools=[...map.values()].sort((x,y)=>y.rating-x.rating||x.name.localeCompare(y.name,'ja'));
     schools.forEach((s,i)=>{s.allRank=i+1;s.form=s.games.slice(-5).map(g=>g.result).join('');s.firstGameDate=s.history[0]?.date||null;});
@@ -482,13 +531,22 @@
   function latestDatasetDate(){const dates=state.matches.map(m=>m.date).filter(Boolean).sort();return dates.length?parseLocalDate(dates.at(-1)):new Date();}
   function historyWindow(history){
     const actual=[...history].filter(h=>h.date).sort((a,b)=>String(a.date).localeCompare(String(b.date)));
-    if(!actual.length)return {points:[],actualCount:0,start:null,end:null};
+    if(!actual.length)return {points:[],actualCount:0,start:null,end:null,label:''};
     const end=latestDatasetDate();
     if(state.historyYears==='all'){
       const start=parseLocalDate(actual[0].date),points=actual.map(p=>({...p,synthetic:false}));
       const last=points.at(-1);
       if(parseLocalDate(last.date)<end)points.push({...last,date:toDateString(end),synthetic:true,opponent:null});
-      return {points,actualCount:actual.length,start,end};
+      return {points,actualCount:actual.length,start,end,label:'全期間'};
+    }
+    if(state.historyYears==='newteam'){
+      const autumnStarts=actual.filter(p=>p.isAutumnFirstGame);
+      if(!autumnStarts.length)return {points:[],actualCount:0,start:null,end,label:'新体制以降',missingNewTeam:true};
+      const first=autumnStarts.at(-1),start=parseLocalDate(first.date);
+      const inRange=actual.filter(p=>parseLocalDate(p.date)>=start&&parseLocalDate(p.date)<=end).map(p=>({...p,synthetic:false}));
+      const points=[...inRange];
+      if(points.length){const last=points.at(-1);if(parseLocalDate(last.date)<end)points.push({...last,date:toDateString(end),synthetic:true,opponent:null});}
+      return {points,actualCount:inRange.length,start,end,label:'新体制以降'};
     }
     const years=Math.max(1,Number(state.historyYears)||1),start=new Date(end);start.setFullYear(start.getFullYear()-years);
     const inRange=actual.filter(p=>{const d=parseLocalDate(p.date);return d>=start&&d<=end;}).map(p=>({...p,synthetic:false}));
@@ -497,12 +555,21 @@
     if(prior)points.push({...prior,date:toDateString(start),synthetic:true,opponent:null});
     points.push(...inRange);
     if(points.length){const last=points.at(-1);if(parseLocalDate(last.date)<end)points.push({...last,date:toDateString(end),synthetic:true,opponent:null});}
-    return {points,actualCount:inRange.length,start,end};
+    return {points,actualCount:inRange.length,start,end,label:`過去${state.historyYears}年`};
+  }
+  function regressionTooltip(p,opponent){
+    const pieces=[`${p.date} レーティング ${formatRating(p.rating)}${opponent}`];
+    if(Number(p.preNewTeamTransitions)>0)pieces.push(`未反映の平均回帰 ${p.preNewTeamTransitions}回（試合前）: ${formatRating(p.preRegressionFrom)} → ${formatRating(p.preRegressionTo)}`);
+    if(Number(p.postNewTeamTransitions)>0)pieces.push(`夏の最終戦後の平均回帰 ${p.postNewTeamTransitions}回: 試合後 ${formatRating(p.postRegressionFrom)} → ${formatRating(p.postRegressionTo)}`);
+    return pieces.join(' / ');
   }
   function renderHistoryChart(history,ratingVisible=true){
     if(!ratingVisible){els.historyChart.innerHTML='<text x="360" y="110" text-anchor="middle" class="chart-private">レーティング1500未満のため推移は非公開です</text>';if(els.historyRangeStatus)els.historyRangeStatus.textContent='戦績は下で閲覧できます。';return;}
     const windowData=historyWindow(history),h=windowData.points;
-    if(els.historyRangeStatus){const label=state.historyYears==='all'?'全期間':`過去${state.historyYears}年`;els.historyRangeStatus.textContent=windowData.start&&windowData.end?`${label}：${toDateString(windowData.start)} ～ ${toDateString(windowData.end)}（期間内 ${windowData.actualCount}試合） · 横軸は試合間隔を均等化`:label;}
+    if(els.historyRangeStatus){
+      if(windowData.missingNewTeam)els.historyRangeStatus.textContent='新体制以降：この学校の秋季大会初戦の履歴がありません。';
+      else els.historyRangeStatus.textContent=windowData.start&&windowData.end?`${windowData.label}：${toDateString(windowData.start)} ～ ${toDateString(windowData.end)}（期間内 ${windowData.actualCount}試合） · 横軸は試合間隔を均等化`:windowData.label;
+    }
     if(!h.length){els.historyChart.innerHTML='<text x="360" y="110" text-anchor="middle" class="chart-private">この期間のレーティング履歴はありません</text>';return;}
     const width=720,height=240,padL=48,padR=18,padT=20,padB=42,vals=h.map(x=>x.rating),minV=Math.min(...vals),maxV=Math.max(...vals),spread=Math.max(20,maxV-minV),yMin=minV-spread*.18,yMax=maxV+spread*.18;
     const x=i=>h.length===1?(padL+width-padR)/2:padL+i/(h.length-1)*(width-padL-padR),y=v=>height-padB-(v-yMin)/(yMax-yMin)*(height-padT-padB);
@@ -513,12 +580,12 @@
       if(p.synthetic)return '';
       const cx=coords[i][0],cy=coords[i][1],opponent=p.opponent?` vs ${escapeHtml(p.opponent)}`:'';
       if(Number(p.newTeamTransitions)>0){
-        const r=5.2,title=`${p.date} レーティング ${formatRating(p.rating)}${opponent} / 新チーム移行の平均回帰 ${p.newTeamTransitions}回: ${formatRating(p.regressionFrom)} → ${formatRating(p.regressionTo)} / 試合後 ${formatRating(p.rating)}`;
+        const r=5.2,title=regressionTooltip(p,opponent);
         return `<polygon class="chart-regression-dot" points="${cx},${cy-r} ${cx+r},${cy} ${cx},${cy+r} ${cx-r},${cy}"><title>${title}</title></polygon>`;
       }
       return `<circle class="chart-dot" cx="${cx}" cy="${cy}" r="2.8"><title>${p.date} レーティング ${formatRating(p.rating)}${opponent}</title></circle>`;
     }).join('');
-    const actualIndexes=h.map((p,i)=>p.synthetic?null:i).filter(i=>i!==null),labelIndexes=[0,Math.floor((h.length-1)/2),h.length-1].filter((v,i,a)=>a.indexOf(v)===i);
+    const labelIndexes=[0,Math.floor((h.length-1)/2),h.length-1].filter((v,i,a)=>a.indexOf(v)===i);
     const labels=labelIndexes.map((idx,i)=>`<text class="chart-date-label" x="${x(idx)}" y="${height-10}" text-anchor="${i===0?'start':i===labelIndexes.length-1?'end':'middle'}">${escapeHtml(h[idx].date)}</text>`).join('');
     els.historyChart.innerHTML=`${grid}<polygon class="chart-area" points="${area}" fill="var(--accent)"/><polyline class="chart-line" points="${pts}"/>${dots}${labels}`;
   }
@@ -1197,7 +1264,7 @@
 
   function bindEvents(){els.siteSettingsForm?.addEventListener('submit',handleSiteSettingsSave);document.querySelectorAll('.admin-public-toggle [data-setting]').forEach(input=>input.addEventListener('change',()=>handlePublicSettingChange(input)));els.searchInput.addEventListener('input',()=>{state.rankingPage=1;renderRanking();});els.rankingPrefOptions?.addEventListener('change',e=>{const input=e.target.closest('input[type=\"checkbox\"]');if(!input)return;if(input.checked)state.selectedRankingPrefs.add(input.value);else state.selectedRankingPrefs.delete(input.value);updateRankingPrefSummary();state.rankingPage=1;renderRanking();});els.rankingPrefClear?.addEventListener('click',()=>{state.selectedRankingPrefs.clear();renderPrefFilter();state.rankingPage=1;renderRanking();});[els.ratingMinFilter,els.ratingMaxFilter].forEach(x=>x?.addEventListener('input',()=>{state.rankingPage=1;renderRanking();}));els.rankingDate?.addEventListener('change',()=>{state.rankingDate=els.rankingDate.value;state.rankingDateIsLatest=state.rankingDate===compareDatasetBounds().last;state.rankingPage=1;renderRanking();});els.rankingDateLatest?.addEventListener('click',()=>{state.rankingDateIsLatest=true;syncRankingDateInput(true);state.rankingPage=1;renderRanking();});els.rankingPageSize?.addEventListener('change',()=>{state.rankingPageSize=Number(els.rankingPageSize.value)||20;state.rankingPage=1;renderRanking();});els.rankingPrev?.addEventListener('click',()=>{if(state.rankingPage>1){state.rankingPage--;renderRanking();document.getElementById('ranking')?.scrollIntoView({behavior:'smooth',block:'start'});}});els.rankingNext?.addEventListener('click',()=>{state.rankingPage++;renderRanking();document.getElementById('ranking')?.scrollIntoView({behavior:'smooth',block:'start'});});els.rankingPageNumbers?.addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(b)goToRankingPage(b.dataset.page);});els.prefSort?.addEventListener('change',()=>{state.prefExpanded=false;renderPrefCards();});els.prefShowMoreButton?.addEventListener('click',()=>{state.prefExpanded=!state.prefExpanded;renderPrefCards();});els.schoolSearch?.addEventListener('input',renderSchoolSearch);els.schoolSearch?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.schoolSearchHits.length){e.preventDefault();selectSchoolSearchHit(0);}});els.recordSchoolSearch?.addEventListener('input',renderRecordSchoolSearch);els.recordSchoolSearch?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.recordSearchHits.length){e.preventDefault();selectRecordSearchHit(0);}});els.schoolSelect.addEventListener('change',()=>{state.selectedSchoolKey=els.schoolSelect.value;renderSchoolProfile();});els.historyRange?.addEventListener('click',e=>{const b=e.target.closest('[data-years]');if(!b)return;state.historyYears=b.dataset.years;els.historyRange.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));renderSchoolProfile();});els.matchYearFilter?.addEventListener('change',()=>renderSchoolProfile());els.rankCompareSearch?.addEventListener('input',renderRankCompareSearch);els.rankCompareSearch?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.rankCompareSearchHits.length){e.preventDefault();addRankCompareSchool(0);}});els.rankCompareStartDate?.addEventListener('change',()=>{state.compareStartDate=els.rankCompareStartDate.value;renderRankCompareChart();});els.rankCompareEndDate?.addEventListener('change',()=>{state.compareEndDate=els.rankCompareEndDate.value;renderRankCompareChart();});els.rankCompareAllRange?.addEventListener('click',()=>{syncRankCompareDateInputs(true);renderRankCompareChart();});[els.ratingA,els.ratingB,els.kValue].forEach(i=>i.addEventListener('input',renderSimulator));els.kValue?.addEventListener('input',()=>{els.kValue.dataset.userEdited='1';});els.loginForm.addEventListener('submit',handleLogin);els.showResetButton.addEventListener('click',showResetRequest);els.resetRequestForm.addEventListener('submit',handleResetRequest);els.backToLoginButton.addEventListener('click',backToLogin);els.passwordSetupForm.addEventListener('submit',handlePasswordSetup);els.logoutButton.addEventListener('click',handleLogout);els.matchForm.addEventListener('submit',handleMatchSubmit);els.cancelEditButton.addEventListener('click',resetMatchForm);els.reloadButton.addEventListener('click',loadMatches);[els.adminMatchKeyword,els.adminMatchTournament,els.adminMatchSchool].forEach(x=>x?.addEventListener('input',renderAdminMatches));els.adminMatchDate?.addEventListener('change',renderAdminMatches);els.adminMatchClear?.addEventListener('click',clearAdminMatchSearch);els.duplicateScanButton?.addEventListener('click',toggleDuplicateView);els.duplicateSelectAll?.addEventListener('change',()=>setAllDuplicateChecks(els.duplicateSelectAll.checked));els.duplicateMergeList?.addEventListener('change',e=>{if(e.target.closest('.js-merge-duplicate'))syncDuplicateSelectionState();});els.duplicateMergeButton?.addEventListener('click',mergeCheckedDuplicates);els.normalizeTournamentButton?.addEventListener('click',normalizeTournamentNames);els.aliasAddButton?.addEventListener('click',addSchoolAlias);els.aliasAddNameButton?.addEventListener('click',()=>{const names=[...(els.aliasNamesContainer?.querySelectorAll('.alias-name-input')||[])].map(x=>x.value);names.push('');renderSchoolAliasNameInputs(names);const inputs=els.aliasNamesContainer?.querySelectorAll('.alias-name-input');inputs?.[inputs.length-1]?.focus();});els.aliasNamesContainer?.addEventListener('click',e=>{const b=e.target.closest('.alias-name-remove');if(!b)return;const row=b.closest('.alias-name-row');row?.remove();const names=[...(els.aliasNamesContainer?.querySelectorAll('.alias-name-input')||[])].map(x=>x.value);renderSchoolAliasNameInputs(names.length?names:['']);});els.aliasCancelEditButton?.addEventListener('click',()=>resetSchoolAliasEditor(true));els.aliasRefreshButton?.addEventListener('click',()=>{renderAliasSuggestions();if(els.aliasMessage)setMessage(els.aliasMessage,'登録済み試合を再検出しました。','success');});els.aliasListPrefFilter?.addEventListener('change',renderAliasList);els.tournamentAliasSaveButton?.addEventListener('click',saveTournamentAlias);els.tournamentAliasCancelEditButton?.addEventListener('click',()=>resetTournamentAliasEditor(true));els.tournamentAliasRefreshButton?.addEventListener('click',loadTournamentAliases);els.tournamentAliasYearFilter?.addEventListener('change',renderTournamentAliasList);els.schoolMergeProposalForm?.addEventListener('submit',submitSchoolMergeProposal);els.schoolMergeProposalType?.addEventListener('change',()=>{clearMergeProposalForm(false);updateProposalMode();});els.mergeProposalSchoolA?.addEventListener('input',()=>renderMergeProposalSearch('A'));els.mergeProposalSchoolB?.addEventListener('input',()=>renderMergeProposalSearch('B'));els.mergeProposalSchoolA?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.mergeProposalAHits.length){e.preventDefault();selectMergeProposalSchool('A',0);}});els.mergeProposalSchoolB?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.mergeProposalBHits.length){e.preventDefault();selectMergeProposalSchool('B',0);}});els.resultProposalMatchSearch?.addEventListener('input',renderResultProposalSearch);els.resultProposalMatchSearch?.addEventListener('keydown',e=>{if(e.key==='Enter'&&state.resultProposalHits.length){e.preventDefault();selectResultProposalMatch(0);}});[els.resultProposalScoreA,els.resultProposalScoreB].forEach(x=>x?.addEventListener('input',updateResultProposalSelection));els.schoolMergeProposalClear?.addEventListener('click',()=>clearMergeProposalForm(false));els.schoolReplacePreviewButton?.addEventListener('click',renderSchoolNameReplacementPreview);els.schoolReplaceApplyButton?.addEventListener('click',applySchoolNameReplacement);[els.schoolReplaceFrom,els.schoolReplaceTo].forEach(x=>x?.addEventListener('input',resetSchoolNameReplacementPreview));els.schoolReplaceMode?.addEventListener('change',resetSchoolNameReplacementPreview);els.reloadProposalsButton?.addEventListener('click',loadProposals);els.reloadHistoryButton?.addEventListener('click',loadEditHistory);document.addEventListener('click',e=>{if(els.schoolSearchResults&&!e.target.closest('.school-search-wrap'))els.schoolSearchResults.classList.add('hidden');if(els.recordSchoolSearchResults&&!e.target.closest('.record-school-search-wrap'))els.recordSchoolSearchResults.classList.add('hidden');if(els.rankCompareSearchResults&&!e.target.closest('.rank-compare-search-wrap'))els.rankCompareSearchResults.classList.add('hidden');if(!e.target.closest('.proposal-school-search-wrap')&&!e.target.closest('.proposal-match-search-wrap')){els.mergeProposalSchoolAResults?.classList.add('hidden');els.mergeProposalSchoolBResults?.classList.add('hidden');els.resultProposalMatchResults?.classList.add('hidden');}});}
 
-  function renderStaticConfig(){const showK=featureVisible('k_values'),vals=configuredKValues(),lo=Math.min(...vals),hi=Math.max(...vals),retentionPct=(newTeamRetentionRate()*100).toFixed(0);els.heroInitial.textContent=ratingCfg.initial;els.heroDivisor.textContent=ratingCfg.divisor;els.heroK.textContent=showK?`大会別 ${lo}〜${hi}`:'非公開';if(els.heroRetention)els.heroRetention.textContent=`${retentionPct}%`;els.heroFormula.textContent="R' = R + K × (W − We)";if(!els.kValue.dataset.userEdited)els.kValue.value=showK?summerQualifierK():ratingCfg.defaultK;if(els.matchK)els.matchK.placeholder='大会タグから自動決定（空欄でOK）';if(els.matchKValues)els.matchKValues.innerHTML=[...new Set(vals)].sort((a,b)=>a-b).map(v=>`<option value="${v}"></option>`).join('');if(els.methodKText)els.methodKText.textContent=showK?`K値：秋季予選${autumnQualifierK()} / 秋季地区${autumnRegionalK()} / 神宮${meijiJinguK()} / 春甲子園1回戦〜準々決勝${springKoshienEarlyK()} / 春甲子園準決勝・決勝${springKoshienFinalK()} / 春季予選${springQualifierK()} / 春季地区${springRegionalK()} / 夏予選${summerQualifierK()} / 夏甲子園1回戦〜準々決勝${summerMainEarlyK()} / 夏甲子園準決勝・決勝${summerMainFinalK()} / 国スポ${kokuspoK()}。大会名ではなく各試合の大会タグで決定し、手動Kがある場合だけ手動値を優先します。`:'K値は各試合の大会タグに基づいて自動決定します。';if(els.methodRetentionText)els.methodRetentionText.textContent=`3年生引退後の新チームでは、1500からの差の${retentionPct}%を引き継ぎます。秋に出場しなかった場合も、次に公式戦へ出場した時点で未反映の世代交代回数を数え、その回数だけ継承率を累乗して適用します。国スポは3年生を含む夏までのチームとして世代移行判定には使いません。`;syncSiteSettingsForm();}
+  function renderStaticConfig(){const showK=featureVisible('k_values'),vals=configuredKValues(),lo=Math.min(...vals),hi=Math.max(...vals),retentionPct=(newTeamRetentionRate()*100).toFixed(0);els.heroInitial.textContent=ratingCfg.initial;els.heroDivisor.textContent=ratingCfg.divisor;els.heroK.textContent=showK?`大会別 ${lo}〜${hi}`:'非公開';if(els.heroRetention)els.heroRetention.textContent=`${retentionPct}%`;els.heroFormula.textContent="R' = R + K × (W − We)";if(!els.kValue.dataset.userEdited)els.kValue.value=showK?summerQualifierK():ratingCfg.defaultK;if(els.matchK)els.matchK.placeholder='大会タグから自動決定（空欄でOK）';if(els.matchKValues)els.matchKValues.innerHTML=[...new Set(vals)].sort((a,b)=>a-b).map(v=>`<option value="${v}"></option>`).join('');if(els.methodKText)els.methodKText.textContent=showK?`K値：秋季予選${autumnQualifierK()} / 秋季地区${autumnRegionalK()} / 神宮${meijiJinguK()} / 春甲子園1回戦〜準々決勝${springKoshienEarlyK()} / 春甲子園準決勝・決勝${springKoshienFinalK()} / 春季予選${springQualifierK()} / 春季地区${springRegionalK()} / 夏予選${summerQualifierK()} / 夏甲子園1回戦〜準々決勝${summerMainEarlyK()} / 夏甲子園準決勝・決勝${summerMainFinalK()} / 国スポ${kokuspoK()}。大会名ではなく各試合の大会タグで決定し、手動Kがある場合だけ手動値を優先します。`:'K値は各試合の大会タグに基づいて自動決定します。';if(els.methodRetentionText)els.methodRetentionText.textContent=`3年生引退後の新チームでは、1500からの差の${retentionPct}%を引き継ぎます。原則として各校のその年の夏大会最後の試合が終わった直後に平均回帰を適用します。夏大会に出場しなかった年度は、次に公式戦へ出場した時点で未反映の世代交代回数をまとめて適用します。`;syncSiteSettingsForm();}
   async function init(){bindEvents();updateProposalMode();renderStaticConfig();renderSimulator();resetMatchForm();if(!isConfigReady()){setDataStatus('要設定');showSetupNotice('<strong>Supabaseの接続情報が未設定です。</strong> config.js を設定してください。');els.loginPanel.classList.add('hidden');els.adminUnavailable.textContent='config.jsを設定すると利用できます。';els.adminUnavailable.classList.remove('hidden');return;}state.client=window.supabase.createClient(cfg.supabaseUrl,cfg.supabasePublishableKey);els.adminUnavailable.classList.add('hidden');await Promise.all([loadSiteSettings(),loadTournamentKSettings()]);await loadSchoolAliases();await Promise.all([restoreSession(),loadMatches()]);}
   init().catch(e=>{console.error(e);setDataStatus('エラー');showSetupNotice(`<code>${escapeHtml(e.message||e)}</code>`);});
 })();
