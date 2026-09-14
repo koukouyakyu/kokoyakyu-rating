@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="高校野球レーティング | 全国ランキング" />
   <meta name="twitter:description" content="全国の高校野球公式戦結果から独自算出したRatingとランキングを公開。" />
-  <link rel="stylesheet" href="styles.css?v=20260914-39" />
+  <link rel="stylesheet" href="styles.css?v=20260915-42" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -158,13 +158,13 @@
       <p class="footnote" id="rankingFootnote"></p>
     </section>
 
-    <section id="pref-share-trend" class="section section-alt" data-public-feature="ranking">
+    <section id="pref-share-trend" class="section section-alt" data-public-feature="pref_share">
       <div class="wrap">
         <div class="section-head">
           <div>
             <p class="eyebrow">PREFECTURE SHARE TREND</p>
-            <h2 id="prefShareTitle">ベスト100に占める都道府県の割合推移</h2>
-            <p class="muted">各年の全国ランキング上位校に、各都道府県の学校が何校・何%入っているかを比較します。</p>
+            <div class="title-with-public-toggle"><h2 id="prefShareTitle">ベスト100に占める都道府県の割合推移</h2><label class="admin-public-toggle hidden"><input type="checkbox" data-setting="public_pref_share" /><span>一般公開</span></label></div>
+            <p class="muted">各年の全国ランキング上位校に、各都道府県の学校が何校・何%入っているかを比較します。年度を押すと昇順・降順で並び替えできます。</p>
           </div>
           <div class="pref-share-controls">
             <label>対象
@@ -866,7 +866,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=20260914-39"></script>
-  <script src="league.js?v=20260915-41"></script>
+  <script src="app.js?v=20260915-42"></script>
+  <script src="league.js?v=20260915-42"></script>
 </body>
 </html>
