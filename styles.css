@@ -1,4 +1,3 @@
-/* 高校野球レーティング rev36 - 2026-09-14 */
 :root {
   --bg: #f5f7f5;
   --surface: #ffffff;
@@ -2350,4 +2349,76 @@ img, svg, canvas { max-width: 100%; }
 }
 .ranking-pref-option input[type="checkbox"]:focus {
   outline: none;
+}
+
+
+/* ===== rev37: 都道府県一括選択 / ベストN都道府県構成推移 ===== */
+.ranking-pref-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.pref-share-controls { display: flex; align-items: end; gap: 10px; }
+.pref-share-controls > label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 800;
+}
+.pref-share-topn-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--text);
+  font-size: .95rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.pref-share-topn-input input {
+  width: 86px;
+  min-height: 40px;
+  padding: 7px 9px;
+  text-align: center;
+}
+.pref-share-table-card {
+  max-height: 680px;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.pref-share-table { min-width: 700px; }
+.pref-share-table th, .pref-share-table td { text-align: center; }
+.pref-share-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #f7faf8;
+}
+.pref-share-table thead th small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: .7rem;
+  font-weight: 700;
+}
+.pref-share-table .pref-share-sticky {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  min-width: 92px;
+  text-align: left;
+  background: var(--surface);
+  box-shadow: 1px 0 0 var(--line);
+}
+.pref-share-table thead .pref-share-sticky { z-index: 4; background: #f7faf8; }
+.pref-share-count, .pref-share-percent { display: block; }
+.pref-share-count { font-weight: 900; color: var(--text); }
+.pref-share-percent { margin-top: 2px; color: var(--muted); font-size: .78rem; }
+@media (max-width: 720px) {
+  .ranking-pref-actions { align-items: stretch; flex-direction: column; }
+  .ranking-pref-action-buttons { justify-content: stretch; }
+  .ranking-pref-action-buttons .btn { flex: 1 1 0; }
+  .pref-share-controls { width: 100%; }
 }

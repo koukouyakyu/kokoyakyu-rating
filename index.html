@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="高校野球レーティング | 全国ランキング" />
   <meta name="twitter:description" content="全国の高校野球公式戦結果から独自算出したRatingとランキングを公開。" />
-  <link rel="stylesheet" href="styles.css?v=20260914-36" />
+  <link rel="stylesheet" href="styles.css?v=20260914-37" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -99,7 +99,10 @@
             <div class="ranking-pref-popover">
               <div class="ranking-pref-actions">
                 <span class="muted">1つまたは複数選択できます</span>
-                <button id="rankingPrefClear" class="btn secondary small" type="button">すべて解除</button>
+                <div class="ranking-pref-action-buttons">
+                  <button id="rankingPrefSelectAll" class="btn secondary small" type="button">すべて選択</button>
+                  <button id="rankingPrefClear" class="btn secondary small" type="button">すべて解除</button>
+                </div>
               </div>
               <div id="rankingPrefOptions" class="ranking-pref-options" role="group" aria-label="ランキング対象の都道府県"></div>
             </div>
@@ -155,7 +158,32 @@
       <p class="footnote" id="rankingFootnote"></p>
     </section>
 
-    <section id="prefectures" class="section section-alt" data-public-feature="prefectures">
+    <section id="pref-share-trend" class="section section-alt" data-public-feature="ranking">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">PREFECTURE SHARE TREND</p>
+            <h2 id="prefShareTitle">ベスト100に占める都道府県の割合推移</h2>
+            <p class="muted">各年の全国ランキング上位校に、各都道府県の学校が何校・何%入っているかを比較します。</p>
+          </div>
+          <div class="pref-share-controls">
+            <label>対象
+              <span class="pref-share-topn-input">ベスト <input id="prefShareTopN" type="number" min="1" max="1000" step="1" value="100" inputmode="numeric" aria-label="集計するランキング上位校数" /> 校</span>
+            </label>
+          </div>
+        </div>
+        <p id="prefShareStatus" class="footnote"></p>
+        <div class="table-card pref-share-table-card">
+          <table class="pref-share-table">
+            <thead id="prefShareHead"></thead>
+            <tbody id="prefShareBody"></tbody>
+          </table>
+        </div>
+        <p class="footnote">各年は12月31日時点で集計し、データの最新年だけは最終試合日時点で集計します。セルは「校数 / 割合」です。</p>
+      </div>
+    </section>
+
+    <section id="prefectures" class="section" data-public-feature="prefectures">
       <div class="wrap">
         <div class="section-head">
           <div>
@@ -826,6 +854,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=20260914-36"></script>
+  <script src="app.js?v=20260914-37"></script>
 </body>
 </html>
