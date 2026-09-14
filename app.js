@@ -429,7 +429,16 @@
       return false;
     }
   }
-  async function ensureFullMatches(reason='詳細データ'){
+  async function ensureFullMatches(reason='詳細データ', forceRefresh=false){
+    // 管理画面からCSVをSupabaseへ直接インポートした後でも、
+    // 再計算時は必ずDBの最新状態を取り直せるようにする。
+    if(forceRefresh){
+      if(state.fullMatchesPromise){
+        try{await state.fullMatchesPromise;}catch(_e){}
+      }
+      state.fullMatchesLoaded=false;
+      state.fullMatchesPromise=null;
+    }
     if(state.fullMatchesLoaded)return true;
     if(state.fullMatchesPromise)return state.fullMatchesPromise;
     state.fullMatchesPromise=(async()=>{
@@ -474,7 +483,8 @@
   async function rebuildRatingCache(){
     if(!state.session?.user)return;
     if(els.ratingCacheAdminStatus)els.ratingCacheAdminStatus.textContent='全試合を読み込んでRatingを再計算しています…';
-    const ok=await ensureFullMatches('Rating再計算用の全試合');
+    // ここではメモリ上の古い試合データを再利用せず、Supabaseから必ず全件再取得する。
+    const ok=await ensureFullMatches('Rating再計算用の全試合',true);
     if(ok)await persistRatingCache();
   }
 
