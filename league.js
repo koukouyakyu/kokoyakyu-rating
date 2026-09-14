@@ -1,3 +1,4 @@
+/* league simulator rev41 - checkbox layout fix */
 (() => {
   'use strict';
 
@@ -68,14 +69,23 @@
       .league-admin-box{margin-bottom:22px;padding:18px;border:1px solid var(--line,#d9e1dc);border-radius:14px;background:var(--surface-soft,#f7faf8)}
       .league-admin-head{display:flex;gap:16px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
       .league-admin-head h3{margin:0 0 5px}.league-admin-head p{margin:0}
-      .league-public-toggle{display:flex;align-items:center;gap:8px;font-weight:700;white-space:nowrap}
+      .league-public-toggle{display:inline-flex;align-items:center;gap:8px;font-weight:700;white-space:nowrap;max-width:100%;cursor:pointer;flex:0 0 auto}
+      .league-public-toggle input[type="checkbox"],.league-pref-option input[type="checkbox"]{
+        -webkit-appearance:checkbox !important;appearance:auto !important;
+        width:18px !important;height:18px !important;min-width:18px !important;min-height:18px !important;max-width:18px !important;
+        padding:0 !important;margin:0 !important;border-radius:3px !important;
+        flex:0 0 18px !important;position:static !important;inset:auto !important;
+        opacity:1 !important;pointer-events:auto !important;cursor:pointer;
+      }
+      .league-public-toggle span,.league-pref-option span{min-width:0}
       .league-config-grid{display:grid;grid-template-columns:minmax(180px,1.2fr) minmax(120px,.6fr);gap:14px;margin-bottom:16px}
       .league-config-grid label,.league-division-size{display:grid;gap:6px;font-weight:700}
       .league-config-grid input,.league-division-size input{width:100%;min-height:42px;border:1px solid var(--line,#cbd7d0);border-radius:10px;padding:8px 10px;background:#fff;color:inherit}
       .league-pref-head{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin:14px 0 9px}
       .league-pref-actions{display:flex;gap:7px;flex-wrap:wrap}
-      .league-pref-grid{display:grid;grid-template-columns:repeat(8,minmax(72px,1fr));gap:7px;max-height:250px;overflow:auto;padding:10px;border:1px solid var(--line,#d9e1dc);border-radius:12px;background:#fff}
-      .league-pref-option{display:flex;align-items:center;gap:6px;font-weight:600;font-size:.92rem}
+      .league-pref-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px;max-height:280px;overflow:auto;padding:10px;border:1px solid var(--line,#d9e1dc);border-radius:12px;background:#fff}
+      .league-pref-option{display:flex;align-items:center;gap:7px;min-width:0;padding:5px 4px;font-weight:600;font-size:.92rem;cursor:pointer;user-select:none}
+      .league-pref-option:hover{background:var(--surface-soft,#f7faf8);border-radius:7px}
       .league-division-controls{margin-top:16px}.league-division-size-grid{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;margin-top:8px}
       .league-admin-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}.league-message{min-height:1.4em;margin:9px 0 0}
       .league-summary{display:flex;gap:10px 18px;flex-wrap:wrap;margin:0 0 16px;color:var(--muted,#5b6b62)}
@@ -86,8 +96,8 @@
       .league-table-wrap{overflow:auto}.league-table{width:100%;border-collapse:collapse}.league-table th,.league-table td{padding:9px 10px;border-bottom:1px solid #edf1ee;text-align:left;font-size:.92rem;white-space:nowrap}.league-table th{font-size:.8rem;color:var(--muted,#5b6b62);background:#fbfcfb}.league-table td:first-child,.league-table th:first-child{text-align:center;width:44px}.league-table td:last-child,.league-table th:last-child{text-align:right}.league-table tr:last-child td{border-bottom:0}
       .league-empty{padding:25px;text-align:center;color:var(--muted,#5b6b62);border:1px dashed var(--line,#d9e1dc);border-radius:12px}
       .league-unassigned{margin-top:15px;padding:11px 13px;border-radius:10px;background:var(--surface-soft,#f7faf8);color:var(--muted,#5b6b62);font-size:.9rem}
-      @media(max-width:1050px){.league-pref-grid{grid-template-columns:repeat(5,minmax(72px,1fr))}.league-divisions{grid-template-columns:repeat(2,minmax(240px,1fr))}}
-      @media(max-width:700px){.league-config-grid{grid-template-columns:1fr}.league-pref-grid{grid-template-columns:repeat(3,minmax(72px,1fr))}.league-division-size-grid{grid-template-columns:repeat(2,minmax(110px,1fr))}.league-divisions{grid-template-columns:1fr}.league-simulator-card{padding:15px}}
+      @media(max-width:1050px){.league-divisions{grid-template-columns:repeat(2,minmax(240px,1fr))}}
+      @media(max-width:700px){.league-config-grid{grid-template-columns:1fr}.league-pref-grid{grid-template-columns:repeat(2,minmax(105px,1fr))}.league-division-size-grid{grid-template-columns:repeat(2,minmax(110px,1fr))}.league-divisions{grid-template-columns:1fr}.league-simulator-card{padding:15px}.league-admin-head{display:grid;grid-template-columns:1fr}.league-public-toggle{justify-self:start}}
     `;
     document.head.appendChild(style);
   }
