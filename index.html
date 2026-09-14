@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="高校野球レーティング | 全国ランキング" />
   <meta name="twitter:description" content="全国の高校野球公式戦結果から独自算出したRatingとランキングを公開。" />
-  <link rel="stylesheet" href="styles.css?v=20260914-37" />
+  <link rel="stylesheet" href="styles.css?v=20260914-38" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -538,6 +538,18 @@
           <button id="logoutButton" class="btn secondary small" type="button">ログアウト</button>
         </div>
 
+        <article class="panel rating-cache-panel">
+          <div class="panel-head">
+            <div>
+              <h3>高速表示キャッシュ</h3>
+              <p class="muted">一般閲覧では5万件超の全試合を毎回ダウンロードせず、ここで作成した最新Ratingだけを読み込みます。CSVをインポートした後は、このボタンでキャッシュを更新してください。</p>
+            </div>
+            <button id="ratingCacheRebuildButton" class="btn primary" type="button">全試合から再計算して更新</button>
+          </div>
+          <p id="ratingCacheAdminStatus" class="form-message" aria-live="polite">キャッシュ状態を確認中…</p>
+          <p class="muted">学校の試合履歴・過去日付ランキング・順位推移などは、閲覧者が実際に必要とした時だけ全試合データを読み込みます。</p>
+        </article>
+
         <article class="panel site-settings-panel">
           <div class="panel-head">
             <div>
@@ -854,6 +866,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=20260914-37"></script>
+  <script src="app.js?v=20260914-38"></script>
 </body>
 </html>

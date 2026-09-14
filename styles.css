@@ -2422,3 +2422,26 @@ img, svg, canvas { max-width: 100%; }
   .ranking-pref-action-buttons .btn { flex: 1 1 0; }
   .pref-share-controls { width: 100%; }
 }
+
+/* rev38: 5万試合対応・高速表示キャッシュ */
+.rating-cache-panel .panel-head {
+  align-items: flex-start;
+  gap: 16px;
+}
+.rating-cache-panel .panel-head > div {
+  min-width: 0;
+}
+.lazy-detail-box .btn,
+#prefShareStatus .btn,
+#rankCompareStatus .btn {
+  margin-top: 8px;
+}
+@media (max-width: 720px) {
+  .rating-cache-panel .panel-head {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .rating-cache-panel .panel-head .btn {
+    width: 100%;
+  }
+}
