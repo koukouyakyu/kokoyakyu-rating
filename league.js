@@ -1,4 +1,4 @@
-/* league simulator rev42 - rating range / national rank / region presets */
+/* league simulator rev44 - lightweight form controls / 4+ division fix */
 (() => {
   'use strict';
 
@@ -108,7 +108,7 @@
       .league-public-toggle span,.league-pref-option span{min-width:0}
       .league-config-grid{display:grid;grid-template-columns:minmax(180px,1.2fr) minmax(105px,.55fr) minmax(120px,.65fr) minmax(120px,.65fr);gap:14px;margin-bottom:16px}
       .league-config-grid label,.league-division-size{display:grid;gap:6px;font-weight:700}
-      .league-config-grid input,.league-division-size input{width:100%;min-height:42px;border:1px solid var(--line,#cbd7d0);border-radius:10px;padding:8px 10px;background:#fff;color:inherit}
+      .league-config-grid input,.league-division-size input{width:100%;min-height:42px;border:1px solid var(--line,#cbd7d0);border-radius:10px;padding:8px 10px;background:#fff;color:inherit;transition:none!important}.league-pref-option,.league-pref-option input,.league-public-toggle input{transition:none!important}
       .league-region-presets{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 11px}
       .league-pref-head{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin:14px 0 9px}
       .league-pref-actions{display:flex;gap:7px;flex-wrap:wrap}
@@ -171,10 +171,27 @@
     const e=els(); if(!e.leaguePrefGrid)return; const selected=new Set(state.config.prefectures);
     e.leaguePrefGrid.innerHTML=PREFECTURES.map(pref=>`<label class="league-pref-option"><input type="checkbox" value="${escapeHtml(pref)}" ${selected.has(pref)?'checked':''}><span>${escapeHtml(pref)}</span></label>`).join('');
   }
-  function renderDivisionInputs(){
-    const e=els(); if(!e.leagueDivisionSizes)return; const count=Math.min(12,Math.max(1,Number(e.leagueDivisionCount?.value||state.config.division_sizes.length)||1));
-    while(state.config.division_sizes.length<count)state.config.division_sizes.push(10); state.config.division_sizes=state.config.division_sizes.slice(0,count);
-    e.leagueDivisionSizes.innerHTML=state.config.division_sizes.map((size,i)=>`<label class="league-division-size">${i+1}部<input type="number" min="2" max="40" step="1" value="${Number(size)||10}" data-division-size="${i}"></label>`).join('');
+  function setPrefectureChecks(prefectures){
+    const e=els(); if(!e.leaguePrefGrid)return;
+    const selected=new Set(prefectures||[]);
+    e.leaguePrefGrid.querySelectorAll('input[type="checkbox"]').forEach(input=>{input.checked=selected.has(input.value);});
+  }
+  function normalizedDivisionSize(value,fallback=10){
+    const raw=String(value??'').trim();
+    if(!raw)return Math.min(40,Math.max(2,Math.trunc(Number(fallback)||10)));
+    const n=Math.trunc(Number(raw));
+    return Number.isFinite(n)?Math.min(40,Math.max(2,n)):Math.min(40,Math.max(2,Math.trunc(Number(fallback)||10)));
+  }
+  function currentDivisionInputValues(){
+    const e=els();
+    return [...(e.leagueDivisionSizes?.querySelectorAll('[data-division-size]')||[])].map((input,i)=>normalizedDivisionSize(input.value,state.config.division_sizes[i]??10));
+  }
+  function renderDivisionInputs(countOverride=null,valuesOverride=null){
+    const e=els(); if(!e.leagueDivisionSizes)return;
+    const count=Math.min(12,Math.max(1,Math.trunc(Number(countOverride??e.leagueDivisionCount?.value??state.config.division_sizes.length)||1)));
+    const source=Array.isArray(valuesOverride)?valuesOverride:state.config.division_sizes;
+    const values=Array.from({length:count},(_,i)=>normalizedDivisionSize(source[i],state.config.division_sizes[i]??10));
+    e.leagueDivisionSizes.innerHTML=values.map((size,i)=>`<label class="league-division-size">${i+1}部<input type="number" min="2" max="40" step="1" value="${size}" inputmode="numeric" data-division-size="${i}"></label>`).join('');
   }
   function syncAdminForm(){
     const e=els(); if(!e.leagueAdminBox)return; e.leagueAdminBox.classList.toggle('hidden',!isAdmin()); if(!isAdmin())return;
@@ -183,7 +200,9 @@
     renderDivisionInputs(); renderPrefectures();
   }
   function collectFormConfig(){
-    const e=els(),selected=[...(e.leaguePrefGrid?.querySelectorAll('input[type="checkbox"]:checked')||[])].map(x=>x.value),sizes=[...(e.leagueDivisionSizes?.querySelectorAll('[data-division-size]')||[])].map(x=>Math.min(40,Math.max(2,Math.trunc(Number(x.value)||10))));
+    const e=els();
+    const selected=[...(e.leaguePrefGrid?.querySelectorAll('input[type="checkbox"]:checked')||[])].map(x=>x.value);
+    const sizes=[...(e.leagueDivisionSizes?.querySelectorAll('[data-division-size]')||[])].map((x,i)=>normalizedDivisionSize(x.value,state.config.division_sizes[i]??10));
     return normalizeConfig({name:e.leagueNameInput?.value||'リーグ編成',prefectures:selected,division_sizes:sizes,rating_min:finiteOrNull(e.leagueRatingMin?.value),rating_max:finiteOrNull(e.leagueRatingMax?.value)},true);
   }
   function validateConfig(config){
@@ -228,12 +247,30 @@
   }
   function bindEvents(){
     const e=els();
-    e.leagueDivisionCount?.addEventListener('change',()=>{const count=Math.min(12,Math.max(1,Math.trunc(Number(e.leagueDivisionCount.value)||1)));e.leagueDivisionCount.value=count;while(state.config.division_sizes.length<count)state.config.division_sizes.push(10);state.config.division_sizes=state.config.division_sizes.slice(0,count);renderDivisionInputs();});
-    e.leagueDivisionSizes?.addEventListener('input',ev=>{const input=ev.target.closest('[data-division-size]');if(!input)return;state.config.division_sizes[Number(input.dataset.divisionSize)]=Number(input.value)||10;});
-    e.leagueRegionPresets?.addEventListener('click',ev=>{const b=ev.target.closest('[data-region]');if(!b)return;const prefs=REGIONS[b.dataset.region];if(!prefs)return;state.config.prefectures=[...prefs];renderPrefectures();setMessage(`${b.dataset.region}を選択しました。`);});
-    e.leaguePrefAll?.addEventListener('click',()=>{state.config.prefectures=[...PREFECTURES];renderPrefectures();}); e.leaguePrefClear?.addEventListener('click',()=>{state.config.prefectures=[];renderPrefectures();});
-    e.leaguePrefGrid?.addEventListener('change',()=>{state.config.prefectures=[...e.leaguePrefGrid.querySelectorAll('input:checked')].map(x=>x.value);});
-    e.leaguePreviewButton?.addEventListener('click',()=>{const draft=collectFormConfig(),validation=validateConfig(draft);if(validation){setMessage(validation,true);return;}state.config=draft;renderDivisionInputs();renderLeague();setMessage('未保存の設定でプレビューしています。');}); e.leagueSaveButton?.addEventListener('click',saveSettings);
+    // 入力中は重い再計算やstate更新をしない。プレビュー/保存時にまとめて反映する。
+    e.leagueDivisionCount?.addEventListener('change',()=>{
+      const previous=currentDivisionInputValues();
+      const count=Math.min(12,Math.max(1,Math.trunc(Number(e.leagueDivisionCount.value)||1)));
+      e.leagueDivisionCount.value=count;
+      const next=Array.from({length:count},(_,i)=>normalizedDivisionSize(previous[i],state.config.division_sizes[i]??10));
+      renderDivisionInputs(count,next);
+    });
+    e.leagueRegionPresets?.addEventListener('click',ev=>{
+      const b=ev.target.closest('[data-region]');if(!b)return;
+      const prefs=REGIONS[b.dataset.region];if(!prefs)return;
+      setPrefectureChecks(prefs);
+      setMessage(`${b.dataset.region}を選択しました。保存またはプレビューで反映します。`);
+    });
+    e.leaguePrefAll?.addEventListener('click',()=>setPrefectureChecks(PREFECTURES));
+    e.leaguePrefClear?.addEventListener('click',()=>setPrefectureChecks([]));
+    e.leaguePreviewButton?.addEventListener('click',()=>{
+      const draft=collectFormConfig(),validation=validateConfig(draft);
+      if(validation){setMessage(validation,true);return;}
+      state.config=draft;
+      renderLeague();
+      setMessage('未保存の設定でプレビューしています。');
+    });
+    e.leagueSaveButton?.addEventListener('click',saveSettings);
   }
   async function refreshAuth(){const {data}=await state.client.auth.getSession();state.session=data?.session||null;syncAdminForm();renderLeague();}
   async function init(){
