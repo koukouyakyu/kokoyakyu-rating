@@ -2443,20 +2443,3 @@ img, svg, canvas { max-width: 100%; }
 .pref-share-sort-button:focus-visible { background: rgba(29,107,69,.08); outline: none; }
 .pref-share-sort-button.active { color: var(--accent); }
 .pref-share-sort-indicator { display: inline-block; margin-left: 4px; font-size: .72rem; }
-
-/* ===== 2026-09-15 rev43: 5万試合対応・高速表示キャッシュ復旧 ===== */
-.rating-cache-panel .panel-head {
-  align-items: flex-start;
-  gap: 16px;
-}
-.rating-cache-panel .panel-head > div { min-width: 0; }
-.lazy-detail-box .btn,
-#prefShareStatus .btn,
-#rankCompareStatus .btn { margin-top: 8px; }
-@media (max-width: 720px) {
-  .rating-cache-panel .panel-head {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-  .rating-cache-panel .panel-head .btn { width: 100%; }
-}
