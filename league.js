@@ -1,4 +1,4 @@
-/* league simulator rev44 - lightweight form controls / 4+ division fix */
+/* league simulator rev45 - shared rating cache / minimal loading */
 (() => {
   'use strict';
 
@@ -234,7 +234,14 @@
     if(error){console.warn('league settings unavailable',error);state.settings={public_league_simulator:false,league_simulator_config:cloneConfig(DEFAULT_CONFIG)};state.config=cloneConfig(DEFAULT_CONFIG);setMessage('リーグ設定を読み込めません。先に upgrade-rev40-league-simulator.sql を実行してください。',true);return;}
     state.settings=data||{};state.config=currentConfig();
   }
+  function sharedRatingSchools(){
+    const rows=window.KOKOYAKYU_RATING_SNAPSHOT;
+    return Array.isArray(rows)&&rows.length?rows.map(r=>({school_key:r.school_key,school_name:r.school_name,prefecture:r.prefecture,rating:Number(r.rating),is_joint:Boolean(r.is_joint),active_last_year:r.active_last_year!==false})):null;
+  }
   async function loadSchools(){
+    let shared=sharedRatingSchools();
+    if(!shared&&window.KOKOYAKYU_RATING_CACHE_READY){try{await window.KOKOYAKYU_RATING_CACHE_READY;}catch(_){ }shared=sharedRatingSchools();}
+    if(shared){state.schools=shared;return;}
     const fields='school_key,school_name,prefecture,rating,is_joint,active_last_year'; const {data,error}=await state.client.from('rating_current').select(fields).order('rating',{ascending:false});
     if(error){console.warn('rating_current unavailable',error);state.schools=[];setMessage(`Rating一覧を読み込めませんでした: ${error.message}`,true);return;} state.schools=data||[];
   }
@@ -275,7 +282,7 @@
   async function refreshAuth(){const {data}=await state.client.auth.getSession();state.session=data?.session||null;syncAdminForm();renderLeague();}
   async function init(){
     if(state.initialized)return;state.initialized=true;if(!window.supabase?.createClient||!cfg.supabaseUrl||!cfg.supabasePublishableKey)return;
-    injectStyles();injectNav();injectSection();state.client=window.supabase.createClient(cfg.supabaseUrl,cfg.supabasePublishableKey,{auth:{detectSessionInUrl:false}});bindEvents();await Promise.all([loadSettings(),loadSchools(),refreshAuth()]);syncAdminForm();renderLeague();state.client.auth.onAuthStateChange((_event,session)=>{state.session=session;syncAdminForm();renderLeague();});
+    injectStyles();injectNav();injectSection();state.client=window.supabase.createClient(cfg.supabaseUrl,cfg.supabasePublishableKey,{auth:{detectSessionInUrl:false}});bindEvents();window.addEventListener('kokoyakyu:ratings-ready',()=>{const shared=sharedRatingSchools();if(shared){state.schools=shared;renderLeague();}},{passive:true});await Promise.all([loadSettings(),loadSchools(),refreshAuth()]);syncAdminForm();renderLeague();state.client.auth.onAuthStateChange((_event,session)=>{state.session=session;syncAdminForm();renderLeague();});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
