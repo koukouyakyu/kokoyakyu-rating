@@ -2443,3 +2443,62 @@ img, svg, canvas { max-width: 100%; }
 .pref-share-sort-button:focus-visible { background: rgba(29,107,69,.08); outline: none; }
 .pref-share-sort-button.active { color: var(--accent); }
 .pref-share-sort-indicator { display: inline-block; margin-left: 4px; font-size: .72rem; }
+
+/* ===== 2026-09-15 rev47: 学校詳細のスマホ横幅修正 ===== */
+.school-layout > *,
+.profile-card,
+.matches-card,
+.history-wrap,
+.recent-matches-scroll {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  /* レーティング推移はスマホ画面内に縮めて表示する */
+  .history-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  #historyChart {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    height: auto;
+  }
+
+  /* 戦績カードは長い学校名・大会名でも画面幅を超えない */
+  .matches-card {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  .matches-head {
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+  .matches-head > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+  #matchYearFilter {
+    max-width: 100%;
+  }
+  .recent-matches-scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    padding-right: 4px;
+  }
+  .recent-matches-scroll .match-row,
+  .recent-matches-scroll .match-meta,
+  .recent-matches-scroll .match-row strong {
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
